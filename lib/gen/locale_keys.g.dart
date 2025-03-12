@@ -99,6 +99,7 @@ abstract class  LocaleKeys {
   static const create_recep_enter_comment = 'create_recep.enter_comment';
   static const create_recep_save_template = 'create_recep.save_template';
   static const create_recep_add_medicine = 'create_recep.add_medicine';
+  static const create_recep_add_mnn_list = 'create_recep.add_mnn_list';
   static const create_recep_send_recep = 'create_recep.send_recep';
   static const create_recep_enter_name = 'create_recep.enter_name';
   static const create_recep_enter_birthdate = 'create_recep.enter_birthdate';
@@ -150,6 +151,7 @@ abstract class  LocaleKeys {
   static const profile_date = 'profile.date';
   static const profile_target = 'profile.target';
   static const profile_step = 'profile.step';
+  static const profile_passed = 'profile.passed';
   static const profile = 'profile';
   static const reset_password_incorrect_password = 'reset_password.incorrect_password';
   static const reset_password_error = 'reset_password.error';
@@ -189,5 +191,6 @@ abstract class  LocaleKeys {
   static const med_agent_add_doctor_hint_name_doctor = 'med_agent.add_doctor.hint_name_doctor';
   static const med_agent_add_doctor = 'med_agent.add_doctor';
   static const med_agent = 'med_agent';
-
+  static const create_recep_inns = 'create_recep.inns';
+  static const create_recep_add_preparations = 'create_recep.add_preparations';
 }

@@ -19,7 +19,8 @@
     "workplace": "Ish joyi",
     "un_recep": "Retseptsiz",
     "preparation": "Dori vositalari",
-    "add_medicine": "Dori qo‘shish",
+    "add_medicine": "Dori qo‘shish111",
+    "add_mnn_list": "List of INN",
     "no_internet": "Internet mavjud emas.",
     "internet_text": "Ilovadan foydalanish uchun internetga ulanishingiz kerak."
   },
@@ -102,11 +103,14 @@
     "enter_comment": "Qo‘shimcha izoh qo‘shing!",
     "save_template": "Shablon sifatida saqlash",
     "add_medicine": "Dori qo‘shish",
+    "add_mnn_list": "List of INN",
     "send_recep": "Retseptni yuborish",
     "enter_name": "Ism va familiyani kiriting",
     "enter_birthdate": "Tug‘ilgan sanani kiriting",
     "enter_number": "Raqamni to‘g‘ri kiriting.",
-    "select": "Tanlash"
+    "select": "Tanlash",
+    "inns": "INNlar ro'yhati",
+    "add_preparations": "Dori qo'shish"
   },
   "create_template": {
     "edit_template": "Shablonni tahrirlash",
@@ -155,7 +159,8 @@
     "execution_period": "Bajarish muddati",
     "date": "{fromDate} dan {toDate} gacha",
     "target": "Maqsad:",
-    "step": "Qadam:"
+    "step": "Qadam:",
+    "passed": "Bajarildi"
   },
   "reset_password": {
     "incorrect_password": "Noto‘g‘ri parol",

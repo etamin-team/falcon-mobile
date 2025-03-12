@@ -17,10 +17,10 @@
     "farmo": "Pharma",
     "recep": "Prescription",
     "workplace": "Workplace",
-
     "un_recep": "Non-Prescription",
     "preparation": "Medications",
     "add_medicine": "Add Medicine",
+    "add_mnn_list": "List of INN",
     "no_internet": "Internet is unavailable.",
     "internet_text": "To use the application, please connect to the Internet."
   },
@@ -104,11 +104,14 @@
     "enter_comment": "Add an additional comment!",
     "save_template": "Save as Template",
     "add_medicine": "Add Medicine",
+    "add_mnn_list": "List of INN",
     "send_recep": "Send Prescription",
     "enter_name": "Enter First and Last Name",
     "enter_birthdate": "Enter Your Date of Birth",
     "enter_number": "Enter the correct number.",
-    "select": "Select"
+    "select": "Select",
+    "inns": "List of INNs",
+    "add_preparations": "Add Preparations"
   },
   "create_template": {
     "edit_template": "Edit Template",
@@ -157,7 +160,8 @@
     "execution_period": "Execution Period",
     "date": "From {fromDate} to {toDate}",
     "target": "Goal:",
-    "step": "Step:"
+    "step": "Step:",
+    "passed": "Passed"
   },
   "reset_password": {
     "incorrect_password": "Incorrect Password",

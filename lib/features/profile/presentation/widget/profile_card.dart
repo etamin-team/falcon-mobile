@@ -170,7 +170,7 @@ class ProfileCard extends StatelessWidget {
                         fontSize: Dimens.space18, fontWeight: FontWeight.w700),
                   ),
                   Text(
-                    "${LocaleKeys.profile_step.tr()} 1.740.000",
+                    "${LocaleKeys.profile_step.tr()} 256.000",
                     style: TextStyle(
                       fontFamily: 'VelaSans',
 
@@ -196,7 +196,7 @@ class ProfileCard extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text("Алтикам"),
+                          Text(LocaleKeys.profile_passed.tr()),
                           Text("22"),
                         ],
                       ),

@@ -37,7 +37,7 @@ class _CreateTemplateState extends State<CreateTemplate> {
 
   @override
   void initState() {
-    context.read<CreateTemplateCubit>().getMedicine();
+    context.read<CreateTemplateCubit>().getMedicine(inn: null);
 
     if (widget.model != null) {
       textController.text = widget.model?.name ?? "";

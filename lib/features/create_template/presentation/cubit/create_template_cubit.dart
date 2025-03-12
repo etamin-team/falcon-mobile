@@ -1,5 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:wm_doctor/features/create_template/data/model/mnn_model.dart';
+import 'package:wm_doctor/features/medicine/presentation/cubit/mnn_cubit.dart';
 
 import '../../../../core/error/failure.dart';
 import '../../../home/data/model/template_model.dart';
@@ -15,9 +17,9 @@ class CreateTemplateCubit extends Cubit<CreateTemplateState> {
   CreateTemplateCubit(this.createTemplateRepositoryImpl)
       : super(CreateTemplateInitial());
 
-  void getMedicine() async {
+  void getMedicine({required inn}) async {
     emit(CreateTemplateGetMedicineLoading());
-    final request = await createTemplateRepositoryImpl.getMedicine();
+    final request = await createTemplateRepositoryImpl.getMedicine(inn: null);
     request.fold(
       (l) => emit(CreateTemplateGetMedicineError(failure: l)),
       (r) => emit(CreateTemplateGetMedicineSuccess(list: r)),

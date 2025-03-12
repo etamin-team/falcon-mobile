@@ -25,7 +25,9 @@ import 'package:wm_doctor/features/med_agent/home/presentation/cubit/agent_home_
 import 'package:wm_doctor/features/med_agent/home/presentation/cubit/doctor/doctor_cubit.dart';
 import 'package:wm_doctor/features/med_agent/profile/data/repository/agent_profile_repository_impl.dart';
 import 'package:wm_doctor/features/medicine/data/repository/medicine_repository_impl.dart';
+import 'package:wm_doctor/features/medicine/data/repository/mnn_repository_impl.dart';
 import 'package:wm_doctor/features/medicine/presentation/cubit/medicine_cubit.dart';
+import 'package:wm_doctor/features/medicine/presentation/cubit/mnn_cubit.dart';
 import 'package:wm_doctor/features/profile/data/repository/profile_repository_impl.dart';
 import 'package:wm_doctor/features/profile/presentation/cubit/profile_cubit.dart';
 import 'package:wm_doctor/features/profile/presentation/cubit/profile_data/profile_data_cubit.dart';
@@ -109,6 +111,8 @@ void _repositories() {
       () => ContractDetailsRepositoryImpl());
   sl.registerLazySingleton<EditContractRepositoryImpl>(
       () => EditContractRepositoryImpl());
+  sl.registerLazySingleton<MnnRepositoryImpl>(
+          () => MnnRepositoryImpl());
 }
 
 /// Register dataSources
@@ -135,6 +139,7 @@ void _blocs() {
   sl.registerFactory(() => RegionsCubit(sl<RegionsRepositoryImpl>()));
   sl.registerFactory(() => ProfileCubit(sl<ProfileRepositoryImpl>()));
   sl.registerFactory(() => CreateRecepCubit(sl<CreateRecepRepositoryImpl>()));
+  sl.registerFactory(() => MnnCubit(sl<MnnRepositoryImpl>()));
   sl.registerFactory(() => WorkplaceCubit(sl<WorkplaceRepositoryImpl>()));
   sl.registerFactory(() => MedicineCubit(sl<MedicineRepositoryImpl>()));
   sl.registerFactory(() => ProfileDataCubit(sl<ProfileRepositoryImpl>()));

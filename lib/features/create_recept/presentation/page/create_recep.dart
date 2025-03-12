@@ -7,8 +7,10 @@ import 'package:toastification/toastification.dart';
 import 'package:wm_doctor/core/extensions/widget_extensions.dart';
 import 'package:wm_doctor/features/create_recept/data/model/recep_model.dart';
 import 'package:wm_doctor/features/create_recept/presentation/cubit/create_recep_cubit.dart';
+import 'package:wm_doctor/features/create_template/data/model/mnn_model.dart';
 import 'package:wm_doctor/features/main/presentation/page/main_page.dart';
 import 'package:wm_doctor/features/medicine/presentation/page/medicine_dialog.dart';
+import 'package:wm_doctor/features/medicine/presentation/page/mnn_page.dart';
 import 'package:wm_doctor/features/template/presentation/page/template.dart';
 
 import '../../../../core/services/secure_storage.dart';
@@ -25,9 +27,23 @@ import '../../../create_template/presentation/cubit/create_template_cubit.dart';
 import '../../../home/data/model/PreparationModel.dart';
 import '../../../home/data/model/template_model.dart';
 import '../../../home/presentation/cubit/home_cubit.dart';
+import '../../../medicine/presentation/page/mnn_dialog.dart';
+
+class PreparationContainerData {
+  List<MnnModel> selectedMNNs;
+  List<Map<String, dynamic>> preparations;
+
+  PreparationContainerData({
+    List<MnnModel>? selectedMNNs,
+    List<Map<String, dynamic>>? preparations,
+  })  : selectedMNNs = selectedMNNs ?? [],
+        preparations = preparations ?? [];
+}
 
 class CreateRecep extends StatefulWidget {
-  const CreateRecep({super.key});
+  final List<MnnModel> selectedMNNs;
+
+  const CreateRecep(this.selectedMNNs, {super.key});
 
   @override
   State<CreateRecep> createState() => _CreateRecepState();
@@ -44,11 +60,37 @@ class _CreateRecepState extends State<CreateRecep> {
   DateTime? selectedDate;
   final formKey = GlobalKey<FormState>();
   List<MedicineModel> medicineList = [];
+  List<MnnModel> innList = [];
   List<PreparationModel> preparation = [];
+  List<Widget> preparationContainers = [];
+
+  // Container ma'lumotlarini saqlash uchun yangi ro'yxat
+  List<PreparationContainerData> preparationContainersData = [];
+
+  List<MnnModel> selectedMNN = MNNPage.getSelectedItems();
+
+  List<Map<String, dynamic>> preps = [
+    {
+      "name": "Paracetamol",
+      "amount": "500 mg",
+      "quantity": 2,
+      "timesInDay": 3,
+      "days": 7,
+      "inn": [
+        "Acetaminophen",
+        "Ibuprofen",
+        "Paracetamol",
+        "Aspirin",
+        "Acetaminophen"
+      ],
+      "type": "Tablet",
+      "medicineId": 1,
+    },
+  ];
 
   @override
   void initState() {
-    context.read<CreateTemplateCubit>().getMedicine();
+    context.read<CreateTemplateCubit>().getMedicine(inn: widget.selectedMNNs);
     super.initState();
   }
 
@@ -121,17 +163,16 @@ class _CreateRecepState extends State<CreateRecep> {
                 selectedDate = null;
                 preparation.clear();
               }
+
               print("Current state: ${state.runtimeType}");
-              if(state is SendTelegramSuccess){
+              if (state is SendTelegramSuccess) {
                 createRecep();
-              }else{
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => MainPage()));
+              } else {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => MainPage()));
               }
 
-              if(state is SendTelegramError){
+              if (state is SendTelegramError) {
                 toastification.show(
                   style: ToastificationStyle.simple,
                   context: context,
@@ -160,9 +201,9 @@ class _CreateRecepState extends State<CreateRecep> {
                   title: Text(
                     LocaleKeys.create_recep_title.tr(),
                     style: TextStyle(
-                      fontFamily: 'VelaSans',
-
-                        fontSize: Dimens.space30, fontWeight: FontWeight.w800),
+                        fontFamily: 'VelaSans',
+                        fontSize: Dimens.space30,
+                        fontWeight: FontWeight.w800),
                   ),
                 ),
                 body: SingleChildScrollView(
@@ -191,32 +232,38 @@ class _CreateRecepState extends State<CreateRecep> {
                                     isBottom: true,
                                     onChange: (TemplateModel value) {
                                       setState(() {
-                                        templateName = value.name??"";
+                                        templateName = value.name ?? "";
                                         preparation = List.generate(
-                                          value.preparations?.length??0,
+                                          value.preparations?.length ?? 0,
                                           (index) => PreparationModel(
-                                              name: value
-                                                  .preparations?[index].name??"",
-                                              amount: value
-                                                  .preparations?[index].amount??"",
+                                              name: value.preparations?[index].name ??
+                                                  "",
+                                              amount: value.preparations?[index]
+                                                      .amount ??
+                                                  "",
                                               quantity: value
-                                                  .preparations?[index].quantity??0,
+                                                      .preparations?[index]
+                                                      .quantity ??
+                                                  0,
                                               timesInDay: value
-                                                  .preparations?[index]
-                                                  .timesInDay??0,
-                                              days: value
-                                                  .preparations?[index].days??0,
-                                              type: value
-                                                  .preparations?[index].type??'',
-                                              inn: value.preparations?[index].medicine?.inn,
-                                              medicineId: value
-                                                  .preparations?[index]
-                                                  .medicineId??0),
+                                                      .preparations?[index]
+                                                      .timesInDay ??
+                                                  0,
+                                              days: value.preparations?[index].days ??
+                                                  0,
+                                              type: value.preparations?[index].type ??
+                                                  '',
+                                              inn: value.preparations?[index]
+                                                  .medicine?.inn,
+                                              medicineId:
+                                                  value.preparations?[index].medicineId ?? 0),
                                         );
                                         // preparation = value.preparations;
-                                        diagnosis.text = value.diagnosis??"";
-                                        commentController.text = value.note??"";
-                                        print("Template has been imported!!!!!!!!!!!!!!!!!!!!!!!");
+                                        diagnosis.text = value.diagnosis ?? "";
+                                        commentController.text =
+                                            value.note ?? "";
+                                        print(
+                                            "Template has been imported!!!!!!!!!!!!!!!!!!!!!!!");
                                       });
                                     },
                                   );
@@ -246,7 +293,7 @@ class _CreateRecepState extends State<CreateRecep> {
                                               .tr()
                                           : templateName,
                                       style: TextStyle(
-                                        fontFamily: 'VelaSans',
+                                          fontFamily: 'VelaSans',
                                           fontSize: Dimens.space14,
                                           fontWeight: FontWeight.w400),
                                     ),
@@ -273,7 +320,7 @@ class _CreateRecepState extends State<CreateRecep> {
                               Text(
                                 LocaleKeys.create_recep_name.tr(),
                                 style: TextStyle(
-                                  fontFamily: 'VelaSans',
+                                    fontFamily: 'VelaSans',
                                     fontSize: Dimens.space18,
                                     fontWeight: FontWeight.w700),
                               ),
@@ -297,8 +344,7 @@ class _CreateRecepState extends State<CreateRecep> {
                                 LocaleKeys.create_recep_birthdate_and_number
                                     .tr(),
                                 style: TextStyle(
-                                  fontFamily: 'VelaSans',
-
+                                    fontFamily: 'VelaSans',
                                     fontSize: Dimens.space18,
                                     fontWeight: FontWeight.w700),
                               ),
@@ -341,7 +387,8 @@ class _CreateRecepState extends State<CreateRecep> {
                                     textAlign: TextAlign.center,
                                     "+998  ",
                                     style: TextStyle(
-                                        fontFamily: 'VelaSans',color: Colors.black),
+                                        fontFamily: 'VelaSans',
+                                        color: Colors.black),
                                   ),
                                   // validator: (value) {
                                   //   if (value.toString().length != 12) {
@@ -375,8 +422,7 @@ class _CreateRecepState extends State<CreateRecep> {
                               Text(
                                 LocaleKeys.create_recep_diagnose.tr(),
                                 style: TextStyle(
-                                  fontFamily: 'VelaSans',
-
+                                    fontFamily: 'VelaSans',
                                     fontSize: Dimens.space18,
                                     fontWeight: FontWeight.w700),
                               ),
@@ -395,11 +441,46 @@ class _CreateRecepState extends State<CreateRecep> {
                             ],
                           ),
                         ),
+
                         Container(
+                          margin: EdgeInsets.symmetric(horizontal: 20),
+                          alignment: Alignment.topLeft,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                LocaleKeys.create_recep_add_preparations.tr(),
+                                style: TextStyle(
+                                    fontFamily: 'VelaSans',
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: Dimens.space18,
+                                    color: Colors.black),
+                                textAlign: TextAlign.left,
+                              ),
+                              GestureDetector(
+                                onTap: addPreparationContainer,
+                                // Tugma bosilganda funksiya chaqiriladi
+                                child: SvgPicture.asset(
+                                  Assets.icons.plus,
+                                  height: Dimens.space30,
+                                  width: Dimens.space30,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        Column(
+                          children:
+                              preparationContainers, // Yangi containerlar shu yerda chiqariladi
+                        ),
+
+                        // Dori qo'shish 2-trugma
+                        /*Container(
                           width: double.infinity,
                           padding: EdgeInsets.all(Dimens.space20),
                           decoration: BoxDecoration(
-                            color: AppColors.white,
+                            color: AppColors.grey,
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Column(
@@ -413,36 +494,31 @@ class _CreateRecepState extends State<CreateRecep> {
                                   Text(
                                     LocaleKeys.create_recep_add_medicine.tr(),
                                     style: TextStyle(
-                                      fontFamily: 'VelaSans',
+                                        fontFamily: 'VelaSans',
                                         fontWeight: FontWeight.w700,
                                         fontSize: Dimens.space18,
                                         color: Colors.black),
                                   ),
                                   GestureDetector(
                                     onTap: () => showMedicine(
-                                        ctx: context,
-                                        model: (value) {
-                                          preparation.add(PreparationModel(
-                                              name: value.name ?? "",
-                                              amount: "${value.prescription} ${value.volume}",
-                                              quantity: 0,
-                                              timesInDay: 0,
-                                              days: 0,
-                                              inn: value.inn,
-                                              type: value.type??"",
-                                              medicineId: value.id ?? 0,));
-                                          setState(() {});
-                                          Navigator.pop(context);
-                                        },
-                                        medicine: List.generate(
-                                          preparation.length,
-                                          (index) => MedicineModel(
-                                              id: preparation[index]
-                                                      .medicineId ??
-                                                  0,
-                                              name: preparation[index].name,
-                                              type: preparation[index].type),
-                                        )),
+                                      ctx: context,
+                                      model: (value) {
+                                        preparation.add(PreparationModel(
+                                          name: value.name ?? "",
+                                          amount:
+                                              "${value.prescription} ${value.volume}",
+                                          quantity: 0,
+                                          timesInDay: 0,
+                                          days: 0,
+                                          inn: value.inn,
+                                          type: value.type ?? "",
+                                          medicineId: value.id ?? 0,
+                                        ));
+                                        setState(() {});
+                                        Navigator.pop(context);
+                                      },
+                                      medicine: [],
+                                    ),
                                     child: SvgPicture.asset(
                                       Assets.icons.plus,
                                       height: Dimens.space30,
@@ -473,7 +549,7 @@ class _CreateRecepState extends State<CreateRecep> {
                                           Text(
                                             preparation[index].name,
                                             style: TextStyle(
-                                              fontFamily: 'VelaSans',
+                                                fontFamily: 'VelaSans',
                                                 fontSize: Dimens.space14,
                                                 color: Colors.black),
                                           ),
@@ -491,41 +567,46 @@ class _CreateRecepState extends State<CreateRecep> {
                                         ],
                                       ),
                                     ),
-                                    if((preparation[index].inn?.length??0)>0)
+                                    if ((preparation[index].inn?.length ?? 0) >
+                                        0)
                                       Text("MNN"),
-                                    if((preparation[index].inn?.length??0)>0)
+                                    if ((preparation[index].inn?.length ?? 0) >
+                                        0)
                                       Wrap(
-
                                         runAlignment: WrapAlignment.start,
-
                                         runSpacing: Dimens.space10,
                                         spacing: Dimens.space10,
-
-                                        children: List.generate(preparation[index].inn?.length??0, (index2) {
-                                          return Container(
-                                            decoration: BoxDecoration(
-                                                color: AppColors.backgroundColor,
-                                                borderRadius: BorderRadius.circular(6)),
-                                            padding: EdgeInsets.symmetric(
-                                              horizontal: Dimens.space10,
-                                              vertical: Dimens.space6,
-                                            ),
-                                            child: Text(
-                                              preparation[index].inn?[index2]??"",
-                                              style: TextStyle(
-                                                  fontFamily: 'VelaSans',
-                                                  fontSize: Dimens.space14,
-                                                  color: Colors.black),
-                                            ),
-                                          );
-                                        },),
+                                        children: List.generate(
+                                          preparation[index].inn?.length ?? 0,
+                                          (index2) {
+                                            return Container(
+                                              decoration: BoxDecoration(
+                                                  color:
+                                                      AppColors.backgroundColor,
+                                                  borderRadius:
+                                                      BorderRadius.circular(6)),
+                                              padding: EdgeInsets.symmetric(
+                                                horizontal: Dimens.space10,
+                                                vertical: Dimens.space6,
+                                              ),
+                                              child: Text(
+                                                preparation[index]
+                                                        .inn?[index2] ??
+                                                    "",
+                                                style: TextStyle(
+                                                    fontFamily: 'VelaSans',
+                                                    fontSize: Dimens.space14,
+                                                    color: Colors.black),
+                                              ),
+                                            );
+                                          },
+                                        ),
                                       ),
                                     Row(
                                       spacing: Dimens.space10,
                                       children: [
                                         Expanded(
                                           child: GestureDetector(
-
                                             child: Container(
                                               width: double.infinity,
                                               padding: EdgeInsets.symmetric(
@@ -547,7 +628,8 @@ class _CreateRecepState extends State<CreateRecep> {
                                                     dataTranslate(
                                                         ctx: context,
                                                         model: checkMedicineType(
-                                                            name: preparation[index]
+                                                            name: preparation[
+                                                                    index]
                                                                 .type)),
                                                     style: GoogleFonts.ubuntu(
                                                         fontWeight:
@@ -572,19 +654,23 @@ class _CreateRecepState extends State<CreateRecep> {
                                                   preparation[index]
                                                       .amount
                                                       .replaceAll(
-                                                      RegExp(r'[^0-9.]'), ''));
-                                              String onlyText = preparation[index]
-                                                  .amount.replaceAll(RegExp(r'[0-9]'), '').trim();
+                                                          RegExp(r'[^0-9.]'),
+                                                          ''));
+                                              String onlyText =
+                                                  preparation[index]
+                                                      .amount
+                                                      .replaceAll(
+                                                          RegExp(r'[0-9]'), '')
+                                                      .trim();
 
                                               print(number); // Natija: 300
                                               showInputAmount(
                                                 name: preparation[index].name,
                                                 amount: number,
                                                 onChange: (value) {
-                                                  preparation[index].amount = "$value $onlyText";
-                                                  setState(() {
-
-                                                  });
+                                                  preparation[index].amount =
+                                                      "$value $onlyText";
+                                                  setState(() {});
                                                 },
                                               );
                                             },
@@ -594,7 +680,8 @@ class _CreateRecepState extends State<CreateRecep> {
                                                   horizontal: Dimens.space20,
                                                   vertical: Dimens.space16),
                                               decoration: BoxDecoration(
-                                                color: AppColors.backgroundColor,
+                                                color:
+                                                    AppColors.backgroundColor,
                                                 borderRadius:
                                                     BorderRadius.circular(10),
                                               ),
@@ -609,7 +696,8 @@ class _CreateRecepState extends State<CreateRecep> {
                                                     style: GoogleFonts.ubuntu(
                                                         fontWeight:
                                                             FontWeight.w600,
-                                                        fontSize: Dimens.space12),
+                                                        fontSize:
+                                                            Dimens.space12),
                                                   ),
                                                   Icon(
                                                     CupertinoIcons.chevron_down,
@@ -707,7 +795,7 @@ class _CreateRecepState extends State<CreateRecep> {
                               )
                             ],
                           ),
-                        ),
+                        ),*/
                         Container(
                           padding: EdgeInsets.all(Dimens.space20),
                           decoration: BoxDecoration(
@@ -721,7 +809,7 @@ class _CreateRecepState extends State<CreateRecep> {
                               Text(
                                 LocaleKeys.create_recep_add_comment.tr(),
                                 style: TextStyle(
-                                  fontFamily: 'VelaSans',
+                                    fontFamily: 'VelaSans',
                                     fontSize: Dimens.space18,
                                     fontWeight: FontWeight.w700),
                               ),
@@ -849,7 +937,9 @@ class _CreateRecepState extends State<CreateRecep> {
                                   style: ToastificationStyle.flat,
                                   context: context,
                                   alignment: Alignment.topCenter,
-                                  title: Text(LocaleKeys.create_recep_add_medicine.tr()),
+                                  title: Text(LocaleKeys
+                                      .create_recep_add_medicine
+                                      .tr()),
                                   autoCloseDuration: const Duration(seconds: 2),
                                   showProgressBar: false,
                                   primaryColor: Colors.white,
@@ -857,34 +947,44 @@ class _CreateRecepState extends State<CreateRecep> {
                                   foregroundColor: Colors.white,
                                 );
                               } else {
-                                String token = await SecureStorage().read(key: "accessToken") ?? "";
-                                Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+                                String token = await SecureStorage()
+                                        .read(key: "accessToken") ??
+                                    "";
+                                Map<String, dynamic> decodedToken =
+                                    JwtDecoder.decode(token);
                                 String docID = decodedToken["sub"];
 
-                                print("Template saqlashdan oldin: $preparation"); // Tekshirish uchun
-                                context.read<CreateTemplateCubit>().uploadTemplate(
-                                  model: UploadTemplateModel(
-                                    name: diagnosis.text.trim(),
-                                    diagnosis: diagnosis.text.trim(),
-                                    preparations: List.generate(
-                                      preparation.length,
+                                print(
+                                    "Template saqlashdan oldin: $preparation"); // Tekshirish uchun
+                                context
+                                    .read<CreateTemplateCubit>()
+                                    .uploadTemplate(
+                                      model: UploadTemplateModel(
+                                        name: diagnosis.text.trim(),
+                                        diagnosis: diagnosis.text.trim(),
+                                        preparations: List.generate(
+                                          preparation.length,
                                           (index) => Preparation(
-                                        name: preparation[index].name,
-                                        amount: preparation[index].amount,
-                                        quantity: preparation[index].quantity,
-                                        timesInDay: preparation[index].timesInDay,
-                                        days: preparation[index].days,
-                                        type: preparation[index].type,
-                                        medicineId: preparation[index].medicineId,
+                                            name: preparation[index].name,
+                                            amount: preparation[index].amount,
+                                            quantity:
+                                                preparation[index].quantity,
+                                            timesInDay:
+                                                preparation[index].timesInDay,
+                                            days: preparation[index].days,
+                                            type: preparation[index].type,
+                                            medicineId:
+                                                preparation[index].medicineId,
+                                          ),
+                                        ),
+                                        note: commentController.text.trim(),
+                                        saved: true,
+                                        doctorId: docID,
                                       ),
-                                    ),
-                                    note: commentController.text.trim(),
-                                    saved: true,
-                                    doctorId: docID,
-                                  ),
-                                );
+                                    );
 
-                                print("Template saqlashdan keyin: $preparation"); // Tekshirish uchun
+                                print(
+                                    "Template saqlashdan keyin: $preparation"); // Tekshirish uchun
                               }
                             }
                           },
@@ -895,7 +995,7 @@ class _CreateRecepState extends State<CreateRecep> {
                         ),
                         UniversalButton.filled(
                           text: LocaleKeys.create_recep_send_recep.tr(),
-                          onPressed: () async{
+                          onPressed: () async {
                             if (formKey.currentState!.validate() &&
                                 nameController.text.isNotEmpty &&
                                 dateTimeController.text.isNotEmpty &&
@@ -914,9 +1014,10 @@ class _CreateRecepState extends State<CreateRecep> {
                               print("call back qaytdi");
 
                               context.read<CreateRecepCubit>().sendTelegramData(
-                                  number: "998${numberController.text.trim().replaceAll(" ", "")}" ?? "0", message:
-                              message);
-
+                                  number:
+                                      "998${numberController.text.trim().replaceAll(" ", "")}" ??
+                                          "0",
+                                  message: message);
                             }
                             if (nameController.text.isEmpty) {
                               toastification.show(
@@ -931,8 +1032,7 @@ class _CreateRecepState extends State<CreateRecep> {
                                 backgroundColor: Colors.redAccent,
                                 foregroundColor: Colors.white,
                               );
-                            }else
-                            if (dateTimeController.text.isEmpty) {
+                            } else if (dateTimeController.text.isEmpty) {
                               toastification.show(
                                 style: ToastificationStyle.flat,
                                 context: context,
@@ -946,9 +1046,7 @@ class _CreateRecepState extends State<CreateRecep> {
                                 backgroundColor: Colors.redAccent,
                                 foregroundColor: Colors.white,
                               );
-                            }else
-
-                            if (numberController.text.length != 12) {
+                            } else if (numberController.text.length != 12) {
                               toastification.show(
                                 style: ToastificationStyle.flat,
                                 context: context,
@@ -961,8 +1059,7 @@ class _CreateRecepState extends State<CreateRecep> {
                                 backgroundColor: Colors.redAccent,
                                 foregroundColor: Colors.white,
                               );
-                            }else
-                            if (preparation.isEmpty) {
+                            } else if (preparation.isEmpty) {
                               toastification.show(
                                 style: ToastificationStyle.flat,
                                 context: context,
@@ -1033,8 +1130,7 @@ class _CreateRecepState extends State<CreateRecep> {
                     return Center(
                       child: Text(
                         '${1901 + index}',
-                        style: TextStyle(
-                            fontFamily: 'VelaSans',fontSize: 22),
+                        style: TextStyle(fontFamily: 'VelaSans', fontSize: 22),
                       ),
                     );
                   }),
@@ -1044,8 +1140,9 @@ class _CreateRecepState extends State<CreateRecep> {
                 child: Text(
                   LocaleKeys.create_recep_select.tr(),
                   style: TextStyle(
-                    fontFamily: 'VelaSans',
-                      color: AppColors.blueColor, fontWeight: FontWeight.w600),
+                      fontFamily: 'VelaSans',
+                      color: AppColors.blueColor,
+                      fontWeight: FontWeight.w600),
                 ),
                 onPressed: () {
                   _selectedYear = dateTime;
@@ -1060,7 +1157,7 @@ class _CreateRecepState extends State<CreateRecep> {
     );
   }
 
-  showMedicineList({required ValueChanged<MedicineModel> onChange}) {
+  showMedicineList({required ValueChanged<MnnModel> onChange}) {
     showModalBottomSheet(
       isScrollControlled: true,
       enableDrag: true,
@@ -1074,14 +1171,14 @@ class _CreateRecepState extends State<CreateRecep> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: List.generate(
-                medicineList.length,
+                innList.length,
                 (index) {
                   return ListTile(
                     onTap: () {
-                      onChange(medicineList[index]);
+                      onChange(innList[index]);
                       Navigator.pop(context);
                     },
-                    title: Text(medicineList[index].name ?? ""),
+                    title: Text(innList[index].name ?? ""),
                   );
                 },
               ),
@@ -1091,35 +1188,6 @@ class _CreateRecepState extends State<CreateRecep> {
       },
     );
   }
-
-  // bool customPartialValidation() {
-  //   // Minimal kerakli maydonlarni tekshirish
-  //   if (diagnosis.text.isEmpty) {
-  //     toastification.show(
-  //       context: context,
-  //       title: const Text("Введите имя и фамилию"),
-  //       backgroundColor: Colors.redAccent,
-  //     );
-  //     return false;
-  //   }
-  //   if (commentController.text.isEmpty) {
-  //     toastification.show(
-  //       context: context,
-  //       title: const Text("Введите номер правильно."),
-  //       backgroundColor: Colors.redAccent,
-  //     );
-  //     return false;
-  //   }
-  //   if (preparation.isEmpty) {
-  //     toastification.show(
-  //       context: context,
-  //       title: const Text("Добавить лекарство"),
-  //       backgroundColor: Colors.redAccent,
-  //     );
-  //     return false;
-  //   }
-  //   return true; // Agar barcha minimal maydonlar to‘ldirilgan bo‘lsa
-  // }
 
   showMedicineTypeList({required ValueChanged<String> onChange}) {
     List<String> types = ["PILLS", "TYPE2", "TYPE3"];
@@ -1153,10 +1221,11 @@ class _CreateRecepState extends State<CreateRecep> {
       },
     );
   }
+
   void showInputAmount(
       {required String name,
-        required double amount,
-        required ValueChanged<double> onChange}) async {
+      required double amount,
+      required ValueChanged<double> onChange}) async {
     final textController = TextEditingController();
     final quantForm = GlobalKey<FormState>();
     textController.text = amount.toString();
@@ -1220,67 +1289,345 @@ class _CreateRecepState extends State<CreateRecep> {
     );
   }
 
-  void createRecep() async{
+  void createRecep() async {
     print("=================================================");
     print("=================================================");
     print("=================================================");
     print("=================================================");
-    String token = await SecureStorage()
-        .read(key: "accessToken") ??
-        "";
-    Map<String, dynamic> decodedToken =
-    JwtDecoder.decode(token);
+    String token = await SecureStorage().read(key: "accessToken") ?? "";
+    Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
     String docID = decodedToken["sub"];
     context.read<CreateRecepCubit>().saveRecep(
         model: RecepModel(
             doctorId: docID,
-            firstName: nameController
-                .text,
-            lastName: nameController
-                .text,
-            dateOfBirth: selectedDate ??
-                DateTime.now(),
-            phoneNumber:
-            numberController
-                .text
-                .trim()
-                .replaceAll(
-                " ", ""),
+            firstName: nameController.text,
+            lastName: nameController.text,
+            dateOfBirth: selectedDate ?? DateTime.now(),
+            phoneNumber: numberController.text.trim().replaceAll(" ", ""),
             phoneNumberPrefix: "+998",
-            dateCreation:
-            DateTime.now(),
-            diagnosis: diagnosis.text
-                .toString(),
-            comment:
-            commentController.text,
-            telegramId:
-
-            0,
+            dateCreation: DateTime.now(),
+            diagnosis: diagnosis.text.toString(),
+            comment: commentController.text,
+            telegramId: 0,
             districtId: 1,
             preparations: List.generate(
-              preparation.length,
-                  (index) =>
-                  Preparation(
-                      name: preparation[index]
-                          .name,
-                      amount:
-                      preparation[index]
-                          .amount,
-                      quantity:
-                      preparation[index]
-                          .quantity,
-                      timesInDay:
-                      preparation[index]
-                          .timesInDay,
-                      days:
-                      preparation[index]
-                          .days,
-                      type:
-                      preparation[index]
-                          .type,
-                      medicineId:
-                      preparation[index]
-                          .medicineId)
-            )));
+                preparation.length,
+                (index) => Preparation(
+                    name: preparation[index].name,
+                    amount: preparation[index].amount,
+                    quantity: preparation[index].quantity,
+                    timesInDay: preparation[index].timesInDay,
+                    days: preparation[index].days,
+                    type: preparation[index].type,
+                    medicineId: preparation[index].medicineId))));
+  }
+
+  // Container qo'shish uchun metod
+  void addPreparationContainer() {
+    setState(() {
+      // Yangi container data qo'shish
+      PreparationContainerData newData = PreparationContainerData(
+        selectedMNNs: [],
+        preparations: List.from(preps), // Default ma'lumotlardan nusxa olish
+      );
+      preparationContainersData.add(newData);
+
+      // Yangi containerni qo'shish
+      preparationContainers
+          .add(buildPreparationContainer(preparationContainersData.length - 1));
+    });
+  }
+
+  Widget buildPreparationContainer(int index) {
+    if (index >= preparationContainersData.length) {
+      return Container(); // Xatolikni oldini olish uchun bo'sh container qaytarish
+    }
+
+    PreparationContainerData containerData = preparationContainersData[index];
+
+    return Container(
+      width: double.infinity,
+      margin: EdgeInsets.only(top: 10),
+      padding: EdgeInsets.all(Dimens.space20),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Dori Tanlash',
+                style: TextStyle(
+                    fontFamily: 'VelaSans',
+                    fontWeight: FontWeight.w700,
+                    fontSize: Dimens.space18,
+                    color: Colors.black),
+              ),
+              GestureDetector(
+                onTap: () {
+                  removePreparationContainer();
+                },
+                child: SvgPicture.asset(
+                  "assets/icons/minus.svg",
+                  height: 30,
+                  width: 30,
+                ),
+              ),
+            ],
+          ),
+          ...preps.map((med) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: Dimens.space10,
+              children: [
+                SizedBox(
+                  height: 5,
+                ),
+                UniversalButton.filled(
+                  text: "Select MNN",
+                  onPressed: () => showMNN(
+                    ctx: context,
+                    model: (value) {
+                      // Kerakli bo'lsa MNN modelini alohida qo'shish
+                      if (mounted) {
+                        setState(() {});
+                      }
+                      Navigator.pop(context);
+                    },
+                    mnn: [],
+                    medicine: [],
+                    initialSelectedItems: containerData.selectedMNNs,
+                    onSelectionComplete: (updatedList) {
+                      if (mounted) {
+                        setState(() {
+                          containerData.selectedMNNs = updatedList;
+                          // Containerlarni yangilash
+                          preparationContainers[index] =
+                              buildPreparationContainer(index);
+                        });
+                      }
+                    },
+                  ),
+                  fontSize: Dimens.space14,
+                  backgroundColor: AppColors.backgroundColor,
+                  textColor: Colors.black,
+                  cornerRadius: Dimens.space10,
+                ),
+                containerData.selectedMNNs.isNotEmpty
+                    ? Wrap(
+                        spacing: 8.0,
+                        children: containerData.selectedMNNs
+                            .map(
+                              (mnn) => Chip(
+                                label: Text(
+                                  mnn.name ?? "nullga tekshir",
+                                  style: TextStyle(color: Colors.black),
+                                ),
+                              ),
+                            )
+                            .toList(),
+                      )
+                    : SizedBox.shrink(),
+                Container(
+                  decoration: BoxDecoration(
+                      color: AppColors.backgroundColor,
+                      borderRadius: BorderRadius.circular(10)),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: Dimens.space20,
+                    vertical: Dimens.space16,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "tempdata",
+                        style: TextStyle(
+                            fontFamily: 'VelaSans',
+                            fontSize: Dimens.space14,
+                            color: Colors.black),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          //Dialog ochish uchun
+                          showMedicine(
+                            ctx: context,
+                            model: (value) {
+                              preparation.add(PreparationModel(
+                                name: value.name ?? "",
+                                amount:
+                                "${value.prescription} ${value.volume}",
+                                quantity: 0,
+                                timesInDay: 0,
+                                days: 0,
+                                inn: value.inn,
+                                type: value.type ?? "",
+                                medicineId: value.id ?? 0,
+                              ));
+                              setState(() {});
+                              Navigator.pop(context);
+                            },
+                            medicine: [],
+                          );
+
+
+                          setState(() {
+                            print(selectedMNN);
+                            print(
+                                "1111111111111111111111111111111111111111111111111111111111111");
+                          });
+                        },
+                        child: SvgPicture.asset(
+                          "assets/icons/minus.svg",
+                          height: 24,
+                          width: 24,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 16),
+                          decoration: BoxDecoration(
+                              color: AppColors.backgroundColor,
+                              borderRadius: BorderRadius.circular(6)),
+                          child: Text(med["type"],
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w600, fontSize: 12)),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          double number = double.parse(
+                              med["amount"].replaceAll(RegExp(r'[^0-9.]'), ''));
+                          String onlyText = med["amount"]
+                              .replaceAll(RegExp(r'[0-9]'), '')
+                              .trim();
+                          setState(() {
+                            med["amount"] = "${number + 100} $onlyText";
+                          });
+                        },
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 16),
+                          decoration: BoxDecoration(
+                            color: AppColors.backgroundColor,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(med["amount"],
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 12)),
+                              Icon(Icons.keyboard_arrow_down, size: 20),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: CupertinoNumberPicker(
+                        selectedNumber: med["quantity"],
+                        onChanged: (int value) {
+                          setState(() {
+                            med["quantity"] = value;
+                          });
+                        },
+                      ),
+                    ),
+                    Expanded(
+                      child: CupertinoNumberPicker(
+                        selectedNumber: med["timesInDay"],
+                        onChanged: (int value) {
+                          setState(() {
+                            med["timesInDay"] = value;
+                          });
+                        },
+                      ),
+                    ),
+                    Expanded(
+                      child: CupertinoNumberPicker(
+                        selectedNumber: med["days"],
+                        onChanged: (int value) {
+                          setState(() {
+                            med["days"] = value;
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  spacing: Dimens.space10,
+                  children: [
+                    Expanded(
+                      child: Center(
+                        child: Text(
+                          LocaleKeys.create_recep_quantity.tr(),
+                          style: GoogleFonts.ubuntu(
+                              fontWeight: FontWeight.w500,
+                              fontSize: Dimens.space12),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Center(
+                        child: Text(
+                          LocaleKeys.create_recep_times.tr(),
+                          style: GoogleFonts.ubuntu(
+                              fontWeight: FontWeight.w500,
+                              fontSize: Dimens.space12),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Center(
+                        child: Text(
+                          LocaleKeys.create_recep_days.tr(),
+                          style: GoogleFonts.ubuntu(
+                              fontWeight: FontWeight.w500,
+                              fontSize: Dimens.space12),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          }).toList(),
+        ],
+      ),
+    );
+  }
+
+  // Container o'chirish uchun metod
+  void removePreparationContainer() {
+    setState(() {
+      if (preparationContainers.isNotEmpty) {
+        preparationContainers.removeAt(preparationContainers.length - 1);
+        if (preparationContainersData.isNotEmpty) {
+          preparationContainersData
+              .removeAt(preparationContainersData.length - 1);
+        }
+      }
+    });
   }
 }

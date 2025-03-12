@@ -19,6 +19,7 @@ import '../../../../gen/locale_keys.g.dart';
 import '../../../../main.dart';
 import '../../../auth/sign_up/presentation/page/sign_page.dart';
 import '../../../auth/sign_up/presentation/page/sign_up_success.dart';
+import '../../../create_template/data/model/mnn_model.dart';
 import '../../../med_agent/home/presentation/page/agent_home_page.dart';
 
 class MainPage extends StatefulWidget {
@@ -170,7 +171,7 @@ class _MainPageState extends State<MainPage> {
                 index: _selectedIndex,
                 children: [
                   HomePage(),
-                  CreateRecep(),
+                  CreateRecep(List<MnnModel>.empty()),
                   ProfilePage(),
                 ],
               ),

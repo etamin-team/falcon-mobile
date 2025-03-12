@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:wm_doctor/core/error/failure.dart';
 import 'package:wm_doctor/core/network/api_client.dart';
 import 'package:wm_doctor/features/create_template/data/model/medicine_model.dart';
+import 'package:wm_doctor/features/create_template/data/model/mnn_model.dart';
 import 'package:wm_doctor/features/create_template/data/model/upload_template_model.dart';
 import 'package:wm_doctor/features/create_template/domain/repository/create_template_repository.dart';
 
@@ -11,13 +12,28 @@ import '../../../home/data/model/template_model.dart';
 
 class CreateTemplateRepositoryImpl implements CreateTemplateRepository {
   @override
-  Future<Either<Failure, List<MedicineModel>>> getMedicine() async {
+  Future<Either<Failure, List<MedicineModel>>> getMedicine({required List<String>? inn}) async {
     final request = await sl<ApiClient>()
-        .getMethod(pathUrl: "/db/medicines", isHeader: true);
+        .getMethod(pathUrl: "/doctor/find-medicines-by-inn", body: {"inn":inn,"exact":true}, isHeader: true);
     if (request.isSuccess) {
       List<MedicineModel> list = [];
       for (var item in request.response) {
         list.add(MedicineModel.fromJson(item));
+      }
+      return Right(list);
+    }
+    return Left(Failure(
+        errorMsg: request.response.toString(),
+        statusCode: request.code ?? 500));
+  }
+  @override
+  Future<Either<Failure, List<MnnModel>>> getMnn() async {
+    final request = await sl<ApiClient>()
+        .getMethod(pathUrl: "/db/mnn/list", isHeader: true);
+    if (request.isSuccess) {
+      List<MnnModel> list = [];
+      for (var item in request.response) {
+        list.add(MnnModel.fromJson(item));
       }
       return Right(list);
     }

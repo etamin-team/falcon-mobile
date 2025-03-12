@@ -164,7 +164,7 @@ class _PreparadPageState extends State<PreparadPage> {
                               child: CachedNetworkImage(
                                 imageUrl: list[index].imageUrl ?? "",
                                 placeholder: (context, url) => Center(child: CircularProgressIndicator()),
-                                errorWidget: (context, url, error) => Image.asset("images/pill-min.png"),
+                                errorWidget: (context, url, error) => Image.asset("assets/images/pill-min.png"),
                               ),
                             ),
 

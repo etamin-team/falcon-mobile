@@ -103,6 +103,7 @@
     "enter_comment": "Добавьте дополнительный комментарий!",
     "save_template": "Сохранить в шаблоны",
     "add_medicine": "Добавить лекарство",
+    "add_mnn_list": "List of INN",
     "send_recep": "Отправить рецепт",
     "enter_name": "Введите имя и фамилию",
     "enter_birthdate": "Введите дату вашего рождения",
@@ -121,7 +122,9 @@
     "timesInDay": "Раз в сутки",
     "days": "Дней",
     "note": "Примечания",
-    "save_template": "Сохранить шаблон"
+    "save_template": "Сохранить шаблон",
+    "inns": "Список МНН",
+    "add_preparations": "Добавить препараты"
   },
   "home": {
     "greeting": "Здравствуйте,  ",
@@ -156,7 +159,8 @@
     "execution_period": "Период выполнения",
     "date": "C  {fromDate}  по  {toDate}",
     "target": "Цель:",
-    "step": "Шаг:"
+    "step": "Шаг:",
+    "passed": "Пройдено"
   },
   "reset_password": {
     "incorrect_password": "Неправильный пароль",
