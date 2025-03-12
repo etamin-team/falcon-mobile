@@ -1,0 +1,2 @@
+/Users/smp/Public/dev/vm_doctor-master/android/app/.cxx/RelWithDebInfo/6g135j3p/arm64-v8a/CMakeFiles/edit_cache.dir
+/Users/smp/Public/dev/vm_doctor-master/android/app/.cxx/RelWithDebInfo/6g135j3p/arm64-v8a/CMakeFiles/rebuild_cache.dir

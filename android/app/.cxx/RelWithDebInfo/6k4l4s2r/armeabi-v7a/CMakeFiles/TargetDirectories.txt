@@ -1,0 +1,2 @@
+C:/Users/admin/Documents/flc_doctor/flc_doctor/vm_doctor-master/android/app/.cxx/RelWithDebInfo/6k4l4s2r/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/admin/Documents/flc_doctor/flc_doctor/vm_doctor-master/android/app/.cxx/RelWithDebInfo/6k4l4s2r/armeabi-v7a/CMakeFiles/rebuild_cache.dir
