@@ -1,48 +1,57 @@
-🦅 Falcon – Onlayn retsept
-Shifokorlar uchun qulay onlayn retsept yaratish tizimi
+# 🦅 Falcon – Online Receipt
 
-📌 Loyiha haqida
-Falcon – bu shifokorlar uchun ishlab chiqilgan onlayn retsept yaratish va saqlash tizimi. Ushbu dastur shifokorlarga bemorlari uchun dori-darmon retseptlarini yaratish, saqlash va boshqarish imkoniyatini beradi.
+**A smart online prescription management system for doctors.**
 
-🚀 Texnologiyalar
-Loyiha quyidagi texnologiyalar asosida ishlab chiqilgan:
+## 📌 About the Project
 
-Flutter – Foydalanuvchi interfeysini yaratish
-Dio – API chaqiriqlari uchun
-Bloc (Cubit) – State management
-Secure Storage – Tokenlarni xavfsiz saqlash
-Toastification – Bildirishnomalar chiqarish
-📥 O‘rnatish
-Loyihani ishga tushirish uchun quyidagi bosqichlarni bajaring:
+Falcon is an **online prescription management system** designed for doctors. It allows medical professionals to **create, save, and manage prescriptions** for their patients efficiently.
 
-Kodni yuklab olish:
-sh
-Copy
-Edit
-git clone https://github.com/USERNAME/falcon-mobile.git
-cd falcon-mobile
-Kerakli paketlarni o‘rnatish:
-sh
-Copy
-Edit
-flutter pub get
-Ilovani ishga tushirish:
-sh
-Copy
-Edit
-flutter run
-🔑 Muhim imkoniyatlar
-✅ Shifokorlar bemorlari uchun retsept yaratishi mumkin
-✅ Retseptlarni shaxsiy shablon sifatida saqlash imkoniyati
-✅ Dori-darmonlar ro‘yxati va ularning dozalari kiritilishi
-✅ Token orqali autentifikatsiya (Secure Storage)
-✅ Toast xabarnomalari orqali foydalanuvchiga bildirishlar chiqarish
+## 🚀 Technologies Used
 
-🛠 API sozlamalari
-Agar backend ishlatilayotgan bo‘lsa, lib/core/network/api_client.dart faylida API endpointlar sozlanishi kerak.
+The project is built using the following technologies:
 
-👨‍💻 Muallif
-Loyiha muallifi: [Sizning GitHub profilingiz]
+- **Flutter** – UI development  
+- **Dio** – API requests  
+- **Bloc (Cubit)** – State management  
+- **Secure Storage** – Securely storing authentication tokens  
+- **Toastification** – User notifications  
 
-📜 Litsenziya
-Bu loyiha [MIT License] asosida tarqatiladi.
+## 📥 Installation
+
+To set up and run the project locally, follow these steps:
+
+1️⃣ **Clone the repository:**  
+   ```sh
+   git clone https://github.com/S1MPL3coder/falcon-mobile.git
+   cd falcon-mobile
+   ```  
+
+2️⃣ **Install dependencies:**  
+   ```sh
+   flutter pub get
+   ```  
+
+3️⃣ **Run the application:**  
+   ```sh
+   flutter run
+   ```  
+
+## 🔑 Key Features
+
+✅ Doctors can **create prescriptions** for patients  
+✅ Save prescriptions as **templates for future use**  
+✅ Manage **medications, dosages, and instructions**  
+✅ **Secure authentication** using JWT tokens  
+✅ **User-friendly notifications** using toast messages  
+
+## 🔌 API Configuration
+
+If using a backend, configure API endpoints in `lib/core/network/api_client.dart`.
+
+## 🛠 Developer
+
+👨‍💻 **Developer:** [S1MPL3coder](https://github.com/S1MPL3coder)  
+
+## 📜 License
+
+This project is licensed under the **MIT License** – see the [LICENSE](LICENSE) file for details.
