@@ -1,16 +1,48 @@
-# wm_doctor
+🦅 Falcon – Onlayn retsept
+Shifokorlar uchun qulay onlayn retsept yaratish tizimi
 
-A new Flutter project.
+📌 Loyiha haqida
+Falcon – bu shifokorlar uchun ishlab chiqilgan onlayn retsept yaratish va saqlash tizimi. Ushbu dastur shifokorlarga bemorlari uchun dori-darmon retseptlarini yaratish, saqlash va boshqarish imkoniyatini beradi.
 
-## Getting Started
+🚀 Texnologiyalar
+Loyiha quyidagi texnologiyalar asosida ishlab chiqilgan:
 
-This project is a starting point for a Flutter application.
+Flutter – Foydalanuvchi interfeysini yaratish
+Dio – API chaqiriqlari uchun
+Bloc (Cubit) – State management
+Secure Storage – Tokenlarni xavfsiz saqlash
+Toastification – Bildirishnomalar chiqarish
+📥 O‘rnatish
+Loyihani ishga tushirish uchun quyidagi bosqichlarni bajaring:
 
-A few resources to get you started if this is your first Flutter project:
+Kodni yuklab olish:
+sh
+Copy
+Edit
+git clone https://github.com/USERNAME/falcon-mobile.git
+cd falcon-mobile
+Kerakli paketlarni o‘rnatish:
+sh
+Copy
+Edit
+flutter pub get
+Ilovani ishga tushirish:
+sh
+Copy
+Edit
+flutter run
+🔑 Muhim imkoniyatlar
+✅ Shifokorlar bemorlari uchun retsept yaratishi mumkin
+✅ Retseptlarni shaxsiy shablon sifatida saqlash imkoniyati
+✅ Dori-darmonlar ro‘yxati va ularning dozalari kiritilishi
+✅ Token orqali autentifikatsiya (Secure Storage)
+✅ Toast xabarnomalari orqali foydalanuvchiga bildirishlar chiqarish
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+🛠 API sozlamalari
+Agar backend ishlatilayotgan bo‘lsa, lib/core/network/api_client.dart faylida API endpointlar sozlanishi kerak.
 
-For help getting started with Flutter development , view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+👨‍💻 Muallif
+Loyiha muallifi: [Sizning GitHub profilingiz]
+
+📜 Litsenziya
+Bu loyiha [MIT License] asosida tarqatiladi.
