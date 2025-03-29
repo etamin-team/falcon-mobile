@@ -18,7 +18,8 @@ class CreateTemplateCubit extends Cubit<CreateTemplateState> {
       : super(CreateTemplateInitial());
 
   void getMedicine({required List<MnnModel> inn}) async {
-    List<String>? newInn = inn.map((e) => e.name ?? "").toList();
+    //TODO(toLowerCase'ni olib tashlash kerak bu test uchun qo'yildi release'da olib tashlansin)
+    List<String>? newInn = inn.map((e) => e.name?.toLowerCase() ?? "").toList();
     emit(CreateTemplateGetMedicineLoading());
     final request = await createTemplateRepositoryImpl.getMedicine(inn: newInn);
     request.fold(

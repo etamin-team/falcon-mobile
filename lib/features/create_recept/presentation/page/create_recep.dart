@@ -32,12 +32,15 @@ import '../../../medicine/presentation/page/mnn_dialog.dart';
 class PreparationContainerData {
   List<MnnModel> selectedMNNs;
   List<PreparationModel> preparations;
+  List<MedicineModel> medicineList;
 
   PreparationContainerData({
     List<MnnModel>? selectedMNNs,
     List<PreparationModel>? preparations,
+    List<MedicineModel>? medicineList,
   })  : selectedMNNs = selectedMNNs ?? [],
-        preparations = preparations ?? [];
+        preparations = preparations ?? [],
+        medicineList = medicineList ?? [];
 }
 
 class CreateRecep extends StatefulWidget {
@@ -90,7 +93,7 @@ class _CreateRecepState extends State<CreateRecep> {
 
   @override
   void initState() {
-    // context.read<CreateTemplateCubit>().getMedicine(inn: widget.selectedMNNs);
+    context.read<CreateTemplateCubit>().getMedicine(inn: widget.selectedMNNs);
     super.initState();
   }
 
@@ -442,6 +445,10 @@ class _CreateRecepState extends State<CreateRecep> {
                           ),
                         ),
 
+                        Column(
+                          children:
+                              preparationContainers, // Yangi containerlar shu yerda chiqariladi
+                        ),
                         Container(
                           margin: EdgeInsets.symmetric(horizontal: 20),
                           alignment: Alignment.topLeft,
@@ -470,10 +477,10 @@ class _CreateRecepState extends State<CreateRecep> {
                           ),
                         ),
 
-                        Column(
+                        /*Column(
                           children:
                               preparationContainers, // Yangi containerlar shu yerda chiqariladi
-                        ),
+                        ),*/
 
                         // Dori qo'shish 2-trugma
                         /*Container(
@@ -1000,13 +1007,14 @@ class _CreateRecepState extends State<CreateRecep> {
                                 nameController.text.isNotEmpty &&
                                 dateTimeController.text.isNotEmpty &&
                                 numberController.text.isNotEmpty &&
-                                preparation.isNotEmpty) {
+                                preparationContainersData.isNotEmpty) {
                               String message =
                                   'Пациент:\n ${nameController.text}';
                               message =
                                   "$message\n\nДиагноз:\n ${diagnosis.text}";
                               message = "$message\n\nРецепт:";
-                              for (var item in preparation) {
+                              for (var item1 in preparationContainersData) {
+                                var item = item1.preparations.first;
                                 message =
                                     "$message\n<<${item.name}>> ${item.amount} ${item.quantity} ${item.type}.* ${item.timesInDay} раз в день  (${item.days} дней)";
                               }
@@ -1329,6 +1337,7 @@ class _CreateRecepState extends State<CreateRecep> {
       PreparationContainerData newData = PreparationContainerData(
         selectedMNNs: [],
         preparations: [], // Default ma'lumotlardan nusxa olish
+        medicineList: [], // Default ma'lumotlardan nusxa olish
       );
       preparationContainersData.add(newData);
 
@@ -1384,7 +1393,310 @@ class _CreateRecepState extends State<CreateRecep> {
               ),
             ],
           ),
-          ...preps.map((med) {
+          // TODO(Tempdata'dan qaytgan ma'lumot qo'yilsin)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: Dimens.space10,
+            children: [
+              SizedBox(
+                height: 5,
+              ),
+              UniversalButton.filled(
+                text: "Select MNN",
+                onPressed: () => showMNN(
+                  ctx: context,
+                  model: (value) {
+                    // Kerakli bo'lsa MNN modelini alohida qo'shish
+                    if (mounted) {
+                      setState(() {});
+                    }
+                    Navigator.pop(context);
+                  },
+                  mnn: [],
+                  medicine: [],
+                  initialSelectedItems: containerData.selectedMNNs,
+                  onSelectionComplete: (updatedList) {
+                    if (mounted) {
+                      context
+                          .read<CreateTemplateCubit>()
+                          .getMedicine(inn: updatedList);
+                      setState(() {
+                        containerData.selectedMNNs = updatedList;
+                        // Containerlarni yangilash
+                        preparationContainers[index] =
+                            buildPreparationContainer(index);
+                      });
+                    }
+                  },
+                ),
+                fontSize: Dimens.space14,
+                backgroundColor: AppColors.backgroundColor,
+                textColor: Colors.black,
+                cornerRadius: Dimens.space10,
+              ),
+              containerData.selectedMNNs.isNotEmpty
+                  ? Wrap(
+                      spacing: 8.0,
+                      children: containerData.selectedMNNs
+                          .map(
+                            (mnn) => Chip(
+                              label: Text(
+                                mnn.name ?? "nullga tekshir",
+                                style: TextStyle(color: Colors.black),
+                              ),
+                            ),
+                          )
+                          .toList(),
+                    )
+                  : SizedBox.shrink(),
+              Container(
+                decoration: BoxDecoration(
+                    color: AppColors.backgroundColor,
+                    borderRadius: BorderRadius.circular(10)),
+                padding: EdgeInsets.symmetric(
+                  horizontal: Dimens.space20,
+                  vertical: Dimens.space16,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      containerData.preparations.isNotEmpty
+                          ? containerData.preparations.first.name
+                          : "Select receipt",
+                      style: TextStyle(
+                          fontFamily: 'VelaSans',
+                          fontSize: Dimens.space14,
+                          color: Colors.black),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        if (containerData.preparations.isNotEmpty) {
+                          containerData.preparations.clear();
+                          setState(() {
+                            preparationContainers[index] =
+                                buildPreparationContainer(index);
+                          });
+                        } else {
+                          print("CreateRecept:::medicineList==>$medicineList");
+                          //Dialog ochish uchun
+                          showMedicine(
+                            ctx: context,
+                            model: (value) {
+                              containerData.preparations.add(
+                                PreparationModel(
+                                  name: value.name ?? "",
+                                  amount:
+                                      "${value.prescription} ${value.volume}",
+                                  quantity: 0,
+                                  timesInDay: 0,
+                                  days: 0,
+                                  inn: value.inn,
+                                  type: value.type ?? "",
+                                  medicineId: value.id ?? 0,
+                                ),
+                              );
+                              setState(() {
+                                preparationContainers[index] =
+                                    buildPreparationContainer(index);
+                              });
+                              Navigator.pop(context);
+                            },
+                            medicine: medicineList,
+                          );
+                        }
+
+                        setState(() {
+                          print(selectedMNN);
+                          print(
+                            "111111111111111111111111",
+                          );
+                        });
+                      },
+                      child: SvgPicture.asset(
+                        containerData.preparations.isEmpty
+                            ? "assets/icons/plus.svg"
+                            : "assets/icons/minus.svg",
+                        height: 24,
+                        width: 24,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              ...containerData.preparations.map((med) {
+                return Column(
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 16),
+                              decoration: BoxDecoration(
+                                  color: AppColors.backgroundColor,
+                                  borderRadius: BorderRadius.circular(6)),
+                              child: Text(med.type,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 12)),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              /*print("bosildi::: ${med.amount}");
+                              double number = double.tryParse(med.amount
+                                  .replaceAll(RegExp(r'[^0-9.]'), '')) ?? 0;
+                              // double number = double.parse(med.amount
+                              //     .replaceAll(RegExp(r'[^0-9.]'), ''));
+                              String onlyText = med.amount
+                                  .replaceAll(RegExp(r'[0-9]'), '')
+                                  .trim();
+                              setState(() {
+                                med.amount = "${number + 100} $onlyText";
+                              });*/
+                            },
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 16),
+                              decoration: BoxDecoration(
+                                color: AppColors.backgroundColor,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(med.amount,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 12)),
+                                  // Icon(Icons.keyboard_arrow_down, size: 20),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: CupertinoNumberPicker(
+                            selectedNumber: med.quantity,
+                            onChanged: (int value) {
+                              setState(() {
+                                med.quantity = value;
+                              });
+                            },
+                          ),
+                        ),
+                        Expanded(
+                          child: CupertinoNumberPicker(
+                            selectedNumber: med.timesInDay,
+                            onChanged: (int value) {
+                              setState(() {
+                                med.timesInDay = value;
+                              });
+                            },
+                          ),
+                        ),
+                        Expanded(
+                          child: CupertinoNumberPicker(
+                            selectedNumber: med.days,
+                            onChanged: (int value) {
+                              setState(() {
+                                med.days = value;
+                              });
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      spacing: Dimens.space10,
+                      children: [
+                        Expanded(
+                          child: Center(
+                            child: Text(
+                              LocaleKeys.create_recep_quantity.tr(),
+                              style: GoogleFonts.ubuntu(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: Dimens.space12),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Center(
+                            child: Text(
+                              LocaleKeys.create_recep_times.tr(),
+                              style: GoogleFonts.ubuntu(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: Dimens.space12),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: Center(
+                            child: Text(
+                              LocaleKeys.create_recep_days.tr(),
+                              style: GoogleFonts.ubuntu(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: Dimens.space12),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                );
+              }),
+              /*...containerData.preparations.map((med) {
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  spacing: Dimens.space10,
+                  children: [
+                    Expanded(
+                      child: Center(
+                        child: Text(
+                          LocaleKeys.create_recep_quantity.tr(),
+                          style: GoogleFonts.ubuntu(
+                              fontWeight: FontWeight.w500,
+                              fontSize: Dimens.space12),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Center(
+                        child: Text(
+                          LocaleKeys.create_recep_times.tr(),
+                          style: GoogleFonts.ubuntu(
+                              fontWeight: FontWeight.w500,
+                              fontSize: Dimens.space12),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Center(
+                        child: Text(
+                          LocaleKeys.create_recep_days.tr(),
+                          style: GoogleFonts.ubuntu(
+                              fontWeight: FontWeight.w500,
+                              fontSize: Dimens.space12),
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              }),*/
+            ],
+          ),
+          /*...preps.map((med) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               spacing: Dimens.space10,
@@ -1460,31 +1772,41 @@ class _CreateRecepState extends State<CreateRecep> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          //Dialog ochish uchun
-                          showMedicine(
-                            ctx: context,
-                            model: (value) {
-                              containerData.preparations.add(
-                                PreparationModel(
-                                  name: value.name ?? "",
-                                  amount:
-                                      "${value.prescription} ${value.volume}",
-                                  quantity: value.quantity ?? 0,
-                                  timesInDay: 0,
-                                  days: 0,
-                                  inn: value.inn,
-                                  type: value.type ?? "",
-                                  medicineId: value.id ?? 0,
-                                ),
-                              );
-                              setState(() {
-                                preparationContainers[index] =
-                                    buildPreparationContainer(index);
-                              });
-                              Navigator.pop(context);
-                            },
-                            medicine: medicineList,
-                          );
+                          if (containerData.preparations.isNotEmpty) {
+                            containerData.preparations.clear();
+                            setState(() {
+                              preparationContainers[index] =
+                                  buildPreparationContainer(index);
+                            });
+                          } else {
+                            print(
+                                "CreateRecept:::medicineList==>$medicineList");
+                            //Dialog ochish uchun
+                            showMedicine(
+                              ctx: context,
+                              model: (value) {
+                                containerData.preparations.add(
+                                  PreparationModel(
+                                    name: value.name ?? "",
+                                    amount:
+                                        "${value.prescription} ${value.volume}",
+                                    quantity: 0,
+                                    timesInDay: 0,
+                                    days: 0,
+                                    inn: value.inn,
+                                    type: value.type ?? "",
+                                    medicineId: value.id ?? 0,
+                                  ),
+                                );
+                                setState(() {
+                                  preparationContainers[index] =
+                                      buildPreparationContainer(index);
+                                });
+                                Navigator.pop(context);
+                              },
+                              medicine: medicineList,
+                            );
+                          }
 
                           setState(() {
                             print(selectedMNN);
@@ -1627,7 +1949,7 @@ class _CreateRecepState extends State<CreateRecep> {
                 ),
               ],
             );
-          }).toList(),
+          }).toList(),*/
         ],
       ),
     );
