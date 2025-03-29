@@ -86,6 +86,7 @@ class _MNNPageState extends State<MNNPage> {
             return Column(
               children: [
                 AppTextField(
+                  padding: EdgeInsets.only(bottom: 15,top: 10),
                   controller: searchController,
                   hintText: LocaleKeys.texts_search.tr(),
                   onChanged: (value) {
@@ -130,17 +131,32 @@ class _MNNPageState extends State<MNNPage> {
                                     fontWeight: FontWeight.w500,
                                     fontSize: Dimens.space14),
                               ),
-                              trailing: Checkbox(
-                                value: isChecked,
-                                onChanged: (bool? value) {
-                                  setState(() {
-                                    if (value == true) {
-                                      selectedItems.add(item);
-                                    } else {
-                                      selectedItems.remove(item);
-                                    }
-                                  });
-                                },
+                              trailing: CheckboxTheme(
+                                data: CheckboxThemeData(
+                                  fillColor: MaterialStateProperty.all(
+                                      AppColors.blueColor),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(
+                                        Dimens.space5),
+                                  ),
+                                  checkColor: MaterialStateProperty.all(
+                                      AppColors.white),
+                                  side: BorderSide(
+                                      color: AppColors.blueColor,
+                                      width: 3),
+                                ),
+                                child: Checkbox(
+                                  value: isChecked,
+                                  onChanged: (bool? value) {
+                                    setState(() {
+                                      if (value == true) {
+                                        selectedItems.add(item);
+                                      } else {
+                                        selectedItems.remove(item);
+                                      }
+                                    });
+                                  },
+                                ),
                               ),
                             ),
                           ),
@@ -178,7 +194,7 @@ class _MNNPageState extends State<MNNPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text("Unexpected error \n please restart the application"),
+                // Text("Unexpected error \n please restart the application"),
                 CircularProgressIndicator(),
               ],
             ),
