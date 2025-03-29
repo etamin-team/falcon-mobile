@@ -31,11 +31,11 @@ import '../../../medicine/presentation/page/mnn_dialog.dart';
 
 class PreparationContainerData {
   List<MnnModel> selectedMNNs;
-  List<Map<String, dynamic>> preparations;
+  List<PreparationModel> preparations;
 
   PreparationContainerData({
     List<MnnModel>? selectedMNNs,
-    List<Map<String, dynamic>>? preparations,
+    List<PreparationModel>? preparations,
   })  : selectedMNNs = selectedMNNs ?? [],
         preparations = preparations ?? [];
 }
@@ -90,7 +90,7 @@ class _CreateRecepState extends State<CreateRecep> {
 
   @override
   void initState() {
-    context.read<CreateTemplateCubit>().getMedicine(inn: widget.selectedMNNs);
+    // context.read<CreateTemplateCubit>().getMedicine(inn: widget.selectedMNNs);
     super.initState();
   }
 
@@ -146,11 +146,11 @@ class _CreateRecepState extends State<CreateRecep> {
                 medicineList = cstate.list;
               });
             }
-            if (cstate is CreateTemplateGetMedicineSuccess) {
+            /*if (cstate is CreateTemplateGetMedicineSuccess) {
               setState(() {
                 medicineList = cstate.list;
               });
-            }
+            }*/
           },
           child: BlocConsumer<CreateRecepCubit, CreateRecepState>(
             listener: (context, cstate) {
@@ -1328,7 +1328,7 @@ class _CreateRecepState extends State<CreateRecep> {
       // Yangi container data qo'shish
       PreparationContainerData newData = PreparationContainerData(
         selectedMNNs: [],
-        preparations: List.from(preps), // Default ma'lumotlardan nusxa olish
+        preparations: [], // Default ma'lumotlardan nusxa olish
       );
       preparationContainersData.add(newData);
 
@@ -1340,7 +1340,12 @@ class _CreateRecepState extends State<CreateRecep> {
 
   Widget buildPreparationContainer(int index) {
     if (index >= preparationContainersData.length) {
-      return Container(); // Xatolikni oldini olish uchun bo'sh container qaytarish
+      return Container(
+        child: Text(
+          "INdex xatosi",
+          style: TextStyle(color: Colors.red),
+        ),
+      ); // Xatolikni oldini olish uchun bo'sh container qaytarish
     }
 
     PreparationContainerData containerData = preparationContainersData[index];
@@ -1403,6 +1408,9 @@ class _CreateRecepState extends State<CreateRecep> {
                     initialSelectedItems: containerData.selectedMNNs,
                     onSelectionComplete: (updatedList) {
                       if (mounted) {
+                        context
+                            .read<CreateTemplateCubit>()
+                            .getMedicine(inn: updatedList);
                         setState(() {
                           containerData.selectedMNNs = updatedList;
                           // Containerlarni yangilash
@@ -1456,32 +1464,39 @@ class _CreateRecepState extends State<CreateRecep> {
                           showMedicine(
                             ctx: context,
                             model: (value) {
-                              preparation.add(PreparationModel(
-                                name: value.name ?? "",
-                                amount:
-                                "${value.prescription} ${value.volume}",
-                                quantity: 0,
-                                timesInDay: 0,
-                                days: 0,
-                                inn: value.inn,
-                                type: value.type ?? "",
-                                medicineId: value.id ?? 0,
-                              ));
-                              setState(() {});
+                              containerData.preparations.add(
+                                PreparationModel(
+                                  name: value.name ?? "",
+                                  amount:
+                                      "${value.prescription} ${value.volume}",
+                                  quantity: value.quantity ?? 0,
+                                  timesInDay: 0,
+                                  days: 0,
+                                  inn: value.inn,
+                                  type: value.type ?? "",
+                                  medicineId: value.id ?? 0,
+                                ),
+                              );
+                              setState(() {
+                                preparationContainers[index] =
+                                    buildPreparationContainer(index);
+                              });
                               Navigator.pop(context);
                             },
-                            medicine: [],
+                            medicine: medicineList,
                           );
-
 
                           setState(() {
                             print(selectedMNN);
                             print(
-                                "1111111111111111111111111111111111111111111111111111111111111");
+                              "111111111111111111111111",
+                            );
                           });
                         },
                         child: SvgPicture.asset(
-                          "assets/icons/minus.svg",
+                          containerData.preparations.isEmpty
+                              ? "assets/icons/plus.svg"
+                              : "assets/icons/minus.svg",
                           height: 24,
                           width: 24,
                         ),

@@ -12,9 +12,12 @@ import '../../../home/data/model/template_model.dart';
 
 class CreateTemplateRepositoryImpl implements CreateTemplateRepository {
   @override
-  Future<Either<Failure, List<MedicineModel>>> getMedicine({required List<String>? inn}) async {
-    final request = await sl<ApiClient>()
-        .getMethod(pathUrl: "/doctor/find-medicines-by-inn", body: {"inn":inn,"exact":true}, isHeader: true);
+  Future<Either<Failure, List<MedicineModel>>> getMedicine(
+      {required List<String>? inn}) async {
+    final request = await sl<ApiClient>().getMethod(
+        pathUrl: "/doctor/find-medicines-by-inn",
+        body: {"inn": inn, "exact": true},
+        isHeader: true);
     if (request.isSuccess) {
       List<MedicineModel> list = [];
       for (var item in request.response) {
@@ -26,6 +29,7 @@ class CreateTemplateRepositoryImpl implements CreateTemplateRepository {
         errorMsg: request.response.toString(),
         statusCode: request.code ?? 500));
   }
+
   @override
   Future<Either<Failure, List<MnnModel>>> getMnn() async {
     final request = await sl<ApiClient>()

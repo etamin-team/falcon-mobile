@@ -5,9 +5,9 @@ import '../utils/logger.dart';
 import 'status_model.dart';
 import '../services/secure_storage.dart';
 
-
 class ApiClient {
   final baseUrl = "http://209.38.109.22:8080/api/v1";
+
   // final baseUrl = "http://192.168.23.109:8080/api/v1";
   Dio dio = Dio();
 
@@ -108,26 +108,26 @@ class ApiClient {
     try {
       final res = await dio
           .post(
-        anotherLink ? pathUrl : baseUrl+pathUrl,
-        options: Options(
-          headers: header ??
-              (isHeader
-                  ? await defaultHeader()
-                  : {"Content_type": "application/json"}),
-        ),
-        data: jsonEncode(body),
-      )
+            anotherLink ? pathUrl : baseUrl + pathUrl,
+            options: Options(
+              headers: header ??
+                  (isHeader
+                      ? await defaultHeader()
+                      : {"Content_type": "application/json"}),
+            ),
+            data: jsonEncode(body),
+          )
           .timeout(const Duration(seconds: 30));
       logger.i(
-        "postMethod pathUrl: ${anotherLink ? pathUrl : baseUrl+pathUrl}"
-            "\n\n"
-            "header: ${header ?? (isHeader ? await defaultHeader() : {
-          "Content_type": "application/json"
-        })}"
-            "\n\n"
-            "body: $body"
-            "\n\n"
-            "code: ${res.statusCode}",
+        "postMethod pathUrl: ${anotherLink ? pathUrl : baseUrl + pathUrl}"
+        "\n\n"
+        "header: ${header ?? (isHeader ? await defaultHeader() : {
+            "Content_type": "application/json"
+          })}"
+        "\n\n"
+        "body: $body"
+        "\n\n"
+        "code: ${res.statusCode}",
       );
 
       if (res.statusCode! >= 200 && res.statusCode! < 300) {
@@ -141,16 +141,16 @@ class ApiClient {
     } on DioException catch (e) {
       logger.e(
         "post method pathUrl: $baseUrl$pathUrl"
-            "\n\n"
-            "header: ${header ?? (isHeader ? await defaultHeader() : {
-          "Content_type": "application/json"
-        })}"
-            "\n\n"
-            "body: $body"
-            "\n\n"
-            "code: ${e.response?.statusCode}"
-            "\n\n"
-            "response: ${e.response?.data}",
+        "\n\n"
+        "header: ${header ?? (isHeader ? await defaultHeader() : {
+            "Content_type": "application/json"
+          })}"
+        "\n\n"
+        "body: $body"
+        "\n\n"
+        "code: ${e.response?.statusCode}"
+        "\n\n"
+        "response: ${e.response?.data}",
       );
       return dioError(e);
     }
@@ -166,26 +166,26 @@ class ApiClient {
     try {
       final res = await dio
           .get(
-        "${anotherLink ? "" : baseUrl}$pathUrl",
-        options: Options(
-            headers: header ??
-                (isHeader
-                    ? await defaultHeader()
-                    : {"Content_type": "application/json"})),
-        queryParameters: body,
-      )
+            "${anotherLink ? "" : baseUrl}$pathUrl",
+            options: Options(
+                headers: header ??
+                    (isHeader
+                        ? await defaultHeader()
+                        : {"Content_type": "application/json"})),
+            queryParameters: body,
+          )
           .timeout(const Duration(seconds: 30));
       logger.i(
         "getMethod pathUrl: ${anotherLink ? pathUrl : baseUrl + pathUrl}"
-            "\n\n"
-            "header: ${header ?? (isHeader ? await defaultHeader() : {
-          "Content_type": "application/json"
-        })}"
-            "\n\n"
-            "body: $body"
-            "\n\n"
-            "code: ${res.statusCode}"
-            "\n\n",
+        "\n\n"
+        "header: ${header ?? (isHeader ? await defaultHeader() : {
+            "Content_type": "application/json"
+          })}"
+        "\n\n"
+        "body: $body"
+        "\n\n"
+        "code: ${res.statusCode}"
+        "\n\n",
       );
 
       if (res.statusCode! >= 200 && res.statusCode! < 300) {
@@ -199,16 +199,16 @@ class ApiClient {
     } on DioException catch (e) {
       logger.e(
         "getMethod pathUrl: $baseUrl$pathUrl"
-            "\n\n"
-            "header: ${header ?? (isHeader ? await defaultHeader() : {
-          "Content_type": "application/json"
-        })}"
-            "\n\n"
-            "body: $body"
-            "\n\n"
-            "code: ${e.response?.statusCode}"
-            "\n\n"
-            "response: ${e.response?.data}",
+        "\n\n"
+        "header: ${header ?? (isHeader ? await defaultHeader() : {
+            "Content_type": "application/json"
+          })}"
+        "\n\n"
+        "body: $body"
+        "\n\n"
+        "code: ${e.response?.statusCode}"
+        "\n\n"
+        "response: ${e.response?.data}",
       );
       return dioError(e);
     }
@@ -223,23 +223,23 @@ class ApiClient {
     try {
       final res = await dio
           .put(
-        "$baseUrl$pathUrl",
-        options: Options(
-            headers: isHeader
-                ? await defaultHeader()
-                : {"Content_type": "application/json"}),
-        data: jsonEncode(body),
-      )
+            "$baseUrl$pathUrl",
+            options: Options(
+                headers: isHeader
+                    ? await defaultHeader()
+                    : {"Content_type": "application/json"}),
+            data: jsonEncode(body),
+          )
           .timeout(const Duration(seconds: 30));
       logger.i(
         "putMethod pathUrl: $baseUrl$pathUrl"
-            "\n\n"
-            "header: ${await defaultHeader()}"
-            "\n\n"
-            "body: $body"
-            "\n\n"
-            "code: ${res.statusCode}"
-            "\n\n",
+        "\n\n"
+        "header: ${await defaultHeader()}"
+        "\n\n"
+        "body: $body"
+        "\n\n"
+        "code: ${res.statusCode}"
+        "\n\n",
       );
 
       if (res.statusCode == 200) {
@@ -252,14 +252,14 @@ class ApiClient {
     } on DioException catch (e) {
       logger.e(
         "putMethod pathUrl: $baseUrl$pathUrl"
-            "\n\n"
-            "header: ${await defaultHeader()}"
-            "\n\n"
-            "body: $body"
-            "\n\n"
-            "code: ${e.response?.statusCode}"
-            "\n\n"
-            "response: ${e.response?.data}",
+        "\n\n"
+        "header: ${await defaultHeader()}"
+        "\n\n"
+        "body: $body"
+        "\n\n"
+        "code: ${e.response?.statusCode}"
+        "\n\n"
+        "response: ${e.response?.data}",
       );
       return dioError(e);
     }
@@ -274,24 +274,24 @@ class ApiClient {
     try {
       final res = await dio
           .patch(
-        "$baseUrl$pathUrl",
-        options: Options(
-          headers: isHeader
-              ? await defaultHeader()
-              : {"Content_type": "application/json"},
-        ),
-        data: jsonEncode(body),
-      )
+            "$baseUrl$pathUrl",
+            options: Options(
+              headers: isHeader
+                  ? await defaultHeader()
+                  : {"Content_type": "application/json"},
+            ),
+            data: jsonEncode(body),
+          )
           .timeout(const Duration(seconds: 30));
       logger.i(
         "patchMethod pathUrl: $baseUrl$pathUrl"
-            "\n\n"
-            "header: ${await defaultHeader()}"
-            "\n\n"
-            "body: $body"
-            "\n\n"
-            "code: ${res.statusCode}"
-            "\n\n",
+        "\n\n"
+        "header: ${await defaultHeader()}"
+        "\n\n"
+        "body: $body"
+        "\n\n"
+        "code: ${res.statusCode}"
+        "\n\n",
       );
 
       if (res.statusCode! >= 200 && res.statusCode! < 300) {
@@ -303,14 +303,14 @@ class ApiClient {
     } on DioException catch (e) {
       logger.e(
         "patchMethod pathUrl: $baseUrl$pathUrl"
-            "\n\n"
-            "header: ${await defaultHeader()}"
-            "\n\n"
-            "body: $body"
-            "\n\n"
-            "code: ${e.response?.statusCode}"
-            "\n\n"
-            "response: ${e.response?.data}",
+        "\n\n"
+        "header: ${await defaultHeader()}"
+        "\n\n"
+        "body: $body"
+        "\n\n"
+        "code: ${e.response?.statusCode}"
+        "\n\n"
+        "response: ${e.response?.data}",
       );
       return dioError(e);
     }
@@ -325,23 +325,23 @@ class ApiClient {
     try {
       final res = await dio
           .delete(
-        "$baseUrl$pathUrl",
-        options: Options(
-            headers: isHeader
-                ? await defaultHeader()
-                : {"Content_type": "application/json"}),
-        data: jsonEncode(body ?? {}),
-      )
+            "$baseUrl$pathUrl",
+            options: Options(
+                headers: isHeader
+                    ? await defaultHeader()
+                    : {"Content_type": "application/json"}),
+            data: jsonEncode(body ?? {}),
+          )
           .timeout(const Duration(seconds: 30));
       logger.i(
         "deleteMethod pathUrl: $baseUrl$pathUrl"
-            "\n\n"
-            "header: ${await defaultHeader()}"
-            "\n\n"
-            "body: $body"
-            "\n\n"
-            "code: ${res.statusCode}"
-            "\n\n",
+        "\n\n"
+        "header: ${await defaultHeader()}"
+        "\n\n"
+        "body: $body"
+        "\n\n"
+        "code: ${res.statusCode}"
+        "\n\n",
       );
 
       if (res.statusCode == 200) {
@@ -354,14 +354,14 @@ class ApiClient {
     } on DioException catch (e) {
       logger.e(
         "deleteMethod pathUrl: $baseUrl$pathUrl"
-            "\n\n"
-            "header: ${await defaultHeader()}"
-            "\n\n"
-            "body: $body"
-            "\n\n"
-            "code: ${e.response?.statusCode}"
-            "\n\n"
-            "response: ${e.response?.data}",
+        "\n\n"
+        "header: ${await defaultHeader()}"
+        "\n\n"
+        "body: $body"
+        "\n\n"
+        "code: ${e.response?.statusCode}"
+        "\n\n"
+        "response: ${e.response?.data}",
       );
       return dioError(e);
     }
@@ -386,8 +386,7 @@ class ApiClient {
     }
     if (e.response!.statusCode! == 404) {
       print('aaaghfhgfahgafhgafhgaf0-------------------------------hagfha');
-      return StatusModel(
-          response: null, isSuccess: true, code: 404);
+      return StatusModel(response: null, isSuccess: true, code: 404);
     }
     try {
       if (e.response!.statusCode! >= 500) {
