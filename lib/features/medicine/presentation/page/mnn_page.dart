@@ -194,7 +194,7 @@ class _MNNPageState extends State<MNNPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text("Unexpected error \n please restart the application"),
+                // Text("Unexpected error \n please restart the application"),
                 CircularProgressIndicator(),
               ],
             ),

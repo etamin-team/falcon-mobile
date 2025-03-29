@@ -1004,14 +1004,19 @@ class _CreateRecepState extends State<CreateRecep> {
                                 preparation.isNotEmpty) {
                               String message =
                                   'Пациент:\n ${nameController.text}';
+                              message = "\nДату рождения : " + message + " ${dateTimeController.text}";
+                              message = "\nТелефон: " + message + " ${numberController.text}";
                               message =
                                   "$message\n\nДиагноз:\n ${diagnosis.text}";
+
+                              message = "$message\n\nMNN: " + message + selectedMNN.toString();
+                              message = "$message\n\nПримечание:\n ${commentController.text}";
+
                               message = "$message\n\nРецепт:";
                               for (var item in preparation) {
                                 message =
                                     "$message\n<<${item.name}>> ${item.amount} ${item.quantity} ${item.type}.* ${item.timesInDay} раз в день  (${item.days} дней)";
                               }
-
                               print("call back qaytdi");
 
                               context.read<CreateRecepCubit>().sendTelegramData(
