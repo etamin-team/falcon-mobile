@@ -201,7 +201,6 @@ class _AgentCreateContractState extends State<AgentCreateContract> {
                             medicine: preparation,
                             model: (MedicineModel value) {
                               Navigator.pop(context);
-          
                               showInputAmount(
                                   name: value.name ?? "",
                                   amount: 1,

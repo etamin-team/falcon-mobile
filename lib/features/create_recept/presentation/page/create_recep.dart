@@ -58,6 +58,7 @@ class _CreateRecepState extends State<CreateRecep> {
   int _selectedYear = DateTime.now().year;
   final commentController = TextEditingController();
   DateTime? selectedDate;
+  String selectedPreparetation = "Select Preparation";
   final formKey = GlobalKey<FormState>();
   List<MedicineModel> medicineList = [];
   List<MnnModel> innList = [];
@@ -1385,10 +1386,10 @@ class _CreateRecepState extends State<CreateRecep> {
               spacing: Dimens.space10,
               children: [
                 SizedBox(
-                  height: 5,
+                  height: 10,
                 ),
                 UniversalButton.filled(
-                  text: "Select MNN",
+                  text: "Select MNNs",
                   onPressed: () => showMNN(
                     ctx: context,
                     model: (value) {
@@ -1414,81 +1415,105 @@ class _CreateRecepState extends State<CreateRecep> {
                   ),
                   fontSize: Dimens.space14,
                   backgroundColor: AppColors.backgroundColor,
-                  textColor: Colors.black,
+                  textColor: Colors.blueAccent,
                   cornerRadius: Dimens.space10,
                 ),
                 containerData.selectedMNNs.isNotEmpty
-                    ? Wrap(
-                        spacing: 8.0,
-                        children: containerData.selectedMNNs
-                            .map(
-                              (mnn) => Chip(
-                                label: Text(
-                                  mnn.name ?? "nullga tekshir",
-                                  style: TextStyle(color: Colors.black),
-                                ),
-                              ),
-                            )
-                            .toList(),
+                    ?
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(" Selected MNNs:",style: TextStyle(fontWeight: FontWeight.w500,fontSize: 15),),
+                    Wrap(
+                      spacing: 8.0,
+                      runSpacing: 2.0,
+                      alignment: WrapAlignment.start, // Markazga joylash
+                      children: containerData.selectedMNNs
+                          .map(
+                            (mnn) => Chip(
+                          label: Text(
+                            mnn.name ?? "nullga tekshir",
+                            style: TextStyle(color: Colors.black), // Matn rangi
+                          ),
+                          backgroundColor: AppColors.backgroundColor, // Chip'ning fon rangi
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0), // Chip'ga burchak radius berish
+                            side: BorderSide(color: AppColors.backgroundColor, width: 1), // Chiziq qo'shish
+                          ),
+                        ),
                       )
+                          .toList(),
+                    ),
+                  ],
+                )
                     : SizedBox.shrink(),
-                Container(
-                  decoration: BoxDecoration(
-                      color: AppColors.backgroundColor,
-                      borderRadius: BorderRadius.circular(10)),
-                  padding: EdgeInsets.symmetric(
-                    horizontal: Dimens.space20,
-                    vertical: Dimens.space16,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "tempdata",
-                        style: TextStyle(
-                            fontFamily: 'VelaSans',
-                            fontSize: Dimens.space14,
-                            color: Colors.black),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          //Dialog ochish uchun
-                          showMedicine(
-                            ctx: context,
-                            model: (value) {
-                              preparation.add(PreparationModel(
-                                name: value.name ?? "",
-                                amount:
-                                "${value.prescription} ${value.volume}",
-                                quantity: 0,
-                                timesInDay: 0,
-                                days: 0,
-                                inn: value.inn,
-                                type: value.type ?? "",
-                                medicineId: value.id ?? 0,
-                              ));
-                              setState(() {});
-                              Navigator.pop(context);
-                            },
-                            medicine: [],
-                          );
+                GestureDetector(
+                  onTap: () {
+                    //Dialog ochish uchun
+                    showMedicine(
+                      ctx: context,
+                      model: (value) {
+                        preparation.add(
+                            PreparationModel(
+                          name: value.name ?? "",
+                          amount:
+                          "${value.prescription} ${value.volume}",
+                          quantity: 0,
+                          timesInDay: 0,
+                          days: 0,
+                          inn: value.inn,
+                          type: value.type ?? "",
+                          medicineId: value.id ?? 0,
+                        )
+                        );
+                        setState(() {
+                          selectedPreparetation = value.name!;
+                        });
+                        Navigator.pop(context);
+                        selectedPreparetation = value.name!;
 
-
-                          setState(() {
-                            print(selectedMNN);
-                            print(
-                                "1111111111111111111111111111111111111111111111111111111111111");
-                          });
-                        },
-                        child: SvgPicture.asset(
-                          "assets/icons/minus.svg",
+                      },
+                      medicine: []
+                    );
+                    setState(() {
+                      print(selectedPreparetation);
+                      print(selectedMNN);
+                      print("1111111111111111111111111111111111111111111111111111111111111");
+                    });
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                        color: AppColors.backgroundColor,
+                        borderRadius: BorderRadius.circular(10)),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: Dimens.space20,
+                      vertical: Dimens.space16,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          selectedPreparetation == ""
+                              ? LocaleKeys
+                              .create_recep_select_template
+                              .tr()
+                              : selectedPreparetation,
+                          style: TextStyle(
+                              fontFamily: 'VelaSans',
+                              fontSize: Dimens.space14,
+                              fontWeight: FontWeight.w400),
+                        ),
+                        SvgPicture.asset(
+                          "assets/icons/plus.svg",
                           height: 24,
                           width: 24,
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
+
                 Row(
                   children: [
                     Expanded(
