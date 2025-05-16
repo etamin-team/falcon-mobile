@@ -128,7 +128,7 @@ showDoctors({required BuildContext ctx}) {
                                 ],
                               ),
                               Expanded(
-                                child: list.isEmpty?Center(child: Text("no data"),): SingleChildScrollView(
+                                child: list.isEmpty?Center(child: Text("NO DATA"),): SingleChildScrollView(
                                   child: Column(
                                     spacing: Dimens.space10,
                                     crossAxisAlignment:

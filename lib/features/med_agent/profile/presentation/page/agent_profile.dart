@@ -31,6 +31,7 @@ class _AgentProfileState extends State<AgentProfile> with AgentProfileUtility {
 
   @override
   Widget build(BuildContext context) {
+
     return BlocConsumer<ProfileCubit, ProfileState>(
       listener: (context, state) {
         // TODO: implement listener
@@ -464,7 +465,7 @@ class _AgentProfileState extends State<AgentProfile> with AgentProfileUtility {
                                       ),
                                       const SizedBox(height: 8),
                                       ...List.generate(
-                                        state.model.medicineWithQuantityDtos
+                                        state.model.medicineAgentGoalQuantityDTOS
                                             ?.length ??
                                             0,
                                             (index) {
@@ -472,21 +473,21 @@ class _AgentProfileState extends State<AgentProfile> with AgentProfileUtility {
                                             // backgroundColor: Colors.white,
                                               title: state
                                                   .model
-                                                  .medicineWithQuantityDtos?[
+                                                  .medicineAgentGoalQuantityDTOS?[
                                               index]
                                                   .medicine
                                                   ?.name ??
                                                   "-",
                                               current: state
                                                   .model
-                                                  .medicineWithQuantityDtos?[
+                                                  .medicineAgentGoalQuantityDTOS?[
                                               index]
-                                                  .contractMedicineAmount
+                                                  .contractMedicineMedAgentAmount
                                                   ?.amount ??
                                                   0,
                                               total: state
                                                   .model
-                                                  .medicineWithQuantityDtos?[
+                                                  .medicineAgentGoalQuantityDTOS?[
                                               index]
                                                   .quote ??
                                                   0);
@@ -629,35 +630,6 @@ class _AgentProfileState extends State<AgentProfile> with AgentProfileUtility {
                         SizedBox(
                           height: Dimens.space10,
                         ),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: Dimens.space14,
-                              vertical: Dimens.space16),
-                          decoration: BoxDecoration(
-                              color: AppColors.backgroundColor,
-                              borderRadius:
-                                  BorderRadius.circular(Dimens.space10)),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            spacing: Dimens.space10,
-                            children: [
-                              Text(
-                                "Должность:",
-                                style: TextStyle(
-                                    fontFamily: 'VelaSans',
-                                    fontSize: Dimens.space14,
-                                    fontWeight: FontWeight.w400),
-                              ),
-                              Text(
-                                "Главный Хирург",
-                                style: TextStyle(
-                                    fontFamily: 'VelaSans',
-                                    fontSize: Dimens.space14,
-                                    fontWeight: FontWeight.w400),
-                              ),
-                            ],
-                          ),
-                        ),
                         SizedBox(
                           height: Dimens.space10,
                         ),
@@ -681,7 +653,7 @@ class _AgentProfileState extends State<AgentProfile> with AgentProfileUtility {
                                     fontWeight: FontWeight.w400),
                               ),
                               Text(
-                                state.workplaceModel?.name.toString().substring(15) ?? "",
+                                state.workplaceModel?.name.toString() ?? "",
                                 style: TextStyle(
                                     fontFamily: 'VelaSans',
                                     fontSize: Dimens.space14,

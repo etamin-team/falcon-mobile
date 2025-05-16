@@ -15,7 +15,7 @@ class CreateTemplateRepositoryImpl implements CreateTemplateRepository {
   Future<Either<Failure, List<MedicineModel>>> getMedicine(
       {required List<String>? inn}) async {
     final request = await sl<ApiClient>().getMethod(
-      pathUrl: "/doctor/find-medicines-by-inn?${inn?.map((e) => "inn=${Uri.encodeComponent(e)}").join("&")}&exact=true",
+      pathUrl: "/doctor/find-medicines-by-inn?${inn?.map((e) => "inn=${Uri.encodeComponent(e)}").join("&")}&exact=false",
       isHeader: true,
     );
 

@@ -5,10 +5,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:toastification/toastification.dart';
 import 'package:wm_doctor/features/auth/sign_in/presentation/cubit/sign_in_cubit.dart';
 import 'package:wm_doctor/gen/locale_keys.g.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
+
 
 import '../../../../../core/services/secure_storage.dart';
 import '../../../../../core/utils/text_mask.dart';
 import '../../../../../core/widgets/export.dart';
+import '../../../../main/presentation/cubit/main_page_cubit.dart';
+import '../../../../main/presentation/page/main_page.dart';
 import '../../../sign_up/presentation/page/sign_up_success.dart';
 import '../../../sign_up/presentation/widgets/language.dart';
 
@@ -22,8 +26,10 @@ class SignInPage extends StatefulWidget {
 class _SignInPageState extends State<SignInPage> {
   final numberController = TextEditingController();
   final passwordController = TextEditingController();
+
   bool isObscureText = true;
   final formKey = GlobalKey<FormState>();
+  String status = "PENDING";
 
   @override
   void initState() {
@@ -52,6 +58,7 @@ class _SignInPageState extends State<SignInPage> {
                         text: LocaleKeys.sign_in_sign_in_text.tr(),
                       )));
         }
+
         if (state is SignInError) {
           toastification.show(
             style: ToastificationStyle.flat,
@@ -198,21 +205,6 @@ class _SignInPageState extends State<SignInPage> {
                           controller: passwordController,
                           hintText: "********"),
                       SizedBox(),
-                      // TextButton(
-                      //   child: Text(
-                      //     "Забыли пароль?",
-                      //     style: GoogleFonts.poppins(
-                      //         fontWeight: FontWeight.w400,
-                      //         fontSize: Dimens.space14,
-                      //         color: Colors.grey),
-                      //   ),
-                      //   onPressed: () {
-                      //     Navigator.push(
-                      //         context,
-                      //         MaterialPageRoute(
-                      //             builder: (context) => SignInReset()));
-                      //   },
-                      // ),
                       SizedBox(),
                       Row(
                         spacing: Dimens.space10,
@@ -237,20 +229,25 @@ class _SignInPageState extends State<SignInPage> {
                             child: UniversalButton.filled(
                               fontSize: 14,
                               height: Dimens.space60,
-                              // icon: Icon(
-                              //   CupertinoIcons.arrow_right,
-                              //   color: Colors.white,
-                              //   size: 25,
-                              // ),
                               text: LocaleKeys.texts_continue.tr(),
                               textFontWeight: FontWeight.w400,
-                              onPressed: () {
+                              onPressed: () async{
                                 if (formKey.currentState!.validate()) {
                                   context.read<SignInCubit>().login(
                                       number:
-                                          "998${numberController.text.trim().replaceAll(" ", "").replaceAll("+", "")}",
+                                      "998${numberController.text.trim().replaceAll(" ", "").replaceAll("+", "")}",
                                       password: passwordController.text.trim());
                                 }
+                                String token =
+                                    await SecureStorage().read(key: "accessToken") ??
+                                    "";
+                                Map<String, dynamic> decodedToken =
+                                JwtDecoder.decode(token);
+                                String uuid = decodedToken["sub"];
+
+
+                                print("Login tugma bosildi................");
+                                print("helllllllo   " + uuid);
                               },
                             ),
                           ),

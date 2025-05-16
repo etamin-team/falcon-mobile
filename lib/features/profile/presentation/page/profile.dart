@@ -281,13 +281,23 @@ class _ProfilePageState extends State<ProfilePage> with ProfileUtility {
                                                   MainAxisAlignment
                                                       .spaceBetween,
                                               children: [
-                                                Text(outState
+                                                Expanded(
+                                                  child: Text(
+                                                    maxLines: 2,
+                                                    overflow: TextOverflow.fade,
+                                                    outState
                                                         .model
-                                                        .outOfContractMedicineAmount[
-                                                            index]
+                                                        .outOfContractMedicineAmount[index]
                                                         .medicine
                                                         .name ??
-                                                    ""),
+                                                        "",
+                                                    style: TextStyle(
+                                                        fontFamily: 'VelaSans',
+                                                        fontSize: Dimens.space14,
+                                                        fontWeight: FontWeight.w400),
+                                                  ),
+                                                ),
+                                                SizedBox(width: 10,),
                                                 Text(outState
                                                     .model
                                                     .outOfContractMedicineAmount[

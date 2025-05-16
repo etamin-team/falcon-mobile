@@ -57,6 +57,7 @@ class AddDoctorRepositoryImpl implements AddDoctorRepository {
     String uuid = decodedToken["sub"];
     model.doctorId = doctorId;
     model.agentId = uuid;
+    print(model.toJson());
     final request = await sl<ApiClient>()
         .postMethod(pathUrl: "/med-agent/doctor/new-contract", body: model.toJson(), isHeader: true);
 

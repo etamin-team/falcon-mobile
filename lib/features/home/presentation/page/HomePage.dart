@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wm_doctor/core/extensions/widget_extensions.dart';
 import 'package:wm_doctor/core/widgets/export.dart';
 import 'package:wm_doctor/features/create_template/presentation/page/create_template.dart';
+import 'package:wm_doctor/features/main/presentation/cubit/main_page_cubit.dart';
 import 'package:wm_doctor/features/preparad/presentation/page/preparad.dart';
 import 'package:wm_doctor/features/profile/presentation/cubit/profile_cubit.dart';
 
@@ -163,7 +164,7 @@ class _HomePageState extends State<HomePage> {
                               ],
                             ),
                             Expanded(
-                              child: state.list.isEmpty?Center(child: Text("no data"),):Stack(
+                              child: state.list.isEmpty?Center(child: Text("TEMPLATES NOT AVAILABLE"),):Stack(
                                 children: [
                                   SingleChildScrollView(
                                     child: Column(
@@ -334,21 +335,22 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                   ),
-                  Center(
-                    child: UniversalButton.filled(
-                      width: 200,
-                      height: Dimens.space50,
-                      fontSize: Dimens.space14,
-                      cornerRadius: Dimens.space16,
-                      text: LocaleKeys.home_create_template.tr(),
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => CreateTemplate()));
-                      },
-                    ),
-                  ).paddingAll(value: Dimens.space10)
+                  // Center(
+                  //   child: UniversalButton.filled(
+                  //     width: 200,
+                  //     height: Dimens.space50,
+                  //     fontSize: Dimens.space14,
+                  //     cornerRadius: Dimens.space16,
+                  //     text: LocaleKeys.home_create_template.tr(),
+                  //     onPressed: () {
+                  //       context.read<MainPageCubit>().changeSelectedIndex(1);
+                  //       // Navigator.push(
+                  //       //     context,
+                  //       //     MaterialPageRoute(
+                  //       //         builder: (context) => CreateTemplate()));
+                  //     },
+                  //   ),
+                  // ).paddingAll(value: Dimens.space10)
                 ],
               ).paddingSymmetric(horizontal: Dimens.space20),
             );

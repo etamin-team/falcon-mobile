@@ -213,7 +213,7 @@ class _AgentHomePageState extends State<AgentHomePage> {
                                   ),
                                 )),
                           ),
-                        if ((state.model.medicineWithQuantityDtos?.length ??
+                        if ((state.model.medicineAgentGoalQuantityDTOS?.length ??
                                 0) !=
                             0)
                           Container(
@@ -237,7 +237,7 @@ class _AgentHomePageState extends State<AgentHomePage> {
                                         fontWeight: FontWeight.bold),
                                   ),
                                   children: List.generate(
-                                    state.model.medicineWithQuantityDtos
+                                    state.model.medicineAgentGoalQuantityDTOS
                                             ?.length ??
                                         0,
                                     (index) {
@@ -245,21 +245,21 @@ class _AgentHomePageState extends State<AgentHomePage> {
                                           backgroundColor: Colors.white,
                                           title: state
                                                   .model
-                                                  .medicineWithQuantityDtos?[
+                                                  .medicineAgentGoalQuantityDTOS?[
                                                       index]
                                                   .medicine
                                                   ?.name ??
                                               "-",
                                           current: state
                                                   .model
-                                                  .medicineWithQuantityDtos?[
+                                                  .medicineAgentGoalQuantityDTOS?[
                                                       index]
-                                                  .contractMedicineAmount
+                                                  .contractMedicineMedAgentAmount
                                                   ?.amount ??
                                               0,
                                           total: state
                                                   .model
-                                                  .medicineWithQuantityDtos?[index]
+                                                  .medicineAgentGoalQuantityDTOS?[index]
                                                   .quote ??
                                               0);
                                     },

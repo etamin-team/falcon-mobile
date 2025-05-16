@@ -12,7 +12,7 @@ class AgentGoalModel {
   final DateTime? startDate;
   final DateTime? endDate;
   final String? medAgentId;
-  final List<MedicineWithQuantityDto>? medicineWithQuantityDtos;
+  final List<MedicineAgentGoalQuantityDTO>? medicineAgentGoalQuantityDTOS;
   final List<FieldWithQuantityDto>? fieldWithQuantityDtos;
   final int? managerGoalId;
   final String? managerId;
@@ -24,7 +24,7 @@ class AgentGoalModel {
     this.startDate,
     this.endDate,
     this.medAgentId,
-    this.medicineWithQuantityDtos,
+    this.medicineAgentGoalQuantityDTOS,
     this.fieldWithQuantityDtos,
     this.managerGoalId,
     this.managerId,
@@ -37,9 +37,9 @@ class AgentGoalModel {
     startDate: json["startDate"] != null ? DateTime.parse(json["startDate"]) : null,
     endDate: json["endDate"] != null ? DateTime.parse(json["endDate"]) : null,
     medAgentId: json["medAgentId"],
-    medicineWithQuantityDtos: json["medicineWithQuantityDTOS"] != null
-        ? List<MedicineWithQuantityDto>.from(
-        json["medicineWithQuantityDTOS"].map((x) => MedicineWithQuantityDto.fromJson(x)))
+    medicineAgentGoalQuantityDTOS: json["medicineAgentGoalQuantityDTOS"] != null
+        ? List<MedicineAgentGoalQuantityDTO>.from(
+        json["medicineAgentGoalQuantityDTOS"].map((x) => MedicineAgentGoalQuantityDTO.fromJson(x)))
         : null,
     fieldWithQuantityDtos: json["fieldWithQuantityDTOS"] != null
         ? List<FieldWithQuantityDto>.from(
@@ -56,7 +56,7 @@ class AgentGoalModel {
     "startDate": startDate?.toIso8601String(),
     "endDate": endDate?.toIso8601String(),
     "medAgentId": medAgentId,
-    "medicineWithQuantityDTOS": medicineWithQuantityDtos?.map((x) => x.toJson()).toList(),
+    "medicineAgentGoalQuantityDTOS": medicineAgentGoalQuantityDTOS?.map((x) => x.toJson()).toList(),
     "fieldWithQuantityDTOS": fieldWithQuantityDtos?.map((x) => x.toJson()).toList(),
     "managerGoalId": managerGoalId,
     "managerId": managerId,
@@ -93,6 +93,60 @@ class FieldWithQuantityDto {
   };
 }
 
+class ContractMedicineMedAgentAmount {
+  final int? id;
+  final int? amount;
+
+  ContractMedicineMedAgentAmount({
+    this.id,
+    this.amount,
+  });
+
+  factory ContractMedicineMedAgentAmount.fromJson(Map<String, dynamic> json) => ContractMedicineMedAgentAmount(
+    id: json["id"],
+    amount: json["amount"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "amount": amount,
+  };
+}
+
+class MedicineAgentGoalQuantityDTO {
+  final int? medicineId;
+  final int? quote;
+  final int? agentContractId;
+  final ContractMedicineMedAgentAmount? contractMedicineMedAgentAmount;
+  final Medicine? medicine;
+
+  MedicineAgentGoalQuantityDTO({
+    this.medicineId,
+    this.quote,
+    this.agentContractId,
+    this.contractMedicineMedAgentAmount,
+    this.medicine,
+  });
+
+  factory MedicineAgentGoalQuantityDTO.fromJson(Map<String, dynamic> json) => MedicineAgentGoalQuantityDTO(
+    medicineId: json["medicineId"],
+    quote: json["quote"],
+    agentContractId: json["agentContractId"],
+    contractMedicineMedAgentAmount:
+    json["contractMedicineMedAgentAmount"] != null ? ContractMedicineMedAgentAmount.fromJson(json["contractMedicineMedAgentAmount"]) : null,
+    medicine: json["medicine"] != null ? Medicine.fromJson(json["medicine"]) : null,
+  );
+
+  Map<String, dynamic> toJson() => {
+    "medicineId": medicineId,
+    "quote": quote,
+    "agentContractId": agentContractId,
+    "contractMedicineMedAgentAmount": contractMedicineMedAgentAmount?.toJson(),
+    "medicine": medicine?.toJson(),
+  };
+}
+
+
 class ContractAmount {
   final int? id;
   final int? amount;
@@ -112,38 +166,4 @@ class ContractAmount {
     "amount": amount,
   };
 }
-
-class MedicineWithQuantityDto {
-  final int? medicineId;
-  final int? quote;
-  final int? agentContractId;
-  final ContractAmount? contractMedicineAmount;
-  final Medicine? medicine;
-
-  MedicineWithQuantityDto({
-    this.medicineId,
-    this.quote,
-    this.agentContractId,
-    this.contractMedicineAmount,
-    this.medicine,
-  });
-
-  factory MedicineWithQuantityDto.fromJson(Map<String, dynamic> json) => MedicineWithQuantityDto(
-    medicineId: json["medicineId"],
-    quote: json["quote"],
-    agentContractId: json["agentContractId"],
-    contractMedicineAmount:
-    json["contractMedicineAmount"] != null ? ContractAmount.fromJson(json["contractMedicineAmount"]) : null,
-    medicine: json["medicine"] != null ? Medicine.fromJson(json["medicine"]) : null,
-  );
-
-  Map<String, dynamic> toJson() => {
-    "medicineId": medicineId,
-    "quote": quote,
-    "agentContractId": agentContractId,
-    "contractMedicineAmount": contractMedicineAmount?.toJson(),
-    "medicine": medicine?.toJson(),
-  };
-}
-
 

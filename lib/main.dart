@@ -42,6 +42,7 @@ void main() async {
       ],
       path: 'assets/translations',
       fallbackLocale: const Locale('ru'),
+      startLocale: const Locale('ru'),
       child: MyApp()));
   // WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
 

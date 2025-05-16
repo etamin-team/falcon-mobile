@@ -180,6 +180,7 @@ class _CreateTemplateState extends State<CreateTemplate> {
                         }
                         return null;
                       }),
+
                   Container(
                     width: double.infinity,
                     padding: EdgeInsets.all(Dimens.space20),
@@ -203,6 +204,7 @@ class _CreateTemplateState extends State<CreateTemplate> {
                                   color: Colors.black),
                             ),
                             GestureDetector(
+
                               onTap: () =>
                                   showMedicine(
                                       ctx: context,
@@ -230,6 +232,7 @@ class _CreateTemplateState extends State<CreateTemplate> {
                                                 name: preparation[index].name,
                                                 type: preparation[index].type),
                                       )),
+
                               child: SvgPicture.asset(
                                 Assets.icons.plus,
                                 height: Dimens.space30,
@@ -508,6 +511,7 @@ class _CreateTemplateState extends State<CreateTemplate> {
                       ],
                     ),
                   ),
+
                   TemplateItem(
                       title: LocaleKeys.create_template_note.tr(),
                       hint: LocaleKeys.create_template_write_here.tr(),

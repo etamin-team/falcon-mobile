@@ -51,7 +51,7 @@ class _MedicinePageState extends State<MedicinePage> {
       body: BlocConsumer<MedicineCubit, MedicineState>(
         listener: (context, state) {
           if (state is MedicineSuccess) {
-            print("this is listen data ============> ${state.list.length}");
+            print("this is listen data  ============> ${state.list.length}");
           }
           // TODO: implement listener
         },

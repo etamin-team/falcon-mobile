@@ -272,14 +272,14 @@ class _AgentContractState extends State<AgentContract> {
               runAlignment: WrapAlignment.start,
               crossAxisAlignment: WrapCrossAlignment.start,
               children: List.generate(
-                model.medicinesWithQuantities?.take(6).length??0,
+                model.medicineWithQuantityDoctorDTOS?.take(6).length??0,
                 (index) => Container(
                   padding: EdgeInsets.symmetric(
                       horizontal: Dimens.space10, vertical: Dimens.space8),
                   decoration: BoxDecoration(
                       color: AppColors.white,
                       borderRadius: BorderRadius.circular(Dimens.space5)),
-                  child: Text(model.medicinesWithQuantities?[index].medicine?.name??""),
+                  child: Text(model.medicineWithQuantityDoctorDTOS?[index].medicine?.name??""),
                 ),
               ),
             )

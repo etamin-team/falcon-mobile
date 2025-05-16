@@ -3,6 +3,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wm_doctor/core/extensions/widget_extensions.dart';
 import 'package:wm_doctor/core/utils/data_translate.dart';
+import 'package:wm_doctor/features/med_agent/profile/presentation/cubit/agent_profile_cubit.dart';
+import 'package:wm_doctor/features/med_agent/profile/presentation/cubit/agent_profile_data/agent_profile_data_cubit.dart';
+import 'package:wm_doctor/features/regions/data/model/district_model.dart';
 import 'package:wm_doctor/features/regions/presentation/cubit/regions_cubit.dart';
 import 'package:wm_doctor/gen/locale_keys.g.dart';
 
@@ -26,7 +29,6 @@ class RegionsPage extends StatefulWidget {
 
 class _RegionsPageState extends State<RegionsPage> {
   final searchController = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<RegionsCubit, RegionsState>(
@@ -116,7 +118,7 @@ class _RegionsPageState extends State<RegionsPage> {
                           children: [
                             SvgPicture.asset(Assets.icons.list),
                             Text(
-                              LocaleKeys.texts_all.tr(),
+                            "HELLO",
                               style: TextStyle(
                                 fontFamily: 'VelaSans',
                                   fontWeight: FontWeight.w700,

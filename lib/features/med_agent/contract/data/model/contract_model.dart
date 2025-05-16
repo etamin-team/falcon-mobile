@@ -16,7 +16,7 @@ class ContractModel {
   final String? agentId;
   final int? agentContractId;
   final String? managerId;
-  final List<MedicinesWithQuantity>? medicinesWithQuantities;
+  final List<MedicineWithQuantityDoctorDTOS>? medicineWithQuantityDoctorDTOS;
   final RegionDistrictDto? regionDistrictDto;
   final User? user;
 
@@ -30,7 +30,7 @@ class ContractModel {
     this.agentId,
     this.agentContractId,
     this.managerId,
-    this.medicinesWithQuantities,
+    this.medicineWithQuantityDoctorDTOS,
     this.regionDistrictDto,
     this.user,
   });
@@ -45,7 +45,7 @@ class ContractModel {
     String? agentId,
     int? agentContractId,
     String? managerId,
-    List<MedicinesWithQuantity>? medicinesWithQuantities,
+    List<MedicineWithQuantityDoctorDTOS>? medicineWithQuantityDoctorDTOS,
     RegionDistrictDto? regionDistrictDto,
     User? user,
   }) =>
@@ -59,7 +59,7 @@ class ContractModel {
         agentId: agentId ?? this.agentId,
         agentContractId: agentContractId ?? this.agentContractId,
         managerId: managerId ?? this.managerId,
-        medicinesWithQuantities: medicinesWithQuantities ?? this.medicinesWithQuantities,
+        medicineWithQuantityDoctorDTOS: medicineWithQuantityDoctorDTOS ?? this.medicineWithQuantityDoctorDTOS,
         regionDistrictDto: regionDistrictDto ?? this.regionDistrictDto,
         user: user ?? this.user,
       );
@@ -74,7 +74,7 @@ class ContractModel {
     agentId: json["agentId"],
     agentContractId: json["agentContractId"],
     managerId: json["managerId"],
-    medicinesWithQuantities: json["medicinesWithQuantities"] == null ? null : List<MedicinesWithQuantity>.from(json["medicinesWithQuantities"].map((x) => MedicinesWithQuantity.fromJson(x))),
+    medicineWithQuantityDoctorDTOS: json["medicineWithQuantityDoctorDTOS"] == null ? null : List<MedicineWithQuantityDoctorDTOS>.from(json["medicineWithQuantityDoctorDTOS"].map((x) => MedicineWithQuantityDoctorDTOS.fromJson(x))),
     regionDistrictDto: json["regionDistrictDTO"] == null ? null : RegionDistrictDto.fromJson(json["regionDistrictDTO"]),
     user: json["user"] == null ? null : User.fromJson(json["user"]),
   );
@@ -89,57 +89,57 @@ class ContractModel {
     "agentId": agentId,
     "agentContractId": agentContractId,
     "managerId": managerId,
-    "medicinesWithQuantities": medicinesWithQuantities == null ? null : List<dynamic>.from(medicinesWithQuantities!.map((x) => x.toJson())),
+    "medicineWithQuantityDoctorDTOS": medicineWithQuantityDoctorDTOS == null ? null : List<dynamic>.from(medicineWithQuantityDoctorDTOS!.map((x) => x.toJson())),
     "regionDistrictDTO": regionDistrictDto?.toJson(),
     "user": user?.toJson(),
   };
 }
 
-class MedicinesWithQuantity {
+class MedicineWithQuantityDoctorDTOS {
   final int? quantityId;
   final int? medicineId;
   final int? quote;
   final int? correction;
   final int? agentContractId;
-  final ContractMedicineAmount? contractMedicineAmount;
+  final ContractMedicineDoctorAmount? contractMedicineDoctorAmount;
   final Medicine? medicine;
 
-  MedicinesWithQuantity({
+  MedicineWithQuantityDoctorDTOS({
     this.quantityId,
     this.medicineId,
     this.quote,
     this.correction,
     this.agentContractId,
-    this.contractMedicineAmount,
+    this.contractMedicineDoctorAmount,
     this.medicine,
   });
 
-  MedicinesWithQuantity copyWith({
+  MedicineWithQuantityDoctorDTOS copyWith({
     int? quantityId,
     int? medicineId,
     int? quote,
     int? correction,
     int? agentContractId,
-    ContractMedicineAmount? contractMedicineAmount,
+    ContractMedicineDoctorAmount? contractMedicineDoctorAmount,
     Medicine? medicine,
   }) =>
-      MedicinesWithQuantity(
+      MedicineWithQuantityDoctorDTOS(
         quantityId: quantityId ?? this.quantityId,
         medicineId: medicineId ?? this.medicineId,
         quote: quote ?? this.quote,
         correction: correction ?? this.correction,
         agentContractId: agentContractId ?? this.agentContractId,
-        contractMedicineAmount: contractMedicineAmount ?? this.contractMedicineAmount,
+        contractMedicineDoctorAmount: contractMedicineDoctorAmount ?? this.contractMedicineDoctorAmount,
         medicine: medicine ?? this.medicine,
       );
 
-  factory MedicinesWithQuantity.fromJson(Map<String, dynamic> json) => MedicinesWithQuantity(
+  factory MedicineWithQuantityDoctorDTOS.fromJson(Map<String, dynamic> json) => MedicineWithQuantityDoctorDTOS(
     quantityId: json["quantityId"],
     medicineId: json["medicineId"],
     quote: json["quote"],
     correction: json["correction"],
     agentContractId: json["agentContractId"],
-    contractMedicineAmount: json["contractMedicineAmount"] == null ? null : ContractMedicineAmount.fromJson(json["contractMedicineAmount"]),
+    contractMedicineDoctorAmount: json["contractMedicineDoctorAmount"] == null ? null : ContractMedicineDoctorAmount.fromJson(json["contractMedicineDoctorAmount"]),
     medicine: json["medicine"] == null ? null : Medicine.fromJson(json["medicine"]),
   );
 
@@ -149,30 +149,30 @@ class MedicinesWithQuantity {
     "quote": quote,
     "correction": correction,
     "agentContractId": agentContractId,
-    "contractMedicineAmount": contractMedicineAmount?.toJson(),
+    "contractMedicineDoctorAmount": contractMedicineDoctorAmount?.toJson(),
     "medicine": medicine?.toJson(),
   };
 }
 
-class ContractMedicineAmount {
+class ContractMedicineDoctorAmount {
   final int? id;
   final int? amount;
 
-  ContractMedicineAmount({
+  ContractMedicineDoctorAmount({
     this.id,
     this.amount,
   });
 
-  ContractMedicineAmount copyWith({
+  ContractMedicineDoctorAmount copyWith({
     int? id,
     int? amount,
   }) =>
-      ContractMedicineAmount(
+      ContractMedicineDoctorAmount(
         id: id ?? this.id,
         amount: amount ?? this.amount,
       );
 
-  factory ContractMedicineAmount.fromJson(Map<String, dynamic> json) => ContractMedicineAmount(
+  factory ContractMedicineDoctorAmount.fromJson(Map<String, dynamic> json) => ContractMedicineDoctorAmount(
     id: json["id"],
     amount: json["amount"],
   );

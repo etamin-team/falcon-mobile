@@ -5,17 +5,72 @@ import '../../../../core/widgets/export.dart';
 import '../../../../gen/locale_keys.g.dart';
 import '../../data/model/profile_data_model.dart';
 
-class ProfileCard extends StatelessWidget {
+class ProfileCard extends StatefulWidget {
   final ProfileDataModel model;
 
   const ProfileCard({super.key, required this.model});
 
   @override
+  State<ProfileCard> createState() => _ProfileCardState();
+}
+
+class _ProfileCardState extends State<ProfileCard> {
+  double allQuote = 0;
+  double allAmount = 0;
+
+  @override
+  void initState() {
+    calculate();
+    super.initState();
+  }
+
+  void calculate() {
+    print("asasas++++ ${widget.model.contractType}");
+    print("LENGTH::::${widget.model.medicineWithQuantityDoctorDTOS.length}");
+    for (var contract in widget.model.medicineWithQuantityDoctorDTOS) {
+      int quote = 0;
+      int amount = 0;
+
+      double ball = 0;
+      switch (widget.model.contractType) {
+        case 'RECIPE':
+          ball = contract.medicine.prescription ?? 0;
+          break;
+        case 'SU':
+          ball = (contract.medicine.suBall ?? 0).toDouble();
+          break;
+        case 'SB':
+          ball = (contract.medicine.sbBall ?? 0).toDouble();
+          break;
+        case 'GZ':
+          ball = (contract.medicine.gzBall ?? 0).toDouble();
+          break;
+        case 'KZ':
+          ball = (contract.medicine.kbBall ?? 0).toDouble();
+          break;
+        default:
+          ball = 0;
+      }
+
+      print("BALL_$ball");
+      print("QUOTE_${contract.quote}");
+      print("Amount_${contract.contractMedicineDoctorAmount.amount}");
+      allQuote += contract.quote * ball;
+      allAmount += contract.contractMedicineDoctorAmount.amount * ball;
+    }
+    print("ALLQUOTE::: $allQuote");
+    print("AllAmount::: $allAmount");
+    setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
-    String fromDate =model.startDate ??
+    String fromDate = widget.model.startDate ??
         DateFormat('dd/MM/yyyy').format(DateTime.now()).toString();
-    String toDate =model.endDate ??
-        DateFormat('dd/MM/yyyy').format( DateTime.now());
+    String toDate =
+        widget.model.endDate ?? DateFormat('dd/MM/yyyy').format(DateTime.now());
+    double amountWidth =
+        (MediaQuery.sizeOf(context).width * allAmount) / allQuote;
 
     return Column(
       spacing: Dimens.space10,
@@ -71,40 +126,50 @@ class ProfileCard extends StatelessWidget {
         //     ],
         //   ),
         // ),
-        Container(
-          padding: EdgeInsets.symmetric(horizontal: Dimens.space20),
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(Dimens.space20),
-              color: AppColors.white),
-          child: Theme(
-              data:
-                  Theme.of(context).copyWith(dividerColor: Colors.transparent),
-              child: ExpansionTile(
-                childrenPadding: EdgeInsets.only(bottom: Dimens.space20),
-                tilePadding: EdgeInsets.zero,
-                title: Text(
-                  LocaleKeys.profile_my_paket.tr(),
-                  style: TextStyle(
-                    fontFamily: 'VelaSans',
-                  
-                      fontSize: Dimens.space18, fontWeight: FontWeight.w700),
-                ),
-                children: List.generate(
-                  model.contractedMedicineWithQuantity.length ?? 0,
-                  (index) {
-                    return CustomProgressBar(
-                        title: model.contractedMedicineWithQuantity[index].medicine.name??
-                            "-",
-                        current: model.contractedMedicineWithQuantity[index]
-                                .contractMedicineAmount.amount ??
-                            0,
-                        total: model
-                                .contractedMedicineWithQuantity[index].quote ??
-                            0);
-                  },
-                ),
-              )),
-        ),
+        if (widget.model.medicineWithQuantityDoctorDTOS.isNotEmpty)
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: Dimens.space20),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(Dimens.space20),
+                color: AppColors.white),
+            child: Theme(
+                data: Theme.of(context)
+                    .copyWith(dividerColor: Colors.transparent),
+                child: ExpansionTile(
+                  childrenPadding: EdgeInsets.only(bottom: Dimens.space20),
+                  tilePadding: EdgeInsets.zero,
+                  title: Text(
+                    LocaleKeys.profile_my_paket.tr(),
+                    style: TextStyle(
+                        fontFamily: 'VelaSans',
+                        fontSize: Dimens.space18,
+                        fontWeight: FontWeight.w700),
+                  ),
+                  children: List.generate(
+                    widget.model.medicineWithQuantityDoctorDTOS.length ?? 0,
+                    (index) {
+                      return CustomProgressBar(
+                          title: widget
+                                  .model
+                                  .medicineWithQuantityDoctorDTOS[index]
+                                  .medicine
+                                  .name ??
+                              "-",
+                          current: widget
+                                  .model
+                                  .medicineWithQuantityDoctorDTOS[index]
+                                  .contractMedicineDoctorAmount
+                                  .amount ??
+                              0,
+                          total: widget
+                                  .model
+                                  .medicineWithQuantityDoctorDTOS[index]
+                                  .quote ??
+                              0);
+                    },
+                  ),
+                )),
+          ),
         Container(
           padding: EdgeInsets.all(Dimens.space20),
           decoration: BoxDecoration(
@@ -116,9 +181,9 @@ class ProfileCard extends StatelessWidget {
               Text(
                 LocaleKeys.profile_execution_period.tr(),
                 style: TextStyle(
-                  fontFamily: 'VelaSans',
-
-                    fontSize: Dimens.space18, fontWeight: FontWeight.w700),
+                    fontFamily: 'VelaSans',
+                    fontSize: Dimens.space18,
+                    fontWeight: FontWeight.w700),
               ),
               SizedBox(
                 height: Dimens.space20,
@@ -136,8 +201,7 @@ class ProfileCard extends StatelessWidget {
                     Text(
                       "C  $fromDate  по  $toDate",
                       style: TextStyle(
-                        fontFamily: 'VelaSans',
-
+                          fontFamily: 'VelaSans',
                           fontSize: Dimens.space14,
                           fontWeight: FontWeight.w400),
                     ),
@@ -148,7 +212,6 @@ class ProfileCard extends StatelessWidget {
             ],
           ),
         ),
-
 
         Container(
           padding: EdgeInsets.all(Dimens.space20),
@@ -165,45 +228,91 @@ class ProfileCard extends StatelessWidget {
                   Text(
                     LocaleKeys.profile_target.tr(),
                     style: TextStyle(
-                      fontFamily: 'VelaSans',
-
-                        fontSize: Dimens.space18, fontWeight: FontWeight.w700),
+                        fontFamily: 'VelaSans',
+                        fontSize: Dimens.space18,
+                        fontWeight: FontWeight.w700),
                   ),
                   Text(
-                    "${LocaleKeys.profile_step.tr()} 256.000",
+                    "${LocaleKeys.profile_step.tr()} $allQuote",
+                    // "${LocaleKeys.profile_step.tr()} 256.000",
                     style: TextStyle(
-                      fontFamily: 'VelaSans',
-
-                        fontSize: Dimens.space14, fontWeight: FontWeight.w400),
+                        fontFamily: 'VelaSans',
+                        fontSize: Dimens.space14,
+                        fontWeight: FontWeight.w400),
                   ),
                 ],
               ),
-              ...List.generate(
-                1,
-                (index) {
+              ...widget.model.medicineWithQuantityDoctorDTOS.map(
+                (e) {
                   return Container(
-                    width: double.infinity,
+                    width: MediaQuery.sizeOf(context).width,
+                    alignment: AlignmentDirectional.centerStart,
                     decoration: BoxDecoration(
                         color: AppColors.backgroundColor,
                         borderRadius: BorderRadius.circular(Dimens.space10)),
-                    child: Container(
-                      width: 100,
-                      padding: EdgeInsets.symmetric(
-                          horizontal: Dimens.space20, vertical: Dimens.space14),
-                      decoration: BoxDecoration(
-                          color: AppColors.lightGreen,
-                          borderRadius: BorderRadius.circular(Dimens.space10)),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    child: SizedBox(
+                      width: MediaQuery.sizeOf(context).width,
+                      child: Stack(
                         children: [
-                          Text(LocaleKeys.profile_passed.tr()),
-                          Text("22"),
+                          Container(
+                            width: amountWidth == 0.0 ? null : amountWidth,
+                            padding: EdgeInsets.symmetric(
+                                // horizontal: Dimens.space20,
+                                vertical: Dimens.space14),
+                            decoration: BoxDecoration(
+                                color: AppColors.lightGreen,
+                                borderRadius:
+                                    BorderRadius.circular(Dimens.space10)),
+                            child: Text(""),
+                          ),
+                          Positioned(
+                            left: Dimens.space20,
+                            right: Dimens.space20,
+                            bottom: 0,
+                            top: 0,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(LocaleKeys.profile_passed.tr()),
+                                Text("$allAmount"),
+                              ],
+                            ),
+                          )
                         ],
                       ),
                     ),
                   );
                 },
               ),
+              // ...List.generate(
+              //   1,
+              //   (index) {
+              //     return Container(
+              //       width: MediaQuery.sizeOf(context).width,
+              //       decoration: BoxDecoration(
+              //           color: AppColors.backgroundColor,
+              //           borderRadius: BorderRadius.circular(Dimens.space10)),
+              //       child: Container(
+              //         width:
+              //             20 /*(MediaQuery.sizeOf(context).width * allAmount) /
+              //             allQuote*/
+              //         ,
+              //         padding: EdgeInsets.symmetric(
+              //             horizontal: Dimens.space20, vertical: Dimens.space14),
+              //         decoration: BoxDecoration(
+              //             color: AppColors.lightGreen,
+              //             borderRadius: BorderRadius.circular(Dimens.space10)),
+              //         child: Row(
+              //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //           children: [
+              //             Text(LocaleKeys.profile_passed.tr()),
+              //             Text("$allAmount"),
+              //           ],
+              //         ),
+              //       ),
+              //     );
+              //   },
+              // ),
             ],
           ),
         ),

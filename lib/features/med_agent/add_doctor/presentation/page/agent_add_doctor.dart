@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:math';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
@@ -12,17 +13,20 @@ import 'package:wm_doctor/features/med_agent/add_doctor/data/model/add_contract_
 import 'package:wm_doctor/features/med_agent/add_doctor/data/model/doctor_model.dart';
 import 'package:wm_doctor/features/med_agent/add_doctor/presentation/cubit/add_doctor_cubit.dart';
 import 'package:wm_doctor/features/med_agent/home/presentation/page/agent_home_page.dart';
+import 'package:wm_doctor/features/medicine/presentation/cubit/medicine_cubit.dart';
 import 'package:wm_doctor/features/medicine/presentation/page/medicine_dialog.dart';
+import 'package:wm_doctor/features/medicine/presentation/page/medicine_page.dart';
 import 'package:wm_doctor/features/regions/presentation/page/regions_dialog.dart';
 import 'package:wm_doctor/features/workplace/presentation/page/workplace_dialog.dart';
-
-import '../../../../../core/utils/text_mask.dart';
-import '../../../../../core/widgets/export.dart';
-import '../../../../profile/presentation/cubit/profile_cubit.dart';
-import '../../../contract/presentation/cubit/contract_cubit.dart';
-import '../../../home/presentation/cubit/agent_home_cubit.dart';
-import '../../../home/presentation/cubit/doctor/doctor_cubit.dart';
-import '../../../profile/presentation/cubit/agent_profile_data/agent_profile_data_cubit.dart';
+import 'package:wm_doctor/core/utils/dependencies_injection.dart';
+import 'package:wm_doctor/core/utils/text_mask.dart';
+import 'package:wm_doctor/core/widgets/export.dart';
+import 'package:wm_doctor/features/medicine/data/repository/medicine_repository_impl.dart';
+import 'package:wm_doctor/features/profile/presentation/cubit/profile_cubit.dart';
+import 'package:wm_doctor/features/med_agent/contract/presentation/cubit/contract_cubit.dart';
+import 'package:wm_doctor/features/med_agent/home/presentation/cubit/agent_home_cubit.dart';
+import 'package:wm_doctor/features/med_agent/home/presentation/cubit/doctor/doctor_cubit.dart';
+import 'package:wm_doctor/features/med_agent/profile/presentation/cubit/agent_profile_data/agent_profile_data_cubit.dart';
 
 class AgentAddDoctor extends StatefulWidget {
   const AgentAddDoctor({super.key});
@@ -43,9 +47,16 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
   final fromDateController = TextEditingController();
   final toDateController = TextEditingController();
   final recipeController = TextEditingController();
+  final amountController = TextEditingController();
+  double allQuote = 0;
+
+  late final MedicineRepositoryImpl medicineRepositoryImpl;
+
   int agentId = 0;
 
-  List<MedicineModel> preparation = [];
+  List<MedicineModel> preparations = [];
+  List<MedicineModel> selectedPreparations = [];
+  List<int> quantity = [];
   LanguageModel location = LanguageModel(uz: "", ru: "", en: "");
   int locationId = 0;
   String workplace = "";
@@ -54,7 +65,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
   String special = "";
   String level = "";
   final formKey = GlobalKey<FormState>();
-  List<String> contractTypesList = ["KZ", "SU", "SB", "GZ", " RECIPE"];
+  List<String> contractTypesList = ["KZ", "SU", "SB", "GZ", "RECIPE"];
   List<String> contractTypesFullList = [
     "Каб.вакцинации",
     "Спецусловия",
@@ -67,6 +78,71 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
   String selectedContractTypeFull = "Каб.вакцинации";
 
   @override
+  void initState() {
+    super.initState();
+    medicineRepositoryImpl = sl<MedicineRepositoryImpl>();
+    loadMedicines();
+    context.read<DoctorCubit>().getDoctors(); // Doktorlarni yuklash
+  }
+
+  void loadMedicines() async {
+    final result = await medicineRepositoryImpl.getMedicine();
+    result.fold(
+          (failure) {
+        print('Error: ${failure.errorMsg}');
+      },
+          (list) {
+        setState(() {
+          preparations = list;
+        });
+      },
+    );
+  }
+
+  void showDoctorDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return BlocBuilder<DoctorCubit, DoctorState>(
+          builder: (context, state) {
+            if (state is DoctorLoading) {
+              return Center(child: CircularProgressIndicator());
+            } else if (state is DoctorLoaded) {
+              return AlertDialog(
+                title: Text("Выберите врача"),
+                content: Container(
+                  width: double.maxFinite,
+                  height: 300,
+                  child: ListView.builder(
+                    itemCount: state.doctors.length,
+                    itemBuilder: (context, index) {
+                      final doctor = state.doctors[index];
+                      return ListTile(
+                        title: Text("${doctor.firstName} ${doctor.lastName}"),
+                        onTap: () {
+                          nameController.text = "${doctor.firstName} ${doctor.lastName}";
+                          Navigator.pop(context);
+                        },
+                      );
+                    },
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text("Отмена"),
+                  ),
+                ],
+              );
+            }
+            return Center(child: Text("Ошибка загрузки"));
+          },
+        );
+      },
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
@@ -74,8 +150,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
         forceMaterialTransparency: true,
         automaticallyImplyLeading: false,
         title: Text("Добавить врача",
-            style: TextStyle(
-                fontWeight: FontWeight.bold, fontSize: Dimens.space28)),
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: Dimens.space28)),
         actions: [
           TextButton(
               onPressed: () {
@@ -88,9 +163,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                     fontSize: Dimens.space18,
                     fontWeight: FontWeight.w500),
               )),
-          SizedBox(
-            width: Dimens.space10,
-          )
+          SizedBox(width: Dimens.space10),
         ],
       ),
       body: BlocConsumer<AddDoctorCubit, AddDoctorState>(
@@ -107,9 +180,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
         },
         builder: (context, state) {
           if (state is AddDoctorLoading) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
+            return Center(child: CircularProgressIndicator());
           }
           return SingleChildScrollView(
             padding: EdgeInsets.symmetric(horizontal: Dimens.space20),
@@ -119,9 +190,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 spacing: Dimens.space10,
                 children: [
-                  SizedBox(
-                    height: Dimens.space10,
-                  ),
+                  SizedBox(height: Dimens.space10),
                   Container(
                     padding: EdgeInsets.all(Dimens.space20),
                     decoration: BoxDecoration(
@@ -131,7 +200,9 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                       spacing: Dimens.space10,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        AppTextField(
+                        GestureDetector(
+                          onTap: showDoctorDialog,
+                          child: AppTextField(
                             validator: (value) {
                               if (value.toString().isEmpty) {
                                 return "Введите имя и фамилию врача.";
@@ -139,7 +210,15 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                               return null;
                             },
                             controller: nameController,
-                            hintText: "Ф.И.О. врача"),
+                            hintText: "Ф.И.О. врача",
+                            suffixIcon: Icon(
+                              CupertinoIcons.chevron_down,
+                              color: Colors.black,
+                            ),
+                            hintColor: Colors.black87,
+                            isEnabled: false,
+                          ),
+                        ),
                         GestureDetector(
                           onTap: () {
                             showRegions(
@@ -275,9 +354,8 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                               RegExp regex = RegExp(pattern);
                               if (!regex.hasMatch(value.toString()) &&
                                   value.toString().isNotEmpty) {
-                                return "Email to'g'ri kriiting";
+                                return "Email to'g'ri kiritilsin";
                               }
-
                               return null;
                             },
                             controller: emailController,
@@ -297,9 +375,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                             ],
                             controller: numberController,
                             hintText: "90 123 45 67"),
-                        SizedBox(
-                          height: Dimens.space10,
-                        ),
+                        SizedBox(height: Dimens.space10),
                         Text(
                           "Временный пароль",
                           style: TextStyle(
@@ -321,8 +397,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                             children: [
                               GestureDetector(
                                   onTap: () {
-                                    passwordController.text =
-                                        generatePassword();
+                                    passwordController.text = generatePassword();
                                     setState(() {});
                                   },
                                   child: SvgPicture.asset(Assets.icons.repeat)),
@@ -339,15 +414,11 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                                     }
                                   },
                                   child: SvgPicture.asset(Assets.icons.copy)),
-                              SizedBox(
-                                width: Dimens.space5,
-                              )
+                              SizedBox(width: Dimens.space5),
                             ],
                           ),
                         ),
-                        SizedBox(
-                          height: Dimens.space10,
-                        ),
+                        SizedBox(height: Dimens.space10),
                       ],
                     ),
                   ),
@@ -361,7 +432,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Text(
-                          "Tип Kонтракта",
+                          "Тип Контракта",
                           style: TextStyle(
                               fontWeight: FontWeight.w600,
                               fontSize: Dimens.space18),
@@ -371,18 +442,17 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(12),
-                            border:
-                                Border.all(color: Colors.blueAccent, width: 2),
+                            border: Border.all(color: Colors.blueAccent, width: 2),
                           ),
                           child: DropdownMenuTheme(
                             data: DropdownMenuThemeData(
                               menuStyle: MenuStyle(
                                 backgroundColor:
-                                    MaterialStateProperty.all(Colors.white),
+                                MaterialStateProperty.all(Colors.white),
                                 shape: MaterialStateProperty.all(
                                   RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                        12), // 🔹 Dropdown menyuga radius qo'shish
+                                    borderRadius:
+                                    BorderRadius.circular(12),
                                   ),
                                 ),
                               ),
@@ -396,26 +466,24 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                                 ),
                                 value: selectedContractTypeFull,
                                 onChanged: (String? newValue) {
+                                  calculate();
                                   setState(() {
                                     int selectedIndex = contractTypesFullList
                                         .indexOf(newValue!);
                                     selectedContractTypeFull = newValue;
                                     selectedContractType = contractTypesList[
-                                        selectedIndex]; // Qisqartma qiymatni olish
+                                    selectedIndex];
                                   });
                                 },
                                 icon: Icon(Icons.arrow_drop_down,
                                     color: Colors.blueAccent, size: 30),
-                                style: TextStyle(
-                                    fontSize: 18, color: Colors.black),
+                                style: TextStyle(fontSize: 18, color: Colors.black),
                                 dropdownColor: Colors.white,
                                 items: contractTypesFullList
-                                    .map<DropdownMenuItem<String>>(
-                                        (String value) {
+                                    .map<DropdownMenuItem<String>>((String value) {
                                   return DropdownMenuItem<String>(
                                     value: value,
-                                    child: Text(value,
-                                        style: TextStyle(fontSize: 16)),
+                                    child: Text(value, style: TextStyle(fontSize: 16)),
                                   );
                                 }).toList(),
                               ),
@@ -442,19 +510,23 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                         ),
                         GestureDetector(
                           onTap: () {
+                            print(preparations.length);
                             showMedicine(
                                 ctx: context,
-                                medicine: preparation,
-                                model: (MedicineModel value) {
+                                medicine: preparations,
+                                model: (MedicineModel value1) {
                                   Navigator.pop(context);
-
                                   showInputAmount(
-                                    name: value.name ?? "",
+                                    name: value1.name ?? "",
                                     amount: 1,
                                     onChange: (v) {
-                                      preparation.add(value);
-                                      preparation.last.quantity = v;
+                                      print("----------------------->${value1.name}");
+                                      print("----------------------->${amountController.text}");
+                                      selectedPreparations.add(value1);
+                                      quantity.add(int.parse(amountController.text));
+                                      preparations.last.quantity = v;
                                       if (formKey.currentState!.validate()) {}
+                                      calculate();
                                       setState(() {});
                                     },
                                   );
@@ -463,7 +535,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                           child: AppTextField(
                             textColor: Colors.black,
                             validator: (value) {
-                              if (preparation.isEmpty) {
+                              if (preparations.isEmpty) {
                                 return "----------";
                               }
                               return null;
@@ -479,24 +551,24 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                           ),
                         ),
                         ...List.generate(
-                          preparation.length,
-                          (index) {
+                          selectedPreparations.length,
+                              (index) {
                             return Container(
                               padding: EdgeInsets.symmetric(
                                   horizontal: Dimens.space20,
                                   vertical: Dimens.space16),
                               decoration: BoxDecoration(
                                   borderRadius:
-                                      BorderRadius.circular(Dimens.space10),
+                                  BorderRadius.circular(Dimens.space10),
                                   color: AppColors.backgroundColor),
                               child: Row(
                                 spacing: Dimens.space10,
                                 mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                MainAxisAlignment.spaceBetween,
                                 children: [
                                   GestureDetector(
                                       onTap: () {
-                                        preparation.removeAt(index);
+                                        selectedPreparations.removeAt(index);
                                         setState(() {});
                                       },
                                       child: SvgPicture.asset(
@@ -504,21 +576,23 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                                         height: Dimens.space20,
                                         width: Dimens.space20,
                                       )),
-                                  Text(
-                                    preparation[index].name ?? "",
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.w600),
+                                  Expanded(
+                                    child: Text(
+                                      selectedPreparations[index].name ?? "",
+                                      style:
+                                      TextStyle(fontWeight: FontWeight.w600),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
-                                  Spacer(),
-                                  Text("${preparation[index].quantity ?? 0}"),
+                                  Text("${quantity[index]}"),
                                   GestureDetector(
                                     onTap: () {
                                       showInputAmount(
-                                          name: preparation[index].name ?? "",
-                                          amount:
-                                              preparation[index].quantity ?? 0,
+                                          name: selectedPreparations[index].name ?? "",
+                                          amount: quantity[index],
                                           onChange: (int value) {
-                                            preparation[index].quantity = value;
+                                            quantity[index] = value;
+                                            calculate();
                                             setState(() {});
                                           });
                                     },
@@ -557,8 +631,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                               DateTime max = DateTime(2050);
                               if (toDateController.text.length == 10) {
                                 DateFormat format = DateFormat("yyyy-MM-dd");
-                                max = format
-                                    .parse(toDateController.text.toString());
+                                max = format.parse(toDateController.text.toString());
                                 max.add(Duration(hours: 12));
                               }
                               showDatePickerBottomSheet(
@@ -599,11 +672,10 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                           GestureDetector(
                             onTap: () {
                               DateTime min =
-                                  DateTime.now().add(Duration(days: 1));
+                              DateTime.now().add(Duration(days: 1));
                               if (fromDateController.text.length == 10) {
                                 DateFormat format = DateFormat("yyyy-MM-dd");
-                                min = format
-                                    .parse(fromDateController.text.toString());
+                                min = format.parse(fromDateController.text.toString());
                                 min.add(Duration(hours: 12));
                               }
                               showDatePickerBottomSheet(
@@ -659,7 +731,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text("Шаги"),
-                          Text("1 200 000"),
+                          Text(allQuote.toString()),
                         ],
                       ),
                     ),
@@ -671,14 +743,14 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                           cornerRadius: Dimens.space20,
                           text: "Зарегистрировать врача",
                           onPressed: () {
-                            if (preparation.length <= 4) {
+                            if (selectedPreparations.length <= 4) {
                               showDialog(
                                   context: context,
                                   builder: (context) {
                                     return AlertDialog(
-                                      title: Text("Ошибка",style: TextStyle(color: Colors.redAccent)),
+                                      title: Text("Ошибка", style: TextStyle(color: Colors.redAccent)),
                                       content: Text(
-                                        "Для зарегистрации врача необходимо заполнить все поля и добавить минимум 5 препаратов",
+                                        "Для регистрации врача необходимо заполнить все поля и добавить минимум 5 препаратов",
                                         style: TextStyle(fontSize: 16),
                                       ),
                                       actions: [
@@ -696,10 +768,8 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                               context.read<AddDoctorCubit>().addDoctor(
                                   doctor: DoctorModel(
                                       firstName: names[0],
-                                      lastName:
-                                          names.length > 1 ? names[1] : "",
-                                      middleName:
-                                          names.length > 2 ? names[2] : "",
+                                      lastName: names.length > 1 ? names[1] : "",
+                                      middleName: names.length > 2 ? names[2] : "",
                                       email: emailController.text.trim(),
                                       role: "DOCTOR",
                                       password: passwordController.text.trim(),
@@ -708,7 +778,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                                           .replaceAll(" ", ""),
                                       phonePrefix: "998",
                                       number:
-                                          "998${numberController.text.trim().replaceAll(" ", "")}",
+                                      "998${numberController.text.trim().replaceAll(" ", "")}",
                                       workPlaceId: workplaceId,
                                       birthDate: "2000-01-01",
                                       gender: "MALE",
@@ -718,20 +788,19 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                                   contract: AddContractModel(
                                     doctorId: "",
                                     startDate:
-                                        fromDateController.text.toString(),
+                                    fromDateController.text.toString(),
                                     endDate: toDateController.text.toString(),
                                     agentId: "",
                                     contractType: selectedContractType,
                                     agentContractId: agentContractId ?? 0,
-                                    medicinesWithQuantities: List.generate(
-                                      preparation.length,
-                                      (index) {
-                                        return MedicinesWithQuantity(
+                                    medicineWithQuantityDoctorDTOS: List.generate(
+                                      selectedPreparations.length,
+                                          (index) {
+                                        return MedicineWithQuantityDoctorDTOS(
                                             medicineId:
-                                                preparation[index].id ?? 0,
+                                            selectedPreparations[index].id ?? 0,
                                             quote:
-                                                preparation[index].quantity ??
-                                                    0);
+                                            quantity[index]);
                                       },
                                     ),
                                   ));
@@ -740,21 +809,17 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                                   context: context,
                                   builder: (context) {
                                     return AlertDialog(
-                                      title: Text("Успешно",style: TextStyle(color: Colors.greenAccent),),
+                                      title: Text("Успешно", style: TextStyle(color: Colors.greenAccent)),
                                       content: Text(
                                         "Вы успешно зарегистрировали врача",
                                       ),
                                     );
                                   });
-                            Navigator.push( context, MaterialPageRoute( builder: (context) => AgentHomePage()));
                             }
-                          }
-                          );
+                          });
                     },
                   ),
-                  SizedBox(
-                    height: Dimens.space20,
-                  ),
+                  SizedBox(height: Dimens.space20),
                 ],
               ),
             ),
@@ -766,11 +831,10 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
 
   void showInputAmount(
       {required String name,
-      required int amount,
-      required ValueChanged<int> onChange}) async {
-    final textController = TextEditingController();
+        required int amount,
+        required ValueChanged<int> onChange}) async {
     final quantForm = GlobalKey<FormState>();
-    textController.text = amount.toString();
+    amountController.text = amount.toString();
     showModalBottomSheet(
       isScrollControlled: true,
       enableDrag: true,
@@ -801,7 +865,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                   return null;
                 },
                 maxLen: 5,
-                controller: textController,
+                controller: amountController,
                 hintText: "1",
               ),
               UniversalButton.filled(
@@ -809,7 +873,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                 onPressed: () {
                   if (quantForm.currentState!.validate()) {
                     int number =
-                        int.tryParse(textController.text.toString()) ?? 1;
+                        int.tryParse(amountController.text.toString()) ?? 1;
                     onChange(number);
                     Navigator.pop(context);
                   }
@@ -817,9 +881,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                 fontSize: Dimens.space14,
                 cornerRadius: Dimens.space20,
               ),
-              SizedBox(
-                height: Dimens.space50,
-              )
+              SizedBox(height: Dimens.space50),
             ],
           ).paddingOnly(
               left: Dimens.space30,
@@ -833,11 +895,11 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
 
   Future<void> showDatePickerBottomSheet(
       {required BuildContext ctx,
-      required String text,
-      required ValueChanged<String> onChange,
-      required DateTime min,
-      required DateTime max,
-      required bool from}) async {
+        required String text,
+        required ValueChanged<String> onChange,
+        required DateTime min,
+        required DateTime max,
+        required bool from}) async {
     DateTime dateTime = DateTime.now().add(Duration(hours: 1));
     if (!from) {
       dateTime = min.add(Duration(hours: 5));
@@ -851,11 +913,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
     return showModalBottomSheet(
       context: ctx,
       isScrollControlled: true,
-      // BottomSheet o'lchamini moslashuvchan qiladi
       backgroundColor: Colors.white,
-      // shape: const RoundedRectangleBorder(
-      //   borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      // ),
       builder: (BuildContext context) {
         return SizedBox(
           height: 350,
@@ -877,7 +935,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                   maximumDate: from ? max : DateTime(2050),
                   minimumDate: from
                       ? DateTime(DateTime.now().year, DateTime.now().month,
-                          DateTime.now().day)
+                      DateTime.now().day)
                       : min,
                   onDateTimeChanged: (DateTime newDate) {
                     dateTime = newDate;
@@ -898,9 +956,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                   Navigator.pop(context);
                 },
               ),
-              const SizedBox(
-                height: 20,
-              ),
+              const SizedBox(height: 20),
             ],
           ),
         );
@@ -912,10 +968,42 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
     const String chars =
         'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     Random random = Random();
-
     return List.generate(10, (index) => chars[random.nextInt(chars.length)])
         .join();
   }
 
   void showContractType(ValueChanged<String> onChange) {}
+
+  void calculate() {
+    allQuote = 0;
+    int i = 0;
+    for (MedicineModel medicine in selectedPreparations) {
+      double ball = 0;
+      switch (selectedContractType) {
+        case 'RECIPE':
+          ball = medicine.prescription ?? 0;
+          break;
+        case 'SU':
+          ball = (medicine.suBall ?? 0).toDouble();
+          break;
+        case 'SB':
+          ball = (medicine.sbBall ?? 0).toDouble();
+          break;
+        case 'GZ':
+          ball = (medicine.gzBall ?? 0).toDouble();
+          break;
+        case 'KZ':
+          ball = (medicine.kbBall ?? 0).toDouble();
+          break;
+        default:
+          ball = 0;
+      }
+      allQuote += quantity[i] * ball;
+      i++;
+    }
+    setState(() {});
+  }
+}
+
+class DoctorLoaded {
 }

@@ -90,8 +90,8 @@
     "title": "Создать рецепт",
     "select_template": "Выберите шаблон",
     "name": "Фамилия / Имя",
-    "birthdate_and_number": "Год рождения и телефон",
-    "select_date": "Выберите год",
+    "birthdate_and_number": "Дату рождения и телефон",
+    "select_date": "Выберите дату рождения",
     "diagnose": "Диагноз",
     "enter_diagnose": "Введите диагноз",
     "write_here": "Пишите сюда",
@@ -108,6 +108,8 @@
     "enter_name": "Введите имя и фамилию",
     "enter_birthdate": "Введите дату вашего рождения",
     "enter_number": "Введите номер правильно.",
+    "add_preparations": "Добавить препараты",
+    "inns": "Список МНН",
     "select": "Выбирать"
   },
   "create_template": {

@@ -22,7 +22,7 @@ class SignInRepositoryImpl implements SignInRepository {
         },
         isHeader: false);
 
-    if (request.isSuccess) {
+    if (request.isSuccess && null != request.response) {
       debugPrint("token ==========>>>> ${request.response["access_token"]}");
       debugPrint("refresh token ==========>>>> ${request.response["refresh_token"]}");
       await SecureStorage().write(key: "number", value: number);

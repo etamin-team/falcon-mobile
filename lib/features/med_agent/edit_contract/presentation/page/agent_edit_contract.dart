@@ -9,10 +9,13 @@ import 'package:wm_doctor/features/create_template/data/model/medicine_model.dar
 import 'package:wm_doctor/features/med_agent/edit_contract/data/model/edit_model.dart';
 import 'package:wm_doctor/features/med_agent/edit_contract/data/model/edit_upload_model.dart';
 import 'package:wm_doctor/features/med_agent/edit_contract/presentation/cubit/edit_contract_cubit.dart';
+import 'package:wm_doctor/features/medicine/presentation/cubit/medicine_cubit.dart';
 
 import '../../../../../core/services/secure_storage.dart';
+import '../../../../../core/utils/dependencies_injection.dart';
 import '../../../../../core/widgets/export.dart';
 import '../../../../auth/sign_up/data/model/workplace_model.dart';
+import '../../../../medicine/data/repository/medicine_repository_impl.dart';
 import '../../../../medicine/presentation/page/medicine_dialog.dart';
 import '../../../../profile/data/model/out_contract_model.dart';
 import '../../../../profile/data/model/profile_data_model.dart';
@@ -44,12 +47,25 @@ class AgentEditContract extends StatefulWidget {
 }
 
 class _AgentEditContractState extends State<AgentEditContract> {
-  List<EditContractModel> medicine = [];
   LanguageModel location = LanguageModel(uz: "", ru: "", en: "");
-  int locationId = 0;
-  String workplace = "";
-  int workplaceId = 0;
   LanguageModel special = LanguageModel(uz: "", ru: "", en: "");
+  int locationId = 0;
+  int workplaceId = 0;
+  String selectedContractType = "KZ";
+
+  late MedicineRepositoryImpl medicineRepositoryImpl;
+  List<EditContractModel> medicine = [];
+  List<MedicineModel> medicines = [];
+  List<MedicineModel> selectedPreparations = [];
+  List<MedicineModel> preparations = [];
+
+  String workplace = "";
+  final amountController = TextEditingController();
+  final recipeController = TextEditingController();
+  List<int> quantity = [];
+  double allQuote = 0;
+
+
 
   @override
   void initState() {
@@ -58,35 +74,52 @@ class _AgentEditContractState extends State<AgentEditContract> {
         ru: widget.districtModel?.nameRussian ?? "",
         en: widget.districtModel?.name ?? "");
     workplace = widget.workplaceModel?.name ?? "";
+    selectedContractType = "KZ";
     special = LanguageModel(
         uz: widget.model.fieldName ?? "",
         ru: widget.model.fieldName ?? "",
         en: widget.model.fieldName ?? "");
     if (widget.profileModel != null) {
       medicine = List.generate(
-        widget.profileModel?.contractedMedicineWithQuantity.length ?? 0,
+        widget.profileModel?.medicineWithQuantityDoctorDTOS.length ?? 0,
         (index) {
           return EditContractModel(
-              name: widget.profileModel?.contractedMedicineWithQuantity[index]
+              name: widget.profileModel?.medicineWithQuantityDoctorDTOS[index]
                       .medicine.name ??
                   "",
-              id: widget.profileModel?.contractedMedicineWithQuantity[index]
+              id: widget.profileModel?.medicineWithQuantityDoctorDTOS[index]
                       .medicine.id ??
                   0,
               quantity: widget.profileModel
-                      ?.contractedMedicineWithQuantity[index].quote ??
+                      ?.medicineWithQuantityDoctorDTOS[index].quote ??
                   0,
               selled: widget
                       .profileModel
-                      ?.contractedMedicineWithQuantity[index]
-                      .contractMedicineAmount
+                      ?.medicineWithQuantityDoctorDTOS[index]
+                      .contractMedicineDoctorAmount
                       .amount ??
                   0);
         },
       );
     }
-
+    medicineRepositoryImpl = sl<MedicineRepositoryImpl>(); // initialize it here
+    loadMedicines();
     super.initState();
+  }
+
+  void loadMedicines() async {
+    final result = await medicineRepositoryImpl.getMedicine();
+    result.fold(
+          (failure) {
+        // Handle the failure case here if needed
+        print('Error: ${failure.errorMsg}');
+      },
+          (list) {
+        setState(() {
+          preparations = list;
+        });
+      },
+    );
   }
 
   @override
@@ -146,11 +179,6 @@ class _AgentEditContractState extends State<AgentEditContract> {
                     spacing: Dimens.space10,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // Text(
-                      //   "Регион",
-                      //   style: TextStyle(
-                      //       fontWeight: FontWeight.w600, fontSize: Dimens.space18),
-                      // ),
                       Container(
                         padding: EdgeInsets.symmetric(
                             horizontal: Dimens.space20,
@@ -247,28 +275,23 @@ class _AgentEditContractState extends State<AgentEditContract> {
                         onTap: () {
                           showMedicine(
                               ctx: context,
-                              medicine: List.generate(
-                                medicine.length,
-                                (index) =>
-                                    MedicineModel(id: medicine[index].id),
-                              ),
-                              model: (MedicineModel value) {
+                              medicine: preparations,
+                              model: (MedicineModel value1) {
                                 Navigator.pop(context);
-
                                 showInputAmount(
-                                  name: value.name ?? "",
+                                  name: value1.name ?? "",
                                   amount: 1,
                                   onChange: (v) {
-                                    medicine.add(EditContractModel(
-                                        name: value.name ?? "",
-                                        id: value.id ?? 0,
-                                        quantity: 0,
-                                        selled: 0));
-                                    medicine.last.quantity = v;
+                                    print("----------------------->${value1.name}" );
+                                    print("----------------------->${amountController.text}" );
+                                    selectedPreparations.add(value1);
 
+                                    quantity.add(int.parse(amountController.text.toString()));
+                                    preparations.last.quantity = v;
+                                    calculate();
                                     setState(() {});
                                   },
-                                  min: 1,
+                                  min: 1
                                 );
                               });
                         },
@@ -312,20 +335,25 @@ class _AgentEditContractState extends State<AgentEditContract> {
                                       },
                                       child: SvgPicture.asset(
                                           Assets.icons.delete)),
-                                Text(
-                                  medicine[index].name,
-                                  style: TextStyle(fontWeight: FontWeight.w600),
+                                Expanded(
+                                  child: Text(
+                                    //TODO
+                                    // (selectedPreparations[index].name!.length>27?selectedPreparations[index].name?.substring(0,27):selectedPreparations[index].name) ?? "",
+                                    overflow: TextOverflow.ellipsis,
+                                    medicine[index].name ?? "",
+                                    style:
+                                    TextStyle(fontWeight: FontWeight.w600),
+                                  ),
                                 ),
-                                Spacer(),
-                                Text(medicine[index].quantity.toString()),
+                                Text("${medicine[index].quantity}"),
                                 GestureDetector(
                                   onTap: () {
                                     showInputAmount(
                                         name: medicine[index].name ?? "",
                                         amount: medicine[index].quantity ?? 0,
                                         onChange: (int value) {
-                                          medicine[index].quantity = value;
-                                          setState(() {});
+                                            medicine[index].quantity = value;
+                                            setState(() {});
                                         },
                                         min: medicine[index].selled);
                                   },
@@ -342,6 +370,7 @@ class _AgentEditContractState extends State<AgentEditContract> {
                     ],
                   ),
                 ),
+
                 Container(
                   padding: EdgeInsets.all(Dimens.space20),
                   decoration: BoxDecoration(
@@ -357,7 +386,7 @@ class _AgentEditContractState extends State<AgentEditContract> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text("Шаги"),
-                        Text("1 200 000"),
+                        Text("$allQuote"),
                       ],
                     ),
                   ),
@@ -399,7 +428,7 @@ class _AgentEditContractState extends State<AgentEditContract> {
                                   quote: medicine[index].quantity,
                                   agentContractId:
                                       widget.profileModel?.agentId ?? 0,
-                                  contractMedicineAmount:
+                                  contractMedicineDoctorAmount:
                                       ContractMedicineAmountEdit(
                                           id: medicine[index].id,
                                           amount: medicine[index].selled));
@@ -421,15 +450,11 @@ class _AgentEditContractState extends State<AgentEditContract> {
 
   void showInputAmount(
       {required String name,
-      required int amount,
-      required int min,
-      required ValueChanged<int> onChange}) async {
-    if (min == 0) {
-      min = 1;
-    }
-    final textController = TextEditingController();
+        required int amount,
+        required ValueChanged<int> onChange,
+      required int min,}) async {
     final quantForm = GlobalKey<FormState>();
-    textController.text = amount.toString();
+    amountController.text = amount.toString();
     showModalBottomSheet(
       isScrollControlled: true,
       enableDrag: true,
@@ -451,24 +476,24 @@ class _AgentEditContractState extends State<AgentEditContract> {
                 keyboardType: TextInputType.numberWithOptions(decimal: false),
                 validator: (value) {
                   if (value.toString().isEmpty) {
-                    return "kamida 1 ta bo'lishi kerak";
+                    return "kamida $min ta bo'lishi kerak";
                   }
                   int number = int.tryParse(value.toString()) ?? 0;
                   if (number < min) {
-                    return "$min bo'lmasligi kerak";
+                    return "Введённое значение меньше или равно предыдущему значению. $min";
                   }
                   return null;
                 },
                 maxLen: 5,
-                controller: textController,
-                hintText: "$min",
+                controller: amountController,
+                hintText: "1",
               ),
               UniversalButton.filled(
                 text: "Сохранять",
                 onPressed: () {
                   if (quantForm.currentState!.validate()) {
                     int number =
-                        int.tryParse(textController.text.toString()) ?? 1;
+                        int.tryParse(amountController.text.toString()) ?? 1;
                     onChange(number);
                     Navigator.pop(context);
                   }
@@ -488,5 +513,39 @@ class _AgentEditContractState extends State<AgentEditContract> {
         );
       },
     );
+  }
+
+  void calculate() {
+    print("asasas++++ ${selectedContractType}");
+    int i = 0;
+    for (MedicineModel medicine in selectedPreparations) {
+      double ball = 0;
+      switch (selectedContractType) {
+        case 'RECIPE':
+          ball = medicine.prescription ?? 0;
+          break;
+        case 'SU':
+          ball = (medicine.suBall ?? 0).toDouble();
+          break;
+        case 'SB':
+          ball = (medicine.sbBall ?? 0).toDouble();
+          break;
+        case 'GZ':
+          ball = (medicine.gzBall ?? 0).toDouble();
+          break;
+        case 'KZ':
+          ball = (medicine.kbBall ?? 0).toDouble();
+          break;
+        default:
+          ball = 0;
+      }
+
+      print("BALL_$ball");
+
+      allQuote += quantity[i] * ball;
+      i++;
+    }
+    print("ALLQUOTE::: $allQuote");
+    setState(() {});
   }
 }

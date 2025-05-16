@@ -21,20 +21,49 @@ class SignUpSuccessPage extends StatefulWidget {
   State<SignUpSuccessPage> createState() => _SignUpSuccessPageState();
 }
 
-class _SignUpSuccessPageState extends State<SignUpSuccessPage> {
+class _SignUpSuccessPageState extends State<SignUpSuccessPage>   with SingleTickerProviderStateMixin {
   String title = "";
   String text = "";
   String buttonText = LocaleKeys.sign_up_start_work.tr();
   String status = "PENDING";
+  late AnimationController _controller;
+  late Animation<double> _animation;
+  bool isButtonDisabled = false;
+
 
   @override
   void initState() {
+    super.initState();
     title = widget.title;
     text = widget.text;
-    // context.read<SignUpCubit>().login();
-    // context.read<MainPageCubit>().checkToken();
-    super.initState();
+
+    _controller = AnimationController(
+      duration: const Duration(seconds: 20),
+      vsync: this,
+    );
+    _animation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.linear),
+    )..addListener(() {
+      setState(() {});
+    });
+    // Trigger token check after short delay
+    Future.delayed(Duration(milliseconds: 1000), () {
+      context.read<MainPageCubit>().checkToken();
+    });
+
+    Future.delayed(Duration(milliseconds: 1000), () {
+      _controller.forward(from: 0);
+    });
+
+
   }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -103,38 +132,57 @@ class _SignUpSuccessPageState extends State<SignUpSuccessPage> {
                 ),
                 SizedBox(),
                 InkWell(
-                  onTap: () async {
+                  onTap: isButtonDisabled
+                      ? null
+                      : () async {
+                    setState(() {
+                      isButtonDisabled = true;
+                    });
+                    _controller.forward(from: 0);
+
                     if (buttonText == LocaleKeys.sign_up_logout.tr()) {
                       await FlutterSecureStorage().deleteAll();
                       Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(builder: (context) => SignPage()),
-                        (route) => false,
+                            (route) => false,
                       );
                     } else {
                       context.read<MainPageCubit>().checkToken();
                     }
+
+                    await Future.delayed(const Duration(seconds: 20));
+                    setState(() {
+                      isButtonDisabled = false;
+                    });
                   },
                   borderRadius: BorderRadius.circular(50),
                   child: Container(
                     padding: EdgeInsets.symmetric(
                         vertical: Dimens.space20, horizontal: Dimens.space30),
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(50),
-                        color: AppColors.blueColor),
+                      borderRadius: BorderRadius.circular(50),
+                      gradient: LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        stops: [_animation.value, _animation.value],
+                        colors: [
+                          AppColors.blueColor,
+                          Colors.grey.shade400,
+                        ],
+                      ),
+                    ),
                     child: BlocConsumer<MainPageCubit, MainPageState>(
                       listener: (context, state) {
                         if (state is MainPageSuccess) {
-                          debugPrint(state.status);
                           status = state.status;
+
                           if (state.status == "ENABLED") {
                             Navigator.pushAndRemoveUntil(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => MainPage(
-                                        fromCheck: true,
-                                      )),
-                              (route) => false,
+                                  builder: (context) => MainPage(fromCheck: true)),
+                                  (route) => false,
                             );
                           }
 
@@ -148,15 +196,14 @@ class _SignUpSuccessPageState extends State<SignUpSuccessPage> {
                               style: ToastificationStyle.flat,
                               context: context,
                               alignment: Alignment.topCenter,
-                              title:
-                                  Text(LocaleKeys.sign_up_declined_title.tr()),
+                              title: Text(LocaleKeys.sign_up_declined_title.tr()),
                               autoCloseDuration: const Duration(seconds: 2),
                               showProgressBar: false,
-                              primaryColor: Colors.white,
                               backgroundColor: Colors.redAccent,
                               foregroundColor: Colors.white,
                             );
                           }
+
                           if (state.status == "DISABLED") {
                             setState(() {
                               title = LocaleKeys.sign_up_disabled_title.tr();
@@ -167,52 +214,41 @@ class _SignUpSuccessPageState extends State<SignUpSuccessPage> {
                               style: ToastificationStyle.flat,
                               context: context,
                               alignment: Alignment.topCenter,
-                              title:
-                                  Text(LocaleKeys.sign_up_disabled_title.tr()),
+                              title: Text(LocaleKeys.sign_up_disabled_title.tr()),
                               autoCloseDuration: const Duration(seconds: 2),
                               showProgressBar: false,
-                              primaryColor: Colors.white,
                               backgroundColor: Colors.redAccent,
                               foregroundColor: Colors.white,
                             );
                           }
+
                           if (state.status == "PENDING") {
-                            toastification.show(
-                              style: ToastificationStyle.flat,
-                              context: context,
-                              alignment: Alignment.topCenter,
-                              title: Text(LocaleKeys.sign_up_pending_text.tr()),
-                              autoCloseDuration: const Duration(seconds: 2),
-                              showProgressBar: false,
-                              primaryColor: Colors.white,
-                              backgroundColor: Colors.redAccent,
-                              foregroundColor: Colors.white,
-                            );
                             setState(() {
                               title = LocaleKeys.sign_up_pending_title.tr();
                               text = LocaleKeys.sign_up_pending_text.tr();
                               buttonText = LocaleKeys.sign_up_check_status.tr();
                             });
+                            toastification.show(
+                              style: ToastificationStyle.flat,
+                              context: context,
+                              icon: Icon(Icons.warning_amber, color: Colors.white,),
+                              alignment: Alignment.topCenter,
+                              title: Text(LocaleKeys.sign_up_pending_text.tr()),
+                              autoCloseDuration: const Duration(seconds: 2),
+                              showProgressBar: false,
+                              backgroundColor: Colors.redAccent,
+                              foregroundColor: Colors.white,
+                            );
                           }
-                          // if (state.status == "PENDING") {
-                          //
-                          //   Navigator.pushAndRemoveUntil(
-                          //     context,
-                          //     MaterialPageRoute(builder: (context) => Home()),
-                          //         (route) => false,
-                          //   );
-                          // }
-                          if (state.status == "DISABLED") {}
                         }
                       },
                       builder: (context, state) {
                         if (state is MainPageLoading) {
                           return Center(
-                            child: CircularProgressIndicator(
-                              color: AppColors.white,
-                            ),
+                            child: CircularProgressIndicator(color: AppColors.white),
                           );
                         }
+
                         return Row(
                           spacing: Dimens.space10,
                           children: [
@@ -221,15 +257,13 @@ class _SignUpSuccessPageState extends State<SignUpSuccessPage> {
                                   ? LocaleKeys.sign_up_check_status.tr()
                                   : LocaleKeys.sign_up_logout.tr(),
                               style: TextStyle(
-                                  fontFamily: 'VelaSans',
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: Dimens.space16,
-                                  color: AppColors.white),
+                                fontFamily: 'VelaSans',
+                                fontWeight: FontWeight.w400,
+                                fontSize: Dimens.space16,
+                                color: AppColors.white,
+                              ),
                             ),
-                            Icon(
-                              CupertinoIcons.arrow_right,
-                              color: AppColors.white,
-                            )
+                            Icon(CupertinoIcons.arrow_right, color: AppColors.white),
                           ],
                         );
                       },
@@ -238,7 +272,7 @@ class _SignUpSuccessPageState extends State<SignUpSuccessPage> {
                 ),
                 UniversalButton.filled(
                   backgroundColor: AppColors.redAccent,
-                  text: "log out",
+                  text: "Log Out",
                   onPressed: () {
                     Navigator.pushAndRemoveUntil(
                       context,
@@ -256,6 +290,9 @@ class _SignUpSuccessPageState extends State<SignUpSuccessPage> {
   }
 
   String checkStatus({required String status, required bool title}) {
+    print("----------------------------------------");
+    print(status);
+    print(title);
     if (status == "PENDING" && title) {
       return LocaleKeys.sign_up_pending_title.tr();
     } else if (status == "PENDING" && !title) {

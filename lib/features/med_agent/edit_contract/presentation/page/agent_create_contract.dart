@@ -462,10 +462,10 @@ class _AgentCreateContractState extends State<AgentCreateContract> {
                                   agentId: '',
                                   contractType: '',
                                   agentContractId: 0,
-                                  medicinesWithQuantities: List.generate(
+                                  medicineWithQuantityDoctorDTOS: List.generate(
                                     preparation.length,
                                     (index) {
-                                      return MedicinesWithQuantity(
+                                      return MedicineWithQuantityDoctorDTOS(
                                           medicineId: preparation[index].id ?? 0,
                                           quote:
                                               preparation[index].quantity ?? 0);

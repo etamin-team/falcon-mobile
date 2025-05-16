@@ -107,14 +107,14 @@ class MedicinesWithQuantity {
   final int medicineId;
   final int quote;
   final int agentContractId;
-  final ContractMedicineAmountEdit contractMedicineAmount;
+  final ContractMedicineAmountEdit contractMedicineDoctorAmount;
 
 
   MedicinesWithQuantity({
     required this.medicineId,
     required this.quote,
     required this.agentContractId,
-    required this.contractMedicineAmount,
+    required this.contractMedicineDoctorAmount,
 
   });
 
@@ -122,15 +122,15 @@ class MedicinesWithQuantity {
     int? medicineId,
     int? quote,
     int? agentContractId,
-    ContractMedicineAmountEdit? contractMedicineAmount,
+    ContractMedicineAmountEdit? contractMedicineDoctorAmount,
     Medicine? medicine,
   }) =>
       MedicinesWithQuantity(
         medicineId: medicineId ?? this.medicineId,
         quote: quote ?? this.quote,
         agentContractId: agentContractId ?? this.agentContractId,
-        contractMedicineAmount:
-            contractMedicineAmount ?? this.contractMedicineAmount,
+        contractMedicineDoctorAmount:
+        contractMedicineDoctorAmount ?? this.contractMedicineDoctorAmount,
 
       );
 
@@ -139,8 +139,8 @@ class MedicinesWithQuantity {
         medicineId: json["medicineId"],
         quote: json["quote"],
         agentContractId: json["agentContractId"],
-        contractMedicineAmount:
-            ContractMedicineAmountEdit.fromJson(json["contractMedicineAmount"]),
+        contractMedicineDoctorAmount:
+            ContractMedicineAmountEdit.fromJson(json["contractMedicineDoctorAmount"]),
 
       );
 
@@ -148,7 +148,7 @@ class MedicinesWithQuantity {
         "medicineId": medicineId,
         "quote": quote,
         "agentContractId": agentContractId,
-        "contractMedicineAmount": contractMedicineAmount.toJson(),
+        "contractMedicineDoctorAmount": contractMedicineDoctorAmount.toJson(),
 
       };
 }

@@ -17,7 +17,7 @@ class AddContractModel {
   String agentId;
   String contractType;
   int agentContractId;
-  List<MedicinesWithQuantity> medicinesWithQuantities;
+  List<MedicineWithQuantityDoctorDTOS> medicineWithQuantityDoctorDTOS;
 
   AddContractModel({
     required this.doctorId,
@@ -25,7 +25,7 @@ class AddContractModel {
     required this.endDate,
     required this.agentId,
     required this.agentContractId,
-    required this.medicinesWithQuantities,
+    required this.medicineWithQuantityDoctorDTOS,
     required this.contractType,
   });
 
@@ -36,7 +36,7 @@ class AddContractModel {
     String? agentId,
     String? contractType,
     int? agentContractId,
-    List<MedicinesWithQuantity>? medicinesWithQuantities,
+    List<MedicineWithQuantityDoctorDTOS>? medicineWithQuantityDoctorDTOS,
   }) =>
       AddContractModel(
         doctorId: doctorId ?? this.doctorId,
@@ -45,8 +45,8 @@ class AddContractModel {
         agentId: agentId ?? this.agentId,
         contractType: contractType ?? this.contractType,
         agentContractId: agentContractId ?? this.agentContractId,
-        medicinesWithQuantities:
-            medicinesWithQuantities ?? this.medicinesWithQuantities,
+        medicineWithQuantityDoctorDTOS:
+        medicineWithQuantityDoctorDTOS ?? this.medicineWithQuantityDoctorDTOS,
       );
 
   factory AddContractModel.fromJson(Map<String, dynamic> json) =>
@@ -57,9 +57,9 @@ class AddContractModel {
         agentId: json["agentId"],
         contractType: json["contractType"],
         agentContractId: json["agentContractId"],
-        medicinesWithQuantities: List<MedicinesWithQuantity>.from(
-            json["medicinesWithQuantities"]
-                .map((x) => MedicinesWithQuantity.fromJson(x))),
+        medicineWithQuantityDoctorDTOS: List<MedicineWithQuantityDoctorDTOS>.from(
+            json["medicineWithQuantityDoctorDTOS"]
+                .map((x) => MedicineWithQuantityDoctorDTOS.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
@@ -69,31 +69,31 @@ class AddContractModel {
         "agentId": agentId,
         "contractType": contractType,
         "agentContractId": agentContractId,
-        "medicinesWithQuantities":
-            List<dynamic>.from(medicinesWithQuantities.map((x) => x.toJson())),
+        "medicineWithQuantityDoctorDTOS":
+            List<dynamic>.from(medicineWithQuantityDoctorDTOS.map((x) => x.toJson())),
       };
 }
 
-class MedicinesWithQuantity {
+class MedicineWithQuantityDoctorDTOS {
   final int medicineId;
   final int quote;
 
-  MedicinesWithQuantity({
+  MedicineWithQuantityDoctorDTOS({
     required this.medicineId,
     required this.quote,
   });
 
-  MedicinesWithQuantity copyWith({
+  MedicineWithQuantityDoctorDTOS copyWith({
     int? medicineId,
     int? quote,
   }) =>
-      MedicinesWithQuantity(
+      MedicineWithQuantityDoctorDTOS(
         medicineId: medicineId ?? this.medicineId,
         quote: quote ?? this.quote,
       );
 
-  factory MedicinesWithQuantity.fromJson(Map<String, dynamic> json) =>
-      MedicinesWithQuantity(
+  factory MedicineWithQuantityDoctorDTOS.fromJson(Map<String, dynamic> json) =>
+      MedicineWithQuantityDoctorDTOS(
         medicineId: json["medicineId"],
         quote: json["quote"],
       );

@@ -1,4 +1,5 @@
 
+import '../../../med_agent/contract/data/model/contract_model.dart';
 import 'out_contract_model.dart';
 
 class ProfileDataModel {
@@ -9,8 +10,9 @@ class ProfileDataModel {
   String endDate;
   int? fieldId;
   int agentId;
-  List<OutOfContractMedicineAmount> outOfContractMedicineAmount;
-  List<ContractedMedicineWithQuantity> contractedMedicineWithQuantity;
+  String contractType;
+  // List<OutOfContractMedicineAmount> outOfContractMedicineAmount;
+  List<ContractedMedicineWithQuantity> medicineWithQuantityDoctorDTOS;
 
   ProfileDataModel({
     required this.id,
@@ -20,8 +22,9 @@ class ProfileDataModel {
     required this.endDate,
     this.fieldId,
     required this.agentId,
-    required this.outOfContractMedicineAmount,
-    required this.contractedMedicineWithQuantity,
+    required this.contractType,
+    // required this.outOfContractMedicineAmount,
+    required this.medicineWithQuantityDoctorDTOS,
   });
 
   factory ProfileDataModel.fromJson(Map<String, dynamic> json) {
@@ -32,13 +35,14 @@ class ProfileDataModel {
       createdAt: json['createdAt'] ?? '',
       startDate: json['startDate'] ?? '',
       endDate: json['endDate'] ?? '',
+      contractType: json['contractType'] ?? '',
       fieldId: json['fieldId'],
       agentId: json['agentId'] ?? 0,
-      outOfContractMedicineAmount: (json['outOfContractMedicineAmount'] as List?)
-          ?.map((e) => OutOfContractMedicineAmount.fromJson(e as Map<String, dynamic>))
-          .toList() ??
-          [],
-      contractedMedicineWithQuantity: (json['contractedMedicineWithQuantity'] as List?)
+      // outOfContractMedicineAmount: (json['outOfContractMedicineAmount'] as List?)
+      //     ?.map((e) => OutOfContractMedicineAmount.fromJson(e as Map<String, dynamic>))
+      //     .toList() ??
+      //     [],
+      medicineWithQuantityDoctorDTOS: (json['medicineWithQuantityDoctorDTOS'] as List?)
           ?.map((e) => ContractedMedicineWithQuantity.fromJson(e as Map<String, dynamic>))
           .toList() ??
           [],
@@ -54,9 +58,10 @@ class ProfileDataModel {
       'endDate': endDate,
       'fieldId': fieldId,
       'agentId': agentId,
-      'outOfContractMedicineAmount': outOfContractMedicineAmount.map((e) => e.toJson()).toList(),
-      'contractedMedicineWithQuantity':
-      contractedMedicineWithQuantity.map((e) => e.toJson()).toList(),
+      'contractType': contractType,
+      // 'outOfContractMedicineAmount': outOfContractMedicineAmount.map((e) => e.toJson()).toList(),
+      'medicineWithQuantityDoctorDTOS':
+      medicineWithQuantityDoctorDTOS.map((e) => e.toJson()).toList(),
     };
   }
 }
@@ -90,58 +95,62 @@ class OutOfContractMedicineAmount {
 }
 
 class ContractedMedicineWithQuantity {
+  int quantityId;
   int medicineId;
   int quote;
   int correction;
   int agentContractId;
-  ContractMedicineAmount contractMedicineAmount;
+  ContractMedicineDoctorAmount contractMedicineDoctorAmount;
   Medicine medicine;
 
   ContractedMedicineWithQuantity({
+    required this.quantityId,
     required this.medicineId,
     required this.quote,
     required this.correction,
     required this.agentContractId,
-    required this.contractMedicineAmount,
+    required this.contractMedicineDoctorAmount,
     required this.medicine,
   });
 
   factory ContractedMedicineWithQuantity.fromJson(Map<String, dynamic> json) {
     return ContractedMedicineWithQuantity(
+      quantityId: json['quantityId'] ?? 0,
       medicineId: json['medicineId'] ?? 0,
       quote: json['quote'] ?? 0,
       correction: json['correction'] ?? 0,
       agentContractId: json['agentContractId'] ?? 0,
-      contractMedicineAmount: json['contractMedicineAmount'] != null
-          ? ContractMedicineAmount.fromJson(json['contractMedicineAmount'])
-          : ContractMedicineAmount(id: 0, amount: 0),
+      contractMedicineDoctorAmount: json['contractMedicineDoctorAmount'] != null
+          ? ContractMedicineDoctorAmount.fromJson(json['contractMedicineDoctorAmount'])
+          : ContractMedicineDoctorAmount(id: 0, amount: 0),
       medicine: Medicine.fromJson(json['medicine'] ?? {}),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
+      'quantityId': quantityId,
       'medicineId': medicineId,
       'quote': quote,
       'correction': correction,
       'agentContractId': agentContractId,
-      'contractMedicineAmount': contractMedicineAmount.toJson(),
+      'contractMedicineDoctorAmount': contractMedicineDoctorAmount.toJson(),
       'medicine': medicine.toJson(),
     };
   }
 }
 
-class ContractMedicineAmount {
+class ContractMedicineDoctorAmount {
   int id;
   int amount;
 
-  ContractMedicineAmount({
+  ContractMedicineDoctorAmount({
     required this.id,
     required this.amount,
   });
 
-  factory ContractMedicineAmount.fromJson(Map<String, dynamic> json) {
-    return ContractMedicineAmount(
+  factory ContractMedicineDoctorAmount.fromJson(Map<String, dynamic> json) {
+    return ContractMedicineDoctorAmount(
       id: json['id'] ?? 0,
       amount: (json['amount'] ?? 0),
     );
