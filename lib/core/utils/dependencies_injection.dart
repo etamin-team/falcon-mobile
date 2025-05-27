@@ -23,6 +23,7 @@ import 'package:wm_doctor/features/med_agent/edit_contract/presentation/cubit/ed
 import 'package:wm_doctor/features/med_agent/home/data/repository/agent_home_repository_impl.dart';
 import 'package:wm_doctor/features/med_agent/home/presentation/cubit/agent_home_cubit.dart';
 import 'package:wm_doctor/features/med_agent/home/presentation/cubit/doctor/doctor_cubit.dart';
+import 'package:wm_doctor/features/med_agent/home/presentation/cubit/doctor/last_doctor_cubit.dart';
 import 'package:wm_doctor/features/med_agent/profile/data/repository/agent_profile_repository_impl.dart';
 import 'package:wm_doctor/features/medicine/data/repository/medicine_repository_impl.dart';
 import 'package:wm_doctor/features/medicine/data/repository/mnn_repository_impl.dart';
@@ -152,6 +153,7 @@ void _blocs() {
   sl.registerFactory(() => AgentHomeCubit(sl<AgentHomeRepositoryImpl>()));
   sl.registerFactory(() => AddDoctorCubit(sl<AddDoctorRepositoryImpl>()));
   sl.registerFactory(() => DoctorCubit(sl<AgentHomeRepositoryImpl>()));
+  sl.registerFactory(() => LastDoctorCubit(sl<AgentHomeRepositoryImpl>()));
   sl.registerFactory(() => ContractCubit(sl<ContractRepositoryImpl>()));
   sl.registerFactory(
       () => ContractDetailsCubit(sl<ContractDetailsRepositoryImpl>()));

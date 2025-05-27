@@ -33,6 +33,7 @@ class DoctorModel {
     required this.districtId,
   });
 
+
   /// JSON obyektni `UserModel` obyektiga o‘tkazish
   factory DoctorModel.fromJson(Map<String, dynamic> json) {
     return DoctorModel(

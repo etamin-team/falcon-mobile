@@ -6,13 +6,15 @@ class CustomProgressBar extends StatelessWidget {
   final String title;
   final int current;
   final int total;
-  Color backgroundColor;
-  CustomProgressBar({
+  final Color backgroundColor;
+
+  const CustomProgressBar({
     super.key,
     required this.title,
     required this.current,
     required this.total,
-    this.backgroundColor=AppColors.backgroundColor
+    this.backgroundColor = AppColors.backgroundColor,
+
   });
 
   @override
@@ -32,7 +34,7 @@ class CustomProgressBar extends StatelessWidget {
           Container(
             height: 50,
             decoration: BoxDecoration(
-              color: backgroundColor,
+              color: AppColors.backgroundColor,
               borderRadius: BorderRadius.circular(10),
             ),
           ),
@@ -55,12 +57,15 @@ class CustomProgressBar extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: Dimens.space14,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black,
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: Dimens.space14,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   Text(

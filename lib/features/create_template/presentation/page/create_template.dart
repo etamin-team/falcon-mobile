@@ -52,7 +52,7 @@ class _CreateTemplateState extends State<CreateTemplate> {
                 days:  widget.model?.preparations?[index].days??0,
                 inn: widget.model?.preparations?[index].medicine?.inn,
                 type:  widget.model?.preparations?[index].type??"",
-                medicineId:  widget.model?.preparations?[index].medicineId??0);
+                medicineId:  widget.model?.preparations?[index].medicineId??0, medicine: MedicineModel());
           },);
     }
     super.initState();
@@ -219,7 +219,7 @@ class _CreateTemplateState extends State<CreateTemplate> {
                                             days: 0,
                                             type: value.type ?? "",
                                             medicineId: value.id ?? 0,
-                                            inn: value.inn));
+                                            inn: value.inn, medicine: MedicineModel()));
                                         setState(() {});
                                         Navigator.pop(context);
                                       },
@@ -228,7 +228,7 @@ class _CreateTemplateState extends State<CreateTemplate> {
                                             (index) =>
                                             MedicineModel(
                                                 id: preparation[index]
-                                                    .medicineId ?? 0,
+                                                    .medicineId,
                                                 name: preparation[index].name,
                                                 type: preparation[index].type),
                                       )),
@@ -381,7 +381,6 @@ class _CreateTemplateState extends State<CreateTemplate> {
                                               .amount.replaceAll(
                                               RegExp(r'[0-9]'), '').trim();
 
-                                          print(number); // Natija: 300
                                           showInputAmount(
                                             name: preparation[index].name,
                                             amount: number,

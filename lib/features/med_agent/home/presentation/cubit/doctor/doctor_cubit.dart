@@ -11,12 +11,17 @@ class DoctorCubit extends Cubit<DoctorState> {
 
   DoctorCubit(this.agentHomeRepositoryImpl) : super(DoctorInitial());
 
-  void getDoctors() async {
+
+  void getDoctorsWithFilters(districtId, workplaceId, doctorType, withContracts) async {
     emit(DoctorLoading());
-    final request = await agentHomeRepositoryImpl.getDoctors();
+    final request = await agentHomeRepositoryImpl.getDoctorsWithFilters(districtId?.toString(), workplaceId?.toString(), doctorType?.toString(), withContracts?.toString());
     request.fold(
-      (l) => emit(DoctorError(failure: l)),
-      (r) => emit(DoctorSuccess(list: r)),
+          (l) => emit(DoctorError(failure: l)),
+          (r) => emit(DoctorSuccess(list: r)),
     );
   }
+  void clear() {
+    emit(DoctorClear());
+  }
 }
+

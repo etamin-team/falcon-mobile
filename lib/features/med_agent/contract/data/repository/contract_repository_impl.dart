@@ -27,4 +27,44 @@ class ContractRepositoryImpl implements ContractRepository {
         errorMsg: request.response.toString(),
         statusCode: request.code ?? 500));
   }
+  Future<Either<Failure, List<ContractModel>>> getContractWithFilter({
+
+    required String districtId,
+    required int workPlaceId,
+    required String firstName,
+    required String lastName,
+    required String middleName,
+    required String fieldName,
+  }) async {
+    try {
+      String token = await SecureStorage().read(key: "accessToken") ?? "";
+      Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+      String uuid = decodedToken["sub"];
+
+      // Construct the URL with query parameters directly
+      String pathUrl = "/med-agent/$uuid/contracts?districtId=$districtId&workPlaceId=$workPlaceId&firstName=$firstName&lastName=$lastName&middleName=$middleName${fieldName=='ALL'?'':'&fieldName=$fieldName'}";
+
+      final request = await sl<ApiClient>().getMethod(
+        pathUrl: pathUrl,
+        isHeader: true,
+      );
+
+      if (request.isSuccess) {
+        List<ContractModel> list = [];
+        for (var item in request.response) {
+          list.add(ContractModel.fromJson(item));
+        }
+        return Right(list);
+      }
+      return Left(Failure(
+        errorMsg: request.response.toString(),
+        statusCode: request.code ?? 500,
+      ));
+    } catch (e) {
+      return Left(Failure(
+        errorMsg: e.toString(),
+        statusCode: 500,
+      ));
+    }
+  }
 }

@@ -56,7 +56,7 @@ class MedicineModel {
       prescription: json['prescription'] as double?,
       volume: json['volume'] as String?,
       type: json['type'] as String?,
-      inn: json['inn'] as List<dynamic>?,
+      inn: json['mnn'] as List<dynamic>?,
       suPercentage: (json['suPercentage'] as num?)?.toDouble(),
       suLimit: (json['suLimit'] as num?)?.toDouble(),
       suBall: json['suBall'] as int?,

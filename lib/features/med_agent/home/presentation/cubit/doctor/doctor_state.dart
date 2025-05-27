@@ -4,16 +4,6 @@ sealed class DoctorState extends Equatable {
   const DoctorState();
 }
 
-final class DoctorInitial extends DoctorState {
-  @override
-  List<Object> get props => [];
-}
-
-final class DoctorLoading extends DoctorState {
-  @override
-  List<Object> get props => [];
-}
-
 final class DoctorSuccess extends DoctorState {
   final List<DoctorsModel> list;
 
@@ -22,7 +12,6 @@ final class DoctorSuccess extends DoctorState {
   @override
   List<Object> get props => [list];
 }
-
 final class DoctorError extends DoctorState {
   final Failure failure;
 
@@ -30,4 +19,16 @@ final class DoctorError extends DoctorState {
 
   @override
   List<Object> get props => [failure];
+}
+final class DoctorInitial extends DoctorState {
+  @override
+  List<Object> get props => [];
+}
+final class DoctorLoading extends DoctorState {
+  @override
+  List<Object> get props => [];
+}
+final class DoctorClear extends DoctorState {
+  @override
+  List<Object> get props => [];
 }

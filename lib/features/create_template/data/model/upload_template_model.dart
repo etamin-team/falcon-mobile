@@ -4,6 +4,8 @@
 
 import 'dart:convert';
 
+import 'package:wm_doctor/features/create_template/data/model/medicine_model.dart';
+
 UploadTemplateModel uploadTemplateModelFromJson(String str) =>
     UploadTemplateModel.fromJson(json.decode(str));
 
@@ -73,6 +75,7 @@ class Preparation {
   int days;
   String type;
   int medicineId;
+  MedicineModel medicine;
   List<dynamic>? inn;
 
   Preparation({
@@ -84,6 +87,7 @@ class Preparation {
     required this.type,
     required this.medicineId,
     this.inn,
+    required this.medicine,
   });
 
   Preparation copyWith(
@@ -94,6 +98,7 @@ class Preparation {
           int? days,
           String? type,
           int? medicineId,
+            MedicineModel? medicine,
           List<dynamic>? inn}) =>
       Preparation(
         name: name ?? this.name,
@@ -104,6 +109,7 @@ class Preparation {
         type: type ?? this.type,
         medicineId: medicineId ?? this.medicineId,
         inn: inn ?? this.inn,
+        medicine: medicine ?? this.medicine,
       );
 
   factory Preparation.fromJson(Map<String, dynamic> json) => Preparation(
@@ -114,6 +120,7 @@ class Preparation {
         days: json["days"],
         type: json["type"],
         medicineId: json["medicineId"],
+        medicine: MedicineModel.fromJson(json["medicine"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -124,5 +131,6 @@ class Preparation {
         "days": days,
         "type": type,
         "medicineId": medicineId,
+        "medicine": medicine.toJson(),
       };
 }

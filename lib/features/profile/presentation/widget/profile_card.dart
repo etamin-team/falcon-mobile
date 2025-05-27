@@ -25,11 +25,7 @@ class _ProfileCardState extends State<ProfileCard> {
   }
 
   void calculate() {
-    print("asasas++++ ${widget.model.contractType}");
-    print("LENGTH::::${widget.model.medicineWithQuantityDoctorDTOS.length}");
     for (var contract in widget.model.medicineWithQuantityDoctorDTOS) {
-      int quote = 0;
-      int amount = 0;
 
       double ball = 0;
       switch (widget.model.contractType) {
@@ -52,25 +48,18 @@ class _ProfileCardState extends State<ProfileCard> {
           ball = 0;
       }
 
-      print("BALL_$ball");
-      print("QUOTE_${contract.quote}");
-      print("Amount_${contract.contractMedicineDoctorAmount.amount}");
       allQuote += contract.quote * ball;
       allAmount += contract.contractMedicineDoctorAmount.amount * ball;
     }
-    print("ALLQUOTE::: $allQuote");
-    print("AllAmount::: $allAmount");
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    String fromDate = widget.model.startDate ??
-        DateFormat('dd/MM/yyyy').format(DateTime.now()).toString();
-    String toDate =
-        widget.model.endDate ?? DateFormat('dd/MM/yyyy').format(DateTime.now());
-    double amountWidth =
-        (MediaQuery.sizeOf(context).width * allAmount) / allQuote;
+    String fromDate = widget.model.startDate;
+    String toDate = widget.model.endDate;
+
+    double amountWidth = allQuote == 0 ? 0.0 : (MediaQuery.sizeOf(context).width * allAmount) / allQuote;
 
     return Column(
       spacing: Dimens.space10,
@@ -146,26 +135,23 @@ class _ProfileCardState extends State<ProfileCard> {
                         fontWeight: FontWeight.w700),
                   ),
                   children: List.generate(
-                    widget.model.medicineWithQuantityDoctorDTOS.length ?? 0,
+                    widget.model.medicineWithQuantityDoctorDTOS.length,
                     (index) {
                       return CustomProgressBar(
                           title: widget
                                   .model
                                   .medicineWithQuantityDoctorDTOS[index]
                                   .medicine
-                                  .name ??
-                              "-",
+                                  .name.toString(),
                           current: widget
                                   .model
                                   .medicineWithQuantityDoctorDTOS[index]
                                   .contractMedicineDoctorAmount
-                                  .amount ??
-                              0,
+                                  .amount,
                           total: widget
                                   .model
                                   .medicineWithQuantityDoctorDTOS[index]
-                                  .quote ??
-                              0);
+                                  .quote);
                     },
                   ),
                 )),
@@ -242,9 +228,7 @@ class _ProfileCardState extends State<ProfileCard> {
                   ),
                 ],
               ),
-              ...widget.model.medicineWithQuantityDoctorDTOS.map(
-                (e) {
-                  return Container(
+              Container(
                     width: MediaQuery.sizeOf(context).width,
                     alignment: AlignmentDirectional.centerStart,
                     decoration: BoxDecoration(
@@ -255,14 +239,14 @@ class _ProfileCardState extends State<ProfileCard> {
                       child: Stack(
                         children: [
                           Container(
-                            width: amountWidth == 0.0 ? null : amountWidth,
+                            width: amountWidth == 0.0 ? 0 : amountWidth,
                             padding: EdgeInsets.symmetric(
-                                // horizontal: Dimens.space20,
+                              // horizontal: Dimens.space20,
                                 vertical: Dimens.space14),
                             decoration: BoxDecoration(
                                 color: AppColors.lightGreen,
                                 borderRadius:
-                                    BorderRadius.circular(Dimens.space10)),
+                                BorderRadius.circular(Dimens.space10)),
                             child: Text(""),
                           ),
                           Positioned(
@@ -281,9 +265,7 @@ class _ProfileCardState extends State<ProfileCard> {
                         ],
                       ),
                     ),
-                  );
-                },
-              ),
+                  ),
               // ...List.generate(
               //   1,
               //   (index) {

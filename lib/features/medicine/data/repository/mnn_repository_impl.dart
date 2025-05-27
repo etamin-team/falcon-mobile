@@ -1,31 +1,21 @@
 import 'package:dartz/dartz.dart';
 import 'package:wm_doctor/core/error/failure.dart';
 import 'package:wm_doctor/features/create_template/data/model/mnn_model.dart';
-
 import '../../../../core/network/api_client.dart';
 import '../../../../core/utils/dependencies_injection.dart';
 import '../../domain/repository/mnn_repository.dart';
 
-class MnnRepositoryImpl implements MnnRepository{
+class MnnRepositoryImpl implements MnnRepository {
   @override
-  Future<Either<Failure, List<MnnModel>>> getMnn() async{
+  Future<Either<Failure, List<MnnModel>>> getMnn({int page = 1, int size = 10}) async {
     final request = await sl<ApiClient>()
-        .getMethod(pathUrl: "/db/mnn/list", isHeader: true);
-    print("-----------------------------------------------------");
-    print("-----------------------------------------------------");
-    print("-----------------------------------------------------");
-    print("-----------------------------------------------------");
-
+        .getMethod(pathUrl: "/db/mnn/list-page?page=$page&size=$size", isHeader: true);
     if (request.isSuccess) {
-      print(request.response.toString());
-      List<MnnModel> list = [];
-      for (var item in request.response) {
-        list.add(MnnModel.fromJson(item));
-      }
-      print(list);
+      final List<dynamic> content = request.response['content'] ?? [];
+      List<MnnModel> list = content.map((item) => MnnModel.fromJson(item)).toList();
       return Right(list);
-    }else print("No MNN found");
-    return Left(Failure(errorMsg: request.response.toString(), statusCode: request.code??500));
+    } else {
+      return Left(Failure(errorMsg: request.response.toString(), statusCode: request.code ?? 500));
+    }
   }
-
 }

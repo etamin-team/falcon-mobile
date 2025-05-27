@@ -630,41 +630,35 @@ class _AgentProfileState extends State<AgentProfile> with AgentProfileUtility {
                         SizedBox(
                           height: Dimens.space10,
                         ),
-                        SizedBox(
-                          height: Dimens.space10,
-                        ),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: Dimens.space14,
-                              vertical: Dimens.space16),
-                          decoration: BoxDecoration(
-                              color: AppColors.backgroundColor,
-                              borderRadius:
-                                  BorderRadius.circular(Dimens.space10)),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            spacing: Dimens.space10,
-                            children: [
-                              Text(
-                                "Место работы:",
-                                style: TextStyle(
-                                    fontFamily: 'VelaSans',
-                                    fontSize: Dimens.space14,
-                                    fontWeight: FontWeight.w400),
-                              ),
-                              Text(
-                                state.workplaceModel?.name.toString() ?? "",
-                                style: TextStyle(
-                                    fontFamily: 'VelaSans',
-                                    fontSize: Dimens.space14,
-                                    fontWeight: FontWeight.w400),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(
-                          height: Dimens.space10,
-                        ),
+                        // Container(
+                        //   padding: EdgeInsets.symmetric(
+                        //       horizontal: Dimens.space14,
+                        //       vertical: Dimens.space16),
+                        //   decoration: BoxDecoration(
+                        //       color: AppColors.backgroundColor,
+                        //       borderRadius:
+                        //           BorderRadius.circular(Dimens.space10)),
+                        //   child: Row(
+                        //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        //     spacing: Dimens.space10,
+                        //     children: [
+                        //       Text(
+                        //         "Место работы:",
+                        //         style: TextStyle(
+                        //             fontFamily: 'VelaSans',
+                        //             fontSize: Dimens.space14,
+                        //             fontWeight: FontWeight.w400),
+                        //       ),
+                        //       Text(
+                        //         state.workplaceModel?.name.toString() ?? "",
+                        //         style: TextStyle(
+                        //             fontFamily: 'VelaSans',
+                        //             fontSize: Dimens.space14,
+                        //             fontWeight: FontWeight.w400),
+                        //       ),
+                        //     ],
+                        //   ),
+                        // ),
                         GestureDetector(
                           onTap: () {
                             Navigator.push(
@@ -799,39 +793,4 @@ class _AgentProfileState extends State<AgentProfile> with AgentProfileUtility {
     return phone; // Noto‘g‘ri format bo‘lsa, o‘zgartirmaslik
   }
 
-  Widget _buildDoctorProgress(String title, int current, int total) {
-    double percentage = current / total;
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.backgroundColor,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Stack(
-        children: [
-          Container(
-            height: 50,
-            decoration: BoxDecoration(
-              color: Colors.greenAccent,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            width: percentage * 200, // Progressni to'g'ri belgilash
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(title,
-                    style: TextStyle(
-                        fontSize: Dimens.space14, fontWeight: FontWeight.bold)),
-                Text("$current из $total",
-                    style: TextStyle(
-                        fontSize: Dimens.space14, fontWeight: FontWeight.bold)),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }

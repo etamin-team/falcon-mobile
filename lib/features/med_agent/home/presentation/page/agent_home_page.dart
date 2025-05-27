@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wm_doctor/core/widgets/export.dart';
+import 'package:wm_doctor/features/med_agent/add_doctor/presentation/page/agent_add_contract.dart';
 import 'package:wm_doctor/features/med_agent/add_doctor/presentation/page/agent_add_doctor.dart';
 import 'package:wm_doctor/features/med_agent/contract/presentation/page/agent_contract.dart';
 import 'package:wm_doctor/features/med_agent/contract_details/presentation/cubit/contract_details_cubit.dart';
 import 'package:wm_doctor/features/med_agent/home/presentation/cubit/agent_home_cubit.dart';
-import 'package:wm_doctor/features/med_agent/home/presentation/cubit/doctor/doctor_cubit.dart';
 import 'package:wm_doctor/features/med_agent/home/presentation/widgets/doctors.dart';
 
 import '../../../../../core/utils/dependencies_injection.dart';
@@ -13,6 +13,7 @@ import '../../../../../core/widgets/custom_progress_bar.dart';
 import '../../../../profile/presentation/cubit/profile_cubit.dart';
 import '../../../add_doctor/presentation/cubit/add_doctor_cubit.dart';
 import '../../../contract_details/presentation/page/contract_details.dart';
+import '../cubit/doctor/last_doctor_cubit.dart';
 
 class AgentHomePage extends StatefulWidget {
   const AgentHomePage({super.key});
@@ -25,7 +26,7 @@ class _AgentHomePageState extends State<AgentHomePage> {
   @override
   void initState() {
     context.read<AgentHomeCubit>().getData();
-    context.read<DoctorCubit>().getDoctors();
+    context.read<LastDoctorCubit>().getDoctors();
     super.initState();
   }
 
@@ -38,22 +39,27 @@ class _AgentHomePageState extends State<AgentHomePage> {
         title: BlocBuilder<ProfileCubit, ProfileState>(
           builder: (context, state) {
             if (state is ProfileSuccess) {
-              return Row(
+              return Column(
                 children: [
-                  Text(
-                    "Здравствуйте,  ",
-                    style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                        fontSize: Dimens.space20,
-                        color: Colors.black),
+                  Row(
+                    children: [
+                      Text(
+                        "Здравствуйте,  ",
+                        style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: Dimens.space20,
+                            color: Colors.black),
+                      ),
+                      Text(
+                        state.model.firstName ?? "",
+                        style: TextStyle(
+                            fontWeight: FontWeight.w900,
+                            fontSize: Dimens.space22,
+                            color: AppColors.blueColor),
+                      ),
+                    ],
                   ),
-                  Text(
-                    state.model.firstName ?? "",
-                    style: TextStyle(
-                        fontWeight: FontWeight.w900,
-                        fontSize: Dimens.space22,
-                        color: AppColors.blueColor),
-                  ),
+
                 ],
               );
             }
@@ -75,71 +81,113 @@ class _AgentHomePageState extends State<AgentHomePage> {
       body: SingleChildScrollView(
         padding: EdgeInsets.symmetric(horizontal: Dimens.space20),
         child: Column(
-          spacing: Dimens.space20,
+          // spacing: Dimens.space20,
           children: [
             SizedBox(),
-            Row(
-              spacing: Dimens.space10,
+            Column(
               children: [
-                Expanded(
-                    child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => BlocProvider(
-                                  create: (context) => sl<AddDoctorCubit>(),
-                                  child: AgentAddDoctor(),
-                                )));
-                  },
-                  child: Container(
-                    padding: EdgeInsets.all(Dimens.space20),
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(Dimens.space20)),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      spacing: Dimens.space6,
-                      children: [
-                        SvgPicture.asset(Assets.icons.stethoscope),
-                        Text(
-                          "Добавить\nврача",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: Dimens.space16),
-                        )
-                      ],
-                    ),
-                  ),
-                )),
-                Expanded(
-                    child: GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => AgentContract()));
-                  },
-                  child: Container(
-                    padding: EdgeInsets.all(Dimens.space20),
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(Dimens.space20)),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      spacing: Dimens.space6,
-                      children: [
-                        SvgPicture.asset(Assets.icons.pills),
-                        Text(
-                          "Изменить\nдоговор",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: Dimens.space16),
-                        )
-                      ],
-                    ),
-                  ),
-                )),
+                SizedBox(height: Dimens.space10),
+                Row(
+                  children: [
+                    Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => BlocProvider(
+                                      create: (context) => sl<AddDoctorCubit>(),
+                                      child: AgentAddDoctor(),
+                                    )));
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(Dimens.space20),
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(Dimens.space20)),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              spacing: Dimens.space10,
+                              children: [
+                                SvgPicture.asset(Assets.icons.stethoscope),
+                                Text(
+                                  "Добавить врача",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: Dimens.space16),
+                                )
+                              ],
+                            ),
+                          ),
+                        )),
+                    SizedBox(width: 10,),
+                    Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => AgentContract()));
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(Dimens.space20),
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(Dimens.space20)),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              spacing: Dimens.space6,
+                              children: [
+                                SvgPicture.asset(Assets.icons.pills),
+                                Text(
+                                  "Изменить договор",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: Dimens.space16),
+                                )
+                              ],
+                            ),
+                          ),
+                        )),
+                  ],
+                ),
+                SizedBox(height: 10,),
+                Row(
+                  children: [
+                    Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => BlocProvider(
+                                      create: (context) => sl<AddDoctorCubit>(),
+                                      child: AgentAddContract(),
+                                    )));
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(Dimens.space20),
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(Dimens.space20)),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              spacing: Dimens.space6,
+                              children: [
+                                SvgPicture.asset(Assets.icons.person_heart),
+                                Text(
+                                  "Предложить договор",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: Dimens.space16),
+                                )
+                              ],
+                            ),
+                          ),
+                        )),
+                  ],
+                ),
+                SizedBox(height: Dimens.space10),
               ],
             ),
             BlocBuilder<AgentHomeCubit, AgentHomeState>(
@@ -213,9 +261,7 @@ class _AgentHomePageState extends State<AgentHomePage> {
                                   ),
                                 )),
                           ),
-                        if ((state.model.medicineAgentGoalQuantityDTOS?.length ??
-                                0) !=
-                            0)
+                        if ((state.model.medicineAgentGoalQuantityDTOS?.length ?? 0) != 0)
                           Container(
                             padding: EdgeInsets.symmetric(
                                 horizontal: Dimens.space20),
@@ -273,9 +319,9 @@ class _AgentHomePageState extends State<AgentHomePage> {
                 return SizedBox();
               },
             ),
-            BlocBuilder<DoctorCubit, DoctorState>(
+            BlocBuilder<LastDoctorCubit, LastDoctorState>(
               builder: (context, state) {
-                if (state is DoctorSuccess) {
+                if (state is LastDoctorSuccess) {
                   return GestureDetector(
                     onTap: () {
                       showDoctors(ctx: context);
@@ -307,11 +353,11 @@ class _AgentHomePageState extends State<AgentHomePage> {
                               controller: TextEditingController(),
                               hintText: "Ф.И.О, Район, ЛПУ, Специальность"),
                           ...List.generate(
-                            state.list.take(5).toList().length,
+                            state.lastList.take(5).toList().length,
                             (index) {
                               return GestureDetector(
                                 onTap: () {
-                                  print(state.list[index].userId);
+                                  print(state.lastList[index].userId);
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -320,7 +366,7 @@ class _AgentHomePageState extends State<AgentHomePage> {
                                                     sl<ContractDetailsCubit>(),
                                                 child: ContractDetails(
                                                   id: state
-                                                          .list[index].userId ??
+                                                          .lastList[index].userId ??
                                                       "",
                                                 ),
                                               )));
@@ -334,7 +380,7 @@ class _AgentHomePageState extends State<AgentHomePage> {
                                           BorderRadius.circular(Dimens.space10),
                                       color: AppColors.backgroundColor),
                                   child: Text(
-                                    "${state.list[index].firstName} ${state.list[index].middleName ?? ""} ${state.list[index].lastName ?? ""}",
+                                    "${state.lastList[index].firstName} ${state.lastList[index].middleName ?? ""} ${state.lastList[index].lastName ?? ""}",
                                     style:
                                         TextStyle(fontWeight: FontWeight.bold),
                                   ),

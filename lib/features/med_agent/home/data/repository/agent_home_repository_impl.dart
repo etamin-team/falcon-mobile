@@ -43,4 +43,22 @@ class AgentHomeRepositoryImpl implements AgentHomeRepository {
         errorMsg: request.response.toString(),
         statusCode: request.code ?? 500));
   }
+
+  Future<Either<Failure, List<DoctorsModel>>> getDoctorsWithFilters(districtId, workplaceId, doctorType, withContracts)async {
+    String url="/user/doctors?districtId=$districtId&workplaceId=$workplaceId&withContracts=$withContracts"+(doctorType==null||doctorType=='ALL'?'':'&field=$doctorType');
+    final request = await sl<ApiClient>()
+        .getMethod(pathUrl: url, isHeader: true);
+    if (request.isSuccess) {
+      List<DoctorsModel> list = [];
+      for (var item in request.response) {
+        list.add(DoctorsModel.fromJson(item));
+      }
+      print("ssssssssssssssssssssssrrrrrrrrrrrrrrrrrrrrrrr-----------------");
+      print(list.length);
+      return Right(list);
+    }
+    return Left(Failure(
+        errorMsg: request.response.toString(),
+        statusCode: request.code ?? 500));
+  }
 }

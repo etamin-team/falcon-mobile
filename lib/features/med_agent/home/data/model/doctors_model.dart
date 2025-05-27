@@ -23,8 +23,11 @@ class DoctorsModel {
   final String? status;
   final String? creatorId;
   final int? workplaceId;
+  // final String? workplaceDTO;
   final int? districtId;
+  // final String? districtDTO;
   final String? role;
+  final bool? contractAvailable;
 
   DoctorsModel({
     required this.userId,
@@ -41,8 +44,12 @@ class DoctorsModel {
     required this.status,
     required this.creatorId,
     required this.workplaceId,
+    // required this.workplaceDTO,
     required this.districtId,
+    // required this.districtDTO,
     required this.role,
+    required this.contractAvailable,
+
   });
 
   DoctorsModel copyWith({
@@ -61,7 +68,10 @@ class DoctorsModel {
     String? creatorId,
     dynamic workplaceId,
     int? districtId,
+    // String? workplaceDTO,
+    // String? districtDTO,
     String? role,
+    bool? contractAvailable,
   }) =>
       DoctorsModel(
         userId: userId ?? this.userId,
@@ -78,8 +88,11 @@ class DoctorsModel {
         status: status ?? this.status,
         creatorId: creatorId ?? this.creatorId,
         workplaceId: workplaceId ?? this.workplaceId,
+        // workplaceDTO: workplaceDTO ?? this.workplaceDTO,
         districtId: districtId ?? this.districtId,
+        // districtDTO: districtDTO ?? this.districtDTO,
         role: role ?? this.role,
+        contractAvailable: contractAvailable ?? this.contractAvailable,
       );
 
   factory DoctorsModel.fromJson(Map<String, dynamic> json) => DoctorsModel(
@@ -97,8 +110,11 @@ class DoctorsModel {
     status: json["status"],
     creatorId: json["creatorId"],
     workplaceId: json["workplaceId"],
+    // workplaceDTO: json["workPlaceDTO"],
     districtId: json["districtId"],
+    // districtDTO: json["regionDistrictDTO"],
     role: json["role"],
+    contractAvailable: json["contractAvailable"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -116,7 +132,10 @@ class DoctorsModel {
     "status": status,
     "creatorId": creatorId,
     "workplaceId": workplaceId,
+    // "workplaceDTO": workplaceDTO,
     "districtId": districtId,
+    // "districtDTO": districtDTO,
     "role": role,
+    "contractAvailable": contractAvailable,
   };
 }

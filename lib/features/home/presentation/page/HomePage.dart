@@ -1,10 +1,8 @@
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wm_doctor/core/extensions/widget_extensions.dart';
 import 'package:wm_doctor/core/widgets/export.dart';
 import 'package:wm_doctor/features/create_template/presentation/page/create_template.dart';
-import 'package:wm_doctor/features/main/presentation/cubit/main_page_cubit.dart';
 import 'package:wm_doctor/features/preparad/presentation/page/preparad.dart';
 import 'package:wm_doctor/features/profile/presentation/cubit/profile_cubit.dart';
 
@@ -32,8 +30,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
@@ -313,15 +309,7 @@ class _HomePageState extends State<HomePage> {
                                         decoration: BoxDecoration(
                                           gradient: LinearGradient(
                                             begin: Alignment.topCenter,
-                                            end: Alignment.bottomCenter,
-                                            colors: [
-                                              Colors.white.withOpacity(0),
-                                              // Yengil xira
-                                              Colors.white.withOpacity(0.6),
-                                              // Yengil xira
-                                              Colors.white.withOpacity(0.9),
-                                              // Qattiq xira
-                                            ],
+                                            end: Alignment.bottomCenter, colors: [],
                                           ),
                                         ),
                                       ),
@@ -335,22 +323,22 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                   ),
-                  // Center(
-                  //   child: UniversalButton.filled(
-                  //     width: 200,
-                  //     height: Dimens.space50,
-                  //     fontSize: Dimens.space14,
-                  //     cornerRadius: Dimens.space16,
-                  //     text: LocaleKeys.home_create_template.tr(),
-                  //     onPressed: () {
-                  //       context.read<MainPageCubit>().changeSelectedIndex(1);
-                  //       // Navigator.push(
-                  //       //     context,
-                  //       //     MaterialPageRoute(
-                  //       //         builder: (context) => CreateTemplate()));
-                  //     },
-                  //   ),
-                  // ).paddingAll(value: Dimens.space10)
+                  Center(
+                    child: UniversalButton.filled(
+                      width: 200,
+                      height: Dimens.space50,
+                      fontSize: Dimens.space14,
+                      cornerRadius: Dimens.space16,
+                      text: LocaleKeys.home_create_template.tr(),
+                      onPressed: () {
+                        // context.read<MainPageCubit>().changeSelectedIndex(1);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => CreateTemplate()));
+                      },
+                    ),
+                  ).paddingAll(value: Dimens.space10)
                 ],
               ).paddingSymmetric(horizontal: Dimens.space20),
             );

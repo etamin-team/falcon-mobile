@@ -3,9 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wm_doctor/core/extensions/widget_extensions.dart';
 import 'package:wm_doctor/core/utils/data_translate.dart';
-import 'package:wm_doctor/features/med_agent/profile/presentation/cubit/agent_profile_cubit.dart';
-import 'package:wm_doctor/features/med_agent/profile/presentation/cubit/agent_profile_data/agent_profile_data_cubit.dart';
-import 'package:wm_doctor/features/regions/data/model/district_model.dart';
 import 'package:wm_doctor/features/regions/presentation/cubit/regions_cubit.dart';
 import 'package:wm_doctor/gen/locale_keys.g.dart';
 
@@ -27,6 +24,7 @@ class RegionsPage extends StatefulWidget {
   State<RegionsPage> createState() => _RegionsPageState();
 }
 
+
 class _RegionsPageState extends State<RegionsPage> {
   final searchController = TextEditingController();
   @override
@@ -36,8 +34,9 @@ class _RegionsPageState extends State<RegionsPage> {
         // TODO: implement listener
       },
       builder: (context, state) {
-        if (state is RegionsSuccess) {
+        if (state is RegionsSuccess ) {
           final filteredRegions = state.regions.where((region) {
+
             final regionName = region.name.toLowerCase();
             final districts = region.districts
                 .where((district) => district.name
@@ -47,6 +46,7 @@ class _RegionsPageState extends State<RegionsPage> {
 
             return regionName.contains(searchController.text.trim()) ||
                 districts.isNotEmpty;
+
           }).toList();
           return Scaffold(
             backgroundColor: AppColors.backgroundColor,
@@ -170,23 +170,19 @@ class _RegionsPageState extends State<RegionsPage> {
                                           return ListTile(
                                             onTap: () {
                                               widget.onChange(LanguageModel(
-                                                  uz: district.nameUzLatin ??
-                                                      "",
-                                                  ru: district.nameRussian ??
-                                                      "",
-                                                  en: district.name ?? ""));
+                                                  uz: district.nameUzLatin,
+                                                  ru: district.nameRussian,
+                                                  en: district.name));
                                               widget.districtId(
-                                                  district.districtId ?? 0);
+                                                  district.districtId);
                                               Navigator.pop(context);
                                             },
                                             title: Text(dataTranslate(
                                                 ctx: context,
                                                 model: LanguageModel(
-                                                    uz: district.nameUzLatin ??
-                                                        "",
-                                                    ru: district.nameRussian ??
-                                                        "",
-                                                    en: district.name ?? ""))),
+                                                    uz: district.nameUzLatin,
+                                                    ru: district.nameRussian,
+                                                    en: district.name))),
                                             dense: true,
                                             visualDensity:
                                                 VisualDensity.compact,

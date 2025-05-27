@@ -19,4 +19,29 @@ class ContractCubit extends Cubit<ContractState> {
       (r) => emit(ContractSuccess(list: r)),
     );
   }
+  void getContractsWithFilter({
+
+    required String districtId,
+    required int workPlaceId,
+    required String firstName,
+    required String lastName,
+    required String middleName,
+    required String fieldName,
+  }) async {
+    emit(ContractLoading());
+    final request = await contractRepositoryImpl.getContractWithFilter(
+
+      districtId: districtId,
+      workPlaceId: workPlaceId,
+      firstName: firstName,
+      lastName: lastName,
+      middleName: middleName,
+      fieldName: fieldName,
+    );
+    request.fold(
+          (l) => emit(ContractError(failure: l)),
+          (r) => emit(ContractSuccess(list: r)),
+    );
+  }
+
 }

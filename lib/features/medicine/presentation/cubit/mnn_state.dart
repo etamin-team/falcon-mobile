@@ -1,34 +1,27 @@
 part of 'mnn_cubit.dart';
 
-
-sealed class MnnState extends Equatable {
-  const MnnState();
-}
-
-final class MnnInitial extends MnnState {
-  @override
-  List<Object> get props => [];
-}
-
-final class MnnLoading extends MnnState {
-  @override
-  List<Object> get props => [];
-}
-
-final class MnnSuccess extends MnnState {
+abstract class MnnState extends Equatable {
   final List<MnnModel> list;
-
-  const MnnSuccess({required this.list});
+  const MnnState(this.list);
 
   @override
   List<Object> get props => [list];
 }
 
-final class MnnError extends MnnState {
-  final Failure failure;
+class MnnInitial extends MnnState {
+  MnnInitial() : super([]);
+}
 
-  const MnnError({required this.failure});
+class MnnLoading extends MnnState {
+  MnnLoading(List<MnnModel> list) : super(list);
+}
 
-  @override
-  List<Object> get props => [];
+class MnnSuccess extends MnnState {
+  MnnSuccess(List<MnnModel> list) : super(list);
+}
+
+class MnnError extends MnnState {
+  final String errorMsg;
+
+  MnnError(this.errorMsg, List<MnnModel> list) : super(list);
 }

@@ -4,10 +4,10 @@ import 'package:wm_doctor/core/extensions/widget_extensions.dart';
 import 'package:wm_doctor/core/widgets/export.dart';
 import 'package:wm_doctor/features/med_agent/contract_details/presentation/cubit/contract_details_cubit.dart';
 import 'package:wm_doctor/features/med_agent/home/data/model/doctors_model.dart';
-import 'package:wm_doctor/features/med_agent/home/presentation/cubit/doctor/doctor_cubit.dart';
 
 import '../../../../../core/utils/dependencies_injection.dart';
 import '../../../contract_details/presentation/page/contract_details.dart';
+import '../cubit/doctor/last_doctor_cubit.dart';
 
 showDoctors({required BuildContext ctx}) {
   final searchTextController = TextEditingController();
@@ -21,14 +21,14 @@ showDoctors({required BuildContext ctx}) {
     builder: (context) {
       return StatefulBuilder(
         builder: (context, setState) {
-          return BlocBuilder<DoctorCubit, DoctorState>(
+          return BlocBuilder<LastDoctorCubit, LastDoctorState>(
             builder: (context, state) {
-              if (state is DoctorSuccess) {
+              if (state is LastDoctorSuccess) {
                 List<DoctorsModel> list = [];
-                list.addAll(state.list);
+                list.addAll(state.lastList);
                 if (searchTextController.text.isNotEmpty) {
                   list = list.where(
-                    (element) {
+                    (element){
                       if (element.firstName!.toLowerCase().startsWith(
                               searchTextController.text.trim().toLowerCase()) ||
                           element.middleName!.toLowerCase().startsWith(
@@ -67,16 +67,6 @@ showDoctors({required BuildContext ctx}) {
                       ),
                     ),
                     actions: [
-                      // UniversalButton.filled(
-                      //   height: 40,
-                      //   cornerRadius: Dimens.space10,
-                      //   width: 130,
-                      //   fontSize: Dimens.space14,
-                      //   text: "Готово",
-                      //   onPressed: () {
-                      //     Navigator.pop(context);
-                      //   },
-                      // ),
                       SizedBox(
                         width: Dimens.space10,
                       )
@@ -181,7 +171,7 @@ showDoctors({required BuildContext ctx}) {
                   ).paddingSymmetric(horizontal: Dimens.space30),
                 );
               }
-              if (state is DoctorLoading) {
+              if (state is LastDoctorLoading) {
                 return Center(
                   child: CircularProgressIndicator(),
                 );

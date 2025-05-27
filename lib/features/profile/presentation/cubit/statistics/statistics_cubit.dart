@@ -11,12 +11,12 @@ class StatisticsCubit extends Cubit<StatisticsState> {
 
   StatisticsCubit(this.profileRepositoryImpl) : super(StatisticsInitial());
 
-  void getStatistics() async {
+  Future<void> getStatistics() async {
     emit(StatisticsLoading());
     final request = await profileRepositoryImpl.getStatistics();
     request.fold(
-      (l) => emit(StatisticsError(failure: l)),
-      (r) => emit(StatisticsSuccess(model: r)),
+          (l) => emit(StatisticsError(failure: l)),
+          (r) => emit(StatisticsSuccess(model: r)),
     );
   }
 }

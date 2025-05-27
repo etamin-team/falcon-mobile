@@ -1,7 +1,6 @@
-import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wm_doctor/features/create_template/data/model/mnn_model.dart';
-import 'package:wm_doctor/features/medicine/presentation/cubit/mnn_cubit.dart';
 
 import '../../../../core/error/failure.dart';
 import '../../../home/data/model/template_model.dart';
@@ -18,8 +17,7 @@ class CreateTemplateCubit extends Cubit<CreateTemplateState> {
       : super(CreateTemplateInitial());
 
   void getMedicine({required List<MnnModel> inn}) async {
-    //TODO(toLowerCase'ni olib tashlash kerak bu test uchun qo'yildi release'da olib tashlansin)
-    List<String>? newInn = inn.map((e) => e.name?.toLowerCase() ?? "").toList();
+    List<String>? newInn = inn.map((e) => e.id.toString()).toList();
     emit(CreateTemplateGetMedicineLoading());
     final request = await createTemplateRepositoryImpl.getMedicine(inn: newInn);
     request.fold(

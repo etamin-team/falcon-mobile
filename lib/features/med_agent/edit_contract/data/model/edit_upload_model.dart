@@ -14,27 +14,11 @@ String editUploadModelToJson(EditUploadModel data) =>
 
 class EditUploadModel {
   final int id;
-  final String doctorId;
-  final String goalStatus;
-  final DateTime createdAt;
-  final DateTime startDate;
-  final DateTime endDate;
-  final String agentId;
-  final int agentContractId;
-  final String managerId;
   final List<MedicinesWithQuantity> medicinesWithQuantities;
 
 
   EditUploadModel({
     required this.id,
-    required this.doctorId,
-    required this.goalStatus,
-    required this.createdAt,
-    required this.startDate,
-    required this.endDate,
-    required this.agentId,
-    required this.agentContractId,
-    required this.managerId,
     required this.medicinesWithQuantities,
 
   });
@@ -54,14 +38,6 @@ class EditUploadModel {
   }) =>
       EditUploadModel(
         id: id ?? this.id,
-        doctorId: doctorId ?? this.doctorId,
-        goalStatus: goalStatus ?? this.goalStatus,
-        createdAt: createdAt ?? this.createdAt,
-        startDate: startDate ?? this.startDate,
-        endDate: endDate ?? this.endDate,
-        agentId: agentId ?? this.agentId,
-        agentContractId: agentContractId ?? this.agentContractId,
-        managerId: managerId ?? this.managerId,
         medicinesWithQuantities:
             medicinesWithQuantities ?? this.medicinesWithQuantities,
 
@@ -70,14 +46,6 @@ class EditUploadModel {
   factory EditUploadModel.fromJson(Map<String, dynamic> json) =>
       EditUploadModel(
         id: json["id"],
-        doctorId: json["doctorId"],
-        goalStatus: json["goalStatus"],
-        createdAt: DateTime.parse(json["createdAt"]),
-        startDate: DateTime.parse(json["startDate"]),
-        endDate: DateTime.parse(json["endDate"]),
-        agentId: json["agentId"],
-        agentContractId: json["agentContractId"],
-        managerId: json["managerId"],
         medicinesWithQuantities: List<MedicinesWithQuantity>.from(
             json["medicinesWithQuantities"]
                 .map((x) => MedicinesWithQuantity.fromJson(x))),
@@ -86,17 +54,6 @@ class EditUploadModel {
 
   Map<String, dynamic> toJson() => {
         "id": id,
-        "doctorId": doctorId,
-        "goalStatus": goalStatus,
-        "createdAt":
-            "${createdAt.year.toString().padLeft(4, '0')}-${createdAt.month.toString().padLeft(2, '0')}-${createdAt.day.toString().padLeft(2, '0')}",
-        "startDate":
-            "${startDate.year.toString().padLeft(4, '0')}-${startDate.month.toString().padLeft(2, '0')}-${startDate.day.toString().padLeft(2, '0')}",
-        "endDate":
-            "${endDate.year.toString().padLeft(4, '0')}-${endDate.month.toString().padLeft(2, '0')}-${endDate.day.toString().padLeft(2, '0')}",
-        "agentId": agentId,
-        "agentContractId": agentContractId,
-        "managerId": managerId,
         "medicinesWithQuantities":
             List<dynamic>.from(medicinesWithQuantities.map((x) => x.toJson())),
 

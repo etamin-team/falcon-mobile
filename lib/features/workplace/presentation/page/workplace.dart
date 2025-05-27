@@ -21,8 +21,22 @@ class WorkplacePage extends StatefulWidget {
   State<WorkplacePage> createState() => _WorkplacePageState();
 }
 
+
 class _WorkplacePageState extends State<WorkplacePage> {
   final searchController = TextEditingController();
+  List<WorkplaceModel> list = [];
+
+  @override
+  void initState() {
+    context.read<WorkplaceCubit>().getWorkplace(); // Doktorlarni yuklash
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    list.clear();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,10 +69,10 @@ class _WorkplacePageState extends State<WorkplacePage> {
         },
         builder: (context, state) {
           if (state is WorkplaceSuccess) {
-            List<WorkplaceModel> list = state.workplace;
+            list = state.workplace;
             if (searchController.text.isNotEmpty) {
               list = state.workplace
-                  .where((element) => (element.name ?? "")
+                  .where((element) => (element.name)
                       .toLowerCase()
                       .startsWith(searchController.text.trim().toLowerCase()))
                   .toList();

@@ -11,12 +11,12 @@ class OutContractCubit extends Cubit<OutContractState> {
 
   OutContractCubit(this.profileRepositoryImpl) : super(OutContractInitial());
 
-  void getOutContract() async {
+  Future<void> getOutContract() async {
     emit(OutContractLoading());
     final request = await profileRepositoryImpl.getOutContract();
     request.fold(
-      (l) => emit(OutContractError(failure: l)),
-      (r) => emit(OutContractSuccess(model: r)),
+          (l) => emit(OutContractError(failure: l)),
+          (r) => emit(OutContractSuccess(model: r)),
     );
   }
 }

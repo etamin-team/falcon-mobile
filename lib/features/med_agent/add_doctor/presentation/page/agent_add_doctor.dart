@@ -1,4 +1,3 @@
-import 'dart:ffi';
 import 'dart:math';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
@@ -6,27 +5,27 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wm_doctor/core/extensions/widget_extensions.dart';
 import 'package:wm_doctor/core/model/language_model.dart';
+import 'package:wm_doctor/core/utils/dependencies_injection.dart';
+import 'package:wm_doctor/core/utils/text_mask.dart';
+import 'package:wm_doctor/core/widgets/export.dart';
 import 'package:wm_doctor/features/auth/sign_up/domain/utility/doctor_level.dart';
 import 'package:wm_doctor/features/auth/sign_up/domain/utility/doctor_type.dart';
+import 'package:wm_doctor/features/auth/sign_up/presentation/cubit/sign_up_cubit.dart';
 import 'package:wm_doctor/features/create_template/data/model/medicine_model.dart';
 import 'package:wm_doctor/features/med_agent/add_doctor/data/model/add_contract_model.dart';
 import 'package:wm_doctor/features/med_agent/add_doctor/data/model/doctor_model.dart';
 import 'package:wm_doctor/features/med_agent/add_doctor/presentation/cubit/add_doctor_cubit.dart';
-import 'package:wm_doctor/features/med_agent/home/presentation/page/agent_home_page.dart';
-import 'package:wm_doctor/features/medicine/presentation/cubit/medicine_cubit.dart';
+import 'package:wm_doctor/features/med_agent/home/presentation/cubit/agent_home_cubit.dart';
+import 'package:wm_doctor/features/med_agent/profile/presentation/cubit/agent_profile_data/agent_profile_data_cubit.dart';
+import 'package:wm_doctor/features/medicine/data/repository/medicine_repository_impl.dart';
 import 'package:wm_doctor/features/medicine/presentation/page/medicine_dialog.dart';
-import 'package:wm_doctor/features/medicine/presentation/page/medicine_page.dart';
+import 'package:wm_doctor/features/profile/presentation/cubit/profile_cubit.dart';
+import 'package:wm_doctor/features/regions/presentation/cubit/regions_cubit.dart';
 import 'package:wm_doctor/features/regions/presentation/page/regions_dialog.dart';
 import 'package:wm_doctor/features/workplace/presentation/page/workplace_dialog.dart';
-import 'package:wm_doctor/core/utils/dependencies_injection.dart';
-import 'package:wm_doctor/core/utils/text_mask.dart';
-import 'package:wm_doctor/core/widgets/export.dart';
-import 'package:wm_doctor/features/medicine/data/repository/medicine_repository_impl.dart';
-import 'package:wm_doctor/features/profile/presentation/cubit/profile_cubit.dart';
-import 'package:wm_doctor/features/med_agent/contract/presentation/cubit/contract_cubit.dart';
-import 'package:wm_doctor/features/med_agent/home/presentation/cubit/agent_home_cubit.dart';
-import 'package:wm_doctor/features/med_agent/home/presentation/cubit/doctor/doctor_cubit.dart';
-import 'package:wm_doctor/features/med_agent/profile/presentation/cubit/agent_profile_data/agent_profile_data_cubit.dart';
+import '../../../../auth/sign_up/data/repository/sign_up_repository_impl.dart';
+import '../../../contract/presentation/cubit/contract_cubit.dart';
+import '../../data/repository/add_doctor_repository_impl.dart';
 
 class AgentAddDoctor extends StatefulWidget {
   const AgentAddDoctor({super.key});
@@ -53,15 +52,17 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
   late final MedicineRepositoryImpl medicineRepositoryImpl;
 
   int agentId = 0;
-
   List<MedicineModel> preparations = [];
   List<MedicineModel> selectedPreparations = [];
   List<int> quantity = [];
   LanguageModel location = LanguageModel(uz: "", ru: "", en: "");
   int locationId = 0;
-  String workplace = "";
   int workplaceId = 0;
+  String doctorID = "";
   int agentContractId = 1;
+  bool isCreateDoctor = true;
+  String locationDTO = "";
+  String workplaceDTO = "";
   String special = "";
   String level = "";
   final formKey = GlobalKey<FormState>();
@@ -73,7 +74,6 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
     "Госзакуп",
     "Рецепт"
   ];
-  final List<bool> _isSelected = [false, false, false, false];
   String selectedContractType = "KZ";
   String selectedContractTypeFull = "Каб.вакцинации";
 
@@ -82,7 +82,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
     super.initState();
     medicineRepositoryImpl = sl<MedicineRepositoryImpl>();
     loadMedicines();
-    context.read<DoctorCubit>().getDoctors(); // Doktorlarni yuklash
+    context.read<RegionsCubit>().getRegions();
   }
 
   void loadMedicines() async {
@@ -99,660 +99,703 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
     );
   }
 
-  void showDoctorDialog() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return BlocBuilder<DoctorCubit, DoctorState>(
-          builder: (context, state) {
-            if (state is DoctorLoading) {
-              return Center(child: CircularProgressIndicator());
-            } else if (state is DoctorLoaded) {
-              return AlertDialog(
-                title: Text("Выберите врача"),
-                content: Container(
-                  width: double.maxFinite,
-                  height: 300,
-                  child: ListView.builder(
-                    itemCount: state.doctors.length,
-                    itemBuilder: (context, index) {
-                      final doctor = state.doctors[index];
-                      return ListTile(
-                        title: Text("${doctor.firstName} ${doctor.lastName}"),
-                        onTap: () {
-                          nameController.text = "${doctor.firstName} ${doctor.lastName}";
-                          Navigator.pop(context);
-                        },
-                      );
-                    },
-                  ),
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text("Отмена"),
-                  ),
-                ],
-              );
-            }
-            return Center(child: Text("Ошибка загрузки"));
-          },
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.backgroundColor,
-      appBar: AppBar(
-        forceMaterialTransparency: true,
-        automaticallyImplyLeading: false,
-        title: Text("Добавить врача",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: Dimens.space28)),
-        actions: [
-          TextButton(
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<SignUpCubit>(
+          create: (context) => SignUpCubit(
+            sl<SignUpRepositoryImpl>(),
+          ),
+        ),
+        BlocProvider<AddDoctorCubit>(
+          create: (context) => AddDoctorCubit(
+            sl<AddDoctorRepositoryImpl>(),
+          ),
+        ),
+      ],
+      child: Scaffold(
+        backgroundColor: AppColors.backgroundColor,
+        appBar: AppBar(
+          forceMaterialTransparency: true,
+          automaticallyImplyLeading: false,
+          title: Text(
+            "Добавить врача",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: Dimens.space28,
+            ),
+          ),
+          actions: [
+            TextButton(
               onPressed: () {
                 Navigator.pop(context);
               },
               child: Text(
                 "Назад",
                 style: TextStyle(
-                    color: Colors.blueAccent,
-                    fontSize: Dimens.space18,
-                    fontWeight: FontWeight.w500),
-              )),
-          SizedBox(width: Dimens.space10),
-        ],
-      ),
-      body: BlocConsumer<AddDoctorCubit, AddDoctorState>(
-        listener: (context, state) {
-          if (state is AddDoctorSuccess) {
-            print("success bo'ldi =================");
-            context.read<AgentHomeCubit>().getData();
-            context.read<DoctorCubit>().getDoctors();
-            context.read<ContractCubit>().getContracts();
-            context.read<ProfileCubit>().getUserData();
-            context.read<AgentProfileDataCubit>().getProfileData();
-            Navigator.pop(context);
-          }
-        },
-        builder: (context, state) {
-          if (state is AddDoctorLoading) {
-            return Center(child: CircularProgressIndicator());
-          }
-          return SingleChildScrollView(
-            padding: EdgeInsets.symmetric(horizontal: Dimens.space20),
-            child: Form(
-              key: formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                spacing: Dimens.space10,
-                children: [
-                  SizedBox(height: Dimens.space10),
-                  Container(
-                    padding: EdgeInsets.all(Dimens.space20),
-                    decoration: BoxDecoration(
-                        color: AppColors.white,
-                        borderRadius: BorderRadius.circular(Dimens.space20)),
-                    child: Column(
-                      spacing: Dimens.space10,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        GestureDetector(
-                          onTap: showDoctorDialog,
-                          child: AppTextField(
-                            validator: (value) {
-                              if (value.toString().isEmpty) {
-                                return "Введите имя и фамилию врача.";
-                              }
-                              return null;
-                            },
-                            controller: nameController,
-                            hintText: "Ф.И.О. врача",
-                            suffixIcon: Icon(
-                              CupertinoIcons.chevron_down,
-                              color: Colors.black,
-                            ),
-                            hintColor: Colors.black87,
-                            isEnabled: false,
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            showRegions(
-                              ctx: context,
-                              onChange: (value) {
-                                addressController.text = value.uz;
-                                if (formKey.currentState!.validate()) {}
-                              },
-                              districtId: (value) {
-                                locationId = value;
-                              },
-                            );
-                          },
-                          child: AppTextField(
-                            textColor: Colors.black,
-                            validator: (value) {
-                              if (value.toString().isEmpty) {
-                                return "";
-                              }
-                              return null;
-                            },
-                            controller: addressController,
-                            hintText: "Район",
-                            suffixIcon: Icon(
-                              CupertinoIcons.chevron_down,
-                              color: Colors.black,
-                            ),
-                            hintColor: Colors.black87,
-                            isEnabled: false,
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            showWorkplaceDialog(
-                                ctx: context,
-                                name: (String value) {
-                                  workplaceController.text = value;
-                                  if (formKey.currentState!.validate()) {}
-                                },
-                                id: (int value) {
-                                  workplaceId = value;
-                                });
-                          },
-                          child: AppTextField(
-                            textColor: Colors.black,
-                            validator: (value) {
-                              if (value.toString().isEmpty) {
-                                return "";
-                              }
-                              return null;
-                            },
-                            controller: workplaceController,
-                            hintText: "Место работы",
-                            suffixIcon: Icon(
-                              CupertinoIcons.chevron_down,
-                              color: Colors.black,
-                            ),
-                            hintColor: Colors.black87,
-                            isEnabled: false,
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            showDoctorTypeList(
-                              ctx: context,
-                              onchange: (value) {
-                                doctorTypeController.text = value.uz;
-                                special = value.en;
-                                if (formKey.currentState!.validate()) {}
-                              },
-                              realType: (value) {},
-                            );
-                          },
-                          child: AppTextField(
-                            textColor: Colors.black,
-                            validator: (value) {
-                              if (value.toString().isEmpty) {
-                                return "";
-                              }
-                              return null;
-                            },
-                            controller: doctorTypeController,
-                            hintText: "Специальность",
-                            suffixIcon: Icon(
-                              CupertinoIcons.chevron_down,
-                              color: Colors.black,
-                            ),
-                            hintColor: Colors.black87,
-                            isEnabled: false,
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            showDoctorPositionList(
-                              ctx: context,
-                              onchange: (value) {
-                                doctorLevelController.text = value.uz;
-                                level = value.uz;
-                                if (formKey.currentState!.validate()) {}
-                              },
-                            );
-                          },
-                          child: AppTextField(
-                            textColor: Colors.black,
-                            validator: (value) {
-                              if (value.toString().isEmpty) {
-                                return "";
-                              }
-                              return null;
-                            },
-                            controller: doctorLevelController,
-                            hintText: "Должность",
-                            suffixIcon: Icon(
-                              CupertinoIcons.chevron_down,
-                              color: Colors.black,
-                            ),
-                            hintColor: Colors.black87,
-                            isEnabled: false,
-                          ),
-                        ),
-                        SizedBox(),
-                        Text(
-                          "Контактные данные врача",
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: Dimens.space18),
-                        ),
-                        AppTextField(
-                            keyboardType: TextInputType.emailAddress,
-                            validator: (value) {
-                              String pattern =
-                                  r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
-                              RegExp regex = RegExp(pattern);
-                              if (!regex.hasMatch(value.toString()) &&
-                                  value.toString().isNotEmpty) {
-                                return "Email to'g'ri kiritilsin";
-                              }
-                              return null;
-                            },
-                            controller: emailController,
-                            hintText: "Почта (muhim emas)"),
-                        AppTextField(
-                            keyboardType: TextInputType.phone,
-                            validator: (value) {
-                              if (value.toString().isEmpty) {
-                                return "---------";
-                              }
-                              return null;
-                            },
-                            prefixIcon: Text("+998 "),
-                            formatter: [
-                              TextMask(pallet: '## ### ## ##'),
-                              LengthLimitingTextInputFormatter(12),
-                            ],
-                            controller: numberController,
-                            hintText: "90 123 45 67"),
-                        SizedBox(height: Dimens.space10),
-                        Text(
-                          "Временный пароль",
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: Dimens.space18),
-                        ),
-                        AppTextField(
-                          validator: (value) {
-                            if (value.toString().isEmpty) {
-                              return "---------";
-                            }
-                            return null;
-                          },
-                          controller: passwordController,
-                          hintText: "********",
-                          suffixIcon: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            spacing: Dimens.space10,
-                            children: [
-                              GestureDetector(
-                                  onTap: () {
-                                    passwordController.text = generatePassword();
-                                    setState(() {});
-                                  },
-                                  child: SvgPicture.asset(Assets.icons.repeat)),
-                              GestureDetector(
-                                  onTap: () {
-                                    if (passwordController.text.isNotEmpty) {
-                                      Clipboard.setData(ClipboardData(
-                                          text: passwordController.text));
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(const SnackBar(
-                                        content: Text('Скопировано'),
-                                        duration: Duration(seconds: 1),
-                                      ));
-                                    }
-                                  },
-                                  child: SvgPicture.asset(Assets.icons.copy)),
-                              SizedBox(width: Dimens.space5),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: Dimens.space10),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.all(Dimens.space20),
-                    decoration: BoxDecoration(
-                        color: AppColors.white,
-                        borderRadius: BorderRadius.circular(Dimens.space20)),
-                    child: Column(
-                      spacing: Dimens.space10,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Text(
-                          "Тип Контракта",
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: Dimens.space18),
-                        ),
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 16),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.blueAccent, width: 2),
-                          ),
-                          child: DropdownMenuTheme(
-                            data: DropdownMenuThemeData(
-                              menuStyle: MenuStyle(
-                                backgroundColor:
-                                MaterialStateProperty.all(Colors.white),
-                                shape: MaterialStateProperty.all(
-                                  RoundedRectangleBorder(
-                                    borderRadius:
-                                    BorderRadius.circular(12),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            child: DropdownButtonHideUnderline(
-                              child: DropdownButton<String>(
-                                hint: Text(
-                                  "Select Contract Type",
-                                  style: TextStyle(
-                                      fontSize: 16, color: Colors.grey[600]),
-                                ),
-                                value: selectedContractTypeFull,
-                                onChanged: (String? newValue) {
-                                  calculate();
-                                  setState(() {
-                                    int selectedIndex = contractTypesFullList
-                                        .indexOf(newValue!);
-                                    selectedContractTypeFull = newValue;
-                                    selectedContractType = contractTypesList[
-                                    selectedIndex];
-                                  });
-                                },
-                                icon: Icon(Icons.arrow_drop_down,
-                                    color: Colors.blueAccent, size: 30),
-                                style: TextStyle(fontSize: 18, color: Colors.black),
-                                dropdownColor: Colors.white,
-                                items: contractTypesFullList
-                                    .map<DropdownMenuItem<String>>((String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(value, style: TextStyle(fontSize: 16)),
-                                  );
-                                }).toList(),
-                              ),
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                  Container(
-                    padding: EdgeInsets.all(Dimens.space20),
-                    decoration: BoxDecoration(
-                        color: AppColors.white,
-                        borderRadius: BorderRadius.circular(Dimens.space20)),
-                    child: Column(
-                      spacing: Dimens.space10,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Text(
-                          "Пакет",
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: Dimens.space18),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            print(preparations.length);
-                            showMedicine(
-                                ctx: context,
-                                medicine: preparations,
-                                model: (MedicineModel value1) {
-                                  Navigator.pop(context);
-                                  showInputAmount(
-                                    name: value1.name ?? "",
-                                    amount: 1,
-                                    onChange: (v) {
-                                      print("----------------------->${value1.name}");
-                                      print("----------------------->${amountController.text}");
-                                      selectedPreparations.add(value1);
-                                      quantity.add(int.parse(amountController.text));
-                                      preparations.last.quantity = v;
-                                      if (formKey.currentState!.validate()) {}
-                                      calculate();
-                                      setState(() {});
-                                    },
-                                  );
-                                });
-                          },
-                          child: AppTextField(
-                            textColor: Colors.black,
-                            validator: (value) {
-                              if (preparations.isEmpty) {
-                                return "----------";
-                              }
-                              return null;
-                            },
-                            controller: recipeController,
-                            hintText: "Выберите препарат",
-                            suffixIcon: Icon(
-                              CupertinoIcons.add_circled_solid,
-                              color: Colors.blueAccent,
-                            ),
-                            hintColor: Colors.black87,
-                            isEnabled: false,
-                          ),
-                        ),
-                        ...List.generate(
+                  color: Colors.blueAccent,
+                  fontSize: Dimens.space18,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            SizedBox(width: Dimens.space10),
+          ],
+        ),
+        body: BlocConsumer<AddDoctorCubit, AddDoctorState>(
+          listener: (context, state) {
+            if (state is AddDoctorSuccess) {
+              print("success bo'ldi =================");
+              context.read<AgentHomeCubit>().getData();
+              context.read<ContractCubit>().getContracts();
+              context.read<RegionsCubit>().getRegions();
+              context.read<ProfileCubit>().getUserData();
+              context.read<AgentProfileDataCubit>().getProfileData();
+              Navigator.pop(context);
+            }
+          },
+          builder: (context, state) {
+            if (state is AddDoctorLoading) {
+              return Center(child: CircularProgressIndicator());
+            }
+            return BlocListener<SignUpCubit, SignUpState>(
+              listener: (context, signUpState) {
+                if (signUpState is SignUpCheckNumberSuccess) {
+                  if (!signUpState.isExist) {
+                    // Proceed with doctor registration
+                    final names = nameController.text.split(" ");
+                    context.read<AddDoctorCubit>().addDoctor(
+                      doctor: DoctorModel(
+                        firstName: names[0],
+                        lastName: names.length > 1 ? names[1] : "",
+                        middleName: names.length > 2 ? names[2] : "",
+                        email: emailController.text.trim(),
+                        role: "DOCTOR",
+                        password: passwordController.text.trim(),
+                        phoneNumber: numberController.text.trim().replaceAll(
+                            " ", ""),
+                        phonePrefix: "998",
+                        number: "998${numberController.text.trim().replaceAll(
+                            " ", "")}",
+                        workPlaceId: workplaceId,
+                        birthDate: "2000-01-01",
+                        gender: "MALE",
+                        fieldName: special.toUpperCase(),
+                        position: level,
+                        districtId: locationId,
+                      ),
+                      contract: AddContractModel(
+                        doctorId: "",
+                        startDate: fromDateController.text.toString(),
+                        endDate: toDateController.text.toString(),
+                        agentId: "",
+                        contractType: selectedContractType,
+                        agentContractId: agentContractId,
+                        medicineWithQuantityDoctorDTOS: List.generate(
                           selectedPreparations.length,
-                              (index) {
-                            return Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: Dimens.space20,
-                                  vertical: Dimens.space16),
-                              decoration: BoxDecoration(
-                                  borderRadius:
-                                  BorderRadius.circular(Dimens.space10),
-                                  color: AppColors.backgroundColor),
-                              child: Row(
+                              (index) =>
+                              MedicineWithQuantityDoctorDTOS(
+                                medicineId: selectedPreparations[index].id ?? 0,
+                                quote: quantity[index],
+                              ),
+                        ),
+                      ),
+                      isCreateDoctor: true,
+                      doctorId: '',
+                    );
+                    agentContractId++;
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: Text("Успешно",
+                              style: TextStyle(color: Colors.greenAccent)),
+                          content: Text("Вы успешно зарегистрировали врача"),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);},
+                              child: Text("Ок"),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  }else{
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: Text("Ошибка", style: TextStyle(color: Colors.redAccent)),
+                          content: Text("Номер телефона уже зарегистрирован"),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: Text("Ок"),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  }
+                }
+              },
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(horizontal: Dimens.space20),
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    spacing: Dimens.space10,
+                    children: [
+                      SizedBox(height: Dimens.space10),
+                      Container(
+                        padding: EdgeInsets.all(Dimens.space20),
+                        decoration: BoxDecoration(
+                          color: AppColors.white,
+                          borderRadius: BorderRadius.circular(Dimens.space20),
+                        ),
+                        child: Column(
+                          spacing: Dimens.space10,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            AppTextField(
+                              validator: (value) {
+                                if (value.toString().isEmpty) {
+                                  return "Введите имя и фамилию врача.";
+                                }
+                                return null;
+                              },
+                              controller: nameController,
+                              hintText: "Ф.И.О. врача",
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                showRegions(
+                                  ctx: context,
+                                  onChange: (value) {
+                                    addressController.text = value.uz;
+                                    if (formKey.currentState!.validate()) {}
+                                  },
+                                  districtId: (value) {
+                                    locationId = value;
+                                  },
+                                );
+                              },
+                              child: AppTextField(
+                                textColor: Colors.black,
+                                validator: (value) {
+                                  if (value.toString().isEmpty) {
+                                    return "Выберите район";
+                                  }
+                                  return null;
+                                },
+                                controller: addressController,
+                                hintText: "Район",
+                                suffixIcon: Icon(
+                                  CupertinoIcons.chevron_down,
+                                  color: Colors.black,
+                                ),
+                                hintColor: Colors.black87,
+                                isEnabled: false,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                showWorkplaceDialog(
+                                  ctx: context,
+                                  name: (String value) {
+                                    workplaceController.text = value;
+                                    if (formKey.currentState!.validate()) {}
+                                  },
+                                  id: (int value) {
+                                    workplaceId = value;
+                                  },
+                                );
+                              },
+                              child: AppTextField(
+                                textColor: Colors.black,
+                                validator: (value) {
+                                  if (value.toString().isEmpty) {
+                                    return "Выберите место работы";
+                                  }
+                                  return null;
+                                },
+                                controller: workplaceController,
+                                hintText: "Место работы",
+                                suffixIcon: Icon(
+                                  CupertinoIcons.chevron_down,
+                                  color: Colors.black,
+                                ),
+                                hintColor: Colors.black87,
+                                isEnabled: false,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                showDoctorTypeList(
+                                  ctx: context,
+                                  onchange: (value) {
+                                    doctorTypeController.text = value.uz;
+                                    special = value.en;
+                                    if (formKey.currentState!.validate()) {}
+                                  },
+                                  realType: (value) {},
+                                );
+                              },
+                              child: AppTextField(
+                                textColor: Colors.black,
+                                validator: (value) {
+                                  if (value.toString().isEmpty) {
+                                    return "Выберите специальность";
+                                  }
+                                  return null;
+                                },
+                                controller: doctorTypeController,
+                                hintText: "Специальность",
+                                suffixIcon: Icon(
+                                  CupertinoIcons.chevron_down,
+                                  color: Colors.black,
+                                ),
+                                hintColor: Colors.black87,
+                                isEnabled: false,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                showDoctorPositionList(
+                                  ctx: context,
+                                  onchange: (value) {
+                                    doctorLevelController.text = value.uz;
+                                    level = value.uz;
+                                    if (formKey.currentState!.validate()) {}
+                                  },
+                                );
+                              },
+                              child: AppTextField(
+                                textColor: Colors.black,
+                                validator: (value) {
+                                  if (value.toString().isEmpty) {
+                                    return "Выберите должность";
+                                  }
+                                  return null;
+                                },
+                                controller: doctorLevelController,
+                                hintText: "Должность",
+                                suffixIcon: Icon(
+                                  CupertinoIcons.chevron_down,
+                                  color: Colors.black,
+                                ),
+                                hintColor: Colors.black87,
+                                isEnabled: false,
+                              ),
+                            ),
+                            SizedBox(),
+                            Text(
+                              "Контактные данные врача",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: Dimens.space18,
+                              ),
+                            ),
+                            AppTextField(
+                              keyboardType: TextInputType.emailAddress,
+                              validator: (value) {
+                                String pattern =
+                                    r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
+                                RegExp regex = RegExp(pattern);
+                                if (!regex.hasMatch(value.toString()) &&
+                                    value.toString().isNotEmpty) {
+                                  return "Emailni to'g'ri kriiting";
+                                }
+                                return null;
+                              },
+                              controller: emailController,
+                              hintText: "Почта (muhim emas)",
+                            ),
+                            AppTextField(
+                              keyboardType: TextInputType.phone,
+                              validator: (value) {
+                                if (value.toString().isEmpty) {
+                                  return "Введите номер телефона";
+                                }
+                                return null;
+                              },
+                              prefixIcon: Text("+998 "),
+                              formatter: [
+                                TextMask(pallet: '## ### ## ##'),
+                                LengthLimitingTextInputFormatter(12),
+                              ],
+                              controller: numberController,
+                              hintText: "90 123 45 67",
+                            ),
+                            SizedBox(height: Dimens.space10),
+                            Text(
+                              "Временный пароль",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: Dimens.space18,
+                              ),
+                            ),
+                            AppTextField(
+                              validator: (value) {
+                                if (value.toString().isEmpty) {
+                                  return "Введите пароль";
+                                }
+                                return null;
+                              },
+                              controller: passwordController,
+                              hintText: "********",
+                              suffixIcon: Row(
+                                mainAxisSize: MainAxisSize.min,
                                 spacing: Dimens.space10,
-                                mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
                                 children: [
                                   GestureDetector(
-                                      onTap: () {
-                                        selectedPreparations.removeAt(index);
-                                        setState(() {});
-                                      },
-                                      child: SvgPicture.asset(
-                                        Assets.icons.delete,
-                                        height: Dimens.space20,
-                                        width: Dimens.space20,
-                                      )),
-                                  Expanded(
-                                    child: Text(
-                                      selectedPreparations[index].name ?? "",
-                                      style:
-                                      TextStyle(fontWeight: FontWeight.w600),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
+                                    onTap: () {
+                                      passwordController.text = generatePassword();
+                                      setState(() {});
+                                    },
+                                    child: SvgPicture.asset(Assets.icons.repeat),
                                   ),
-                                  Text("${quantity[index]}"),
                                   GestureDetector(
                                     onTap: () {
-                                      showInputAmount(
-                                          name: selectedPreparations[index].name ?? "",
-                                          amount: quantity[index],
-                                          onChange: (int value) {
-                                            quantity[index] = value;
-                                            calculate();
-                                            setState(() {});
-                                          });
+                                      if (passwordController.text.isNotEmpty) {
+                                        Clipboard.setData(
+                                          ClipboardData(text: passwordController.text),
+                                        );
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(
+                                            content: Text('Скопировано'),
+                                            duration: Duration(seconds: 1),
+                                          ),
+                                        );
+                                      }
                                     },
-                                    child: SvgPicture.asset(
-                                      Assets.icons.pen,
-                                      color: Colors.grey,
-                                      height: Dimens.space20,
-                                      width: Dimens.space20,
-                                    ),
+                                    child: SvgPicture.asset(Assets.icons.copy),
                                   ),
+                                  SizedBox(width: Dimens.space5),
                                 ],
                               ),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                      padding: EdgeInsets.all(Dimens.space20),
-                      decoration: BoxDecoration(
-                          color: AppColors.white,
-                          borderRadius: BorderRadius.circular(Dimens.space20)),
-                      child: Column(
-                        spacing: Dimens.space10,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Условия пакета",
-                            style: TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: Dimens.space18),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              DateTime max = DateTime(2050);
-                              if (toDateController.text.length == 10) {
-                                DateFormat format = DateFormat("yyyy-MM-dd");
-                                max = format.parse(toDateController.text.toString());
-                                max.add(Duration(hours: 12));
-                              }
-                              showDatePickerBottomSheet(
-                                ctx: context,
-                                text: fromDateController.text.trim(),
-                                onChange: (value) {
-                                  setState(() {
-                                    fromDateController.text = value;
-                                  });
-                                },
-                                min: DateTime.now(),
-                                max: max,
-                                from: true,
-                              );
-                            },
-                            child: AppTextField(
-                              validator: (value) {
-                                if (value.toString().isEmpty) {
-                                  return "";
-                                }
-                                return null;
-                              },
-                              isEnabled: false,
-                              title: "Дата начала",
-                              titleStyle: TextStyle(
-                                  fontSize: Dimens.space14,
-                                  fontWeight: FontWeight.bold),
-                              controller: fromDateController,
-                              hintText: "2025-09-05",
-                              textColor: Colors.black,
-                              suffixIcon: SvgPicture.asset(
-                                Assets.icons.calendar,
-                                height: Dimens.space14,
-                                width: Dimens.space14,
-                              ).paddingAll(value: Dimens.space10),
                             ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              DateTime min =
-                              DateTime.now().add(Duration(days: 1));
-                              if (fromDateController.text.length == 10) {
-                                DateFormat format = DateFormat("yyyy-MM-dd");
-                                min = format.parse(fromDateController.text.toString());
-                                min.add(Duration(hours: 12));
-                              }
-                              showDatePickerBottomSheet(
-                                ctx: context,
-                                text: toDateController.text.trim(),
-                                onChange: (value) {
-                                  setState(() {
-                                    toDateController.text = value;
-                                  });
-                                },
-                                min: min,
-                                max: DateTime(2050),
-                                from: false,
-                              );
-                            },
-                            child: AppTextField(
-                              validator: (value) {
-                                if (value.toString().isEmpty) {
-                                  return "";
-                                }
-                                return null;
+                            SizedBox(height: Dimens.space10),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: EdgeInsets.all(Dimens.space20),
+                        decoration: BoxDecoration(
+                          color: AppColors.white,
+                          borderRadius: BorderRadius.circular(Dimens.space20),
+                        ),
+                        child: Column(
+                          spacing: Dimens.space10,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(
+                              "Тип Контракта",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: Dimens.space18,
+                              ),
+                            ),
+                            Container(
+                              padding: EdgeInsets.symmetric(horizontal: 16),
+                              decoration: BoxDecoration(
+                                color: Color.fromRGBO(247, 248, 252, 1),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton<String>(
+                                  hint: Text(
+                                    "Select Contract Type",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                  borderRadius: BorderRadius.all(Radius.circular(15)),
+                                  value: selectedContractTypeFull,
+                                  onChanged: (String? newValue) {
+                                    calculate();
+                                    setState(() {
+                                      int selectedIndex = contractTypesFullList.indexOf(newValue!);
+                                      selectedContractTypeFull = newValue;
+                                      selectedContractType = contractTypesList[selectedIndex];
+                                    });
+                                  },
+                                  icon: Icon(Icons.arrow_drop_down, color: Colors.black, size: 30),
+                                  style: TextStyle(fontSize: 18, color: Colors.black),
+                                  dropdownColor: Color.fromRGBO(247, 248, 252, 1),
+                                  items: contractTypesFullList
+                                      .map<DropdownMenuItem<String>>((String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Text(value, style: TextStyle(fontSize: 16)),
+                                    );
+                                  }).toList(),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: EdgeInsets.all(Dimens.space20),
+                        decoration: BoxDecoration(
+                          color: AppColors.white,
+                          borderRadius: BorderRadius.circular(Dimens.space20),
+                        ),
+                        child: Column(
+                          spacing: Dimens.space10,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Text(
+                              "Пакет",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: Dimens.space18,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                print(preparations.length);
+                                showMedicine(
+                                  ctx: context,
+                                  medicine: preparations,
+                                  model: (MedicineModel value1) {
+                                    Navigator.pop(context);
+                                    showInputAmount(
+                                      name: value1.name ?? "",
+                                      amount: 1,
+                                      onChange: (v) {
+                                        print("----------------------->${value1.name}");
+                                        print("----------------------->${amountController.text}");
+                                        selectedPreparations.add(value1);
+                                        quantity.add(int.parse(amountController.text));
+                                        preparations.last.quantity = v;
+                                        if (formKey.currentState!.validate()) {}
+                                        calculate();
+                                        setState(() {});
+                                      },
+                                    );
+                                  },
+                                );
                               },
-                              isEnabled: false,
-                              title: "Дата окончания",
-                              titleStyle: TextStyle(
+                              child: AppTextField(
+                                textColor: Colors.black,
+                                controller: recipeController,
+                                hintText: "Выберите препарат",
+                                suffixIcon: Icon(
+                                  CupertinoIcons.add_circled_solid,
+                                  color: Colors.blueAccent,
+                                ),
+                                hintColor: Colors.black87,
+                                isEnabled: false,
+                              ),
+                            ),
+                            ...List.generate(
+                              selectedPreparations.length,
+                                  (index) {
+                                return Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: Dimens.space20,
+                                    vertical: Dimens.space16,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(Dimens.space10),
+                                    color: AppColors.backgroundColor,
+                                  ),
+                                  child: Row(
+                                    spacing: Dimens.space10,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      GestureDetector(
+                                        onTap: () {
+                                          selectedPreparations.removeAt(index);
+                                          setState(() {});
+                                        },
+                                        child: SvgPicture.asset(
+                                          Assets.icons.delete,
+                                          height: Dimens.space20,
+                                          width: Dimens.space20,
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Text(
+                                          selectedPreparations[index].name ?? "",
+                                          style: TextStyle(fontWeight: FontWeight.w600),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      Text("${quantity[index]}"),
+                                      GestureDetector(
+                                        onTap: () {
+                                          showInputAmount(
+                                            name: selectedPreparations[index].name ?? "",
+                                            amount: quantity[index],
+                                            onChange: (int value) {
+                                              quantity[index] = value;
+                                              calculate();
+                                              setState(() {});
+                                            },
+                                          );
+                                        },
+                                        child: SvgPicture.asset(
+                                          Assets.icons.pen,
+                                          color: Colors.grey,
+                                          height: Dimens.space20,
+                                          width: Dimens.space20,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: EdgeInsets.all(Dimens.space20),
+                        decoration: BoxDecoration(
+                          color: AppColors.white,
+                          borderRadius: BorderRadius.circular(Dimens.space20),
+                        ),
+                        child: Column(
+                          spacing: Dimens.space10,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Условия пакета",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: Dimens.space18,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                DateTime max = DateTime(2050);
+                                if (toDateController.text.length == 10) {
+                                  DateFormat format = DateFormat("yyyy-MM-dd");
+                                  max = format.parse(toDateController.text.toString());
+                                  max.add(Duration(hours: 12));
+                                }
+                                showDatePickerBottomSheet(
+                                  ctx: context,
+                                  text: fromDateController.text.trim(),
+                                  onChange: (value) {
+                                    setState(() {
+                                      fromDateController.text = value;
+                                    });
+                                  },
+                                  min: DateTime.now(),
+                                  max: max,
+                                  from: true,
+                                );
+                              },
+                              child: AppTextField(
+                                isEnabled: false,
+                                title: "Дата начала",
+                                titleStyle: TextStyle(
+                                  fontSize: Dimens.space14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                controller: fromDateController,
+                                hintText: "2025-09-05",
+                                textColor: Colors.black,
+                                suffixIcon: SvgPicture.asset(
+                                  Assets.icons.calendar,
+                                  height: Dimens.space14,
+                                  width: Dimens.space14,
+                                ).paddingAll(value: Dimens.space10),
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                DateTime min = DateTime.now().add(Duration(days: 1));
+                                if (fromDateController.text.length == 10) {
+                                  DateFormat format = DateFormat("yyyy-MM-dd");
+                                  min = format.parse(fromDateController.text.toString());
+                                  min.add(Duration(hours: 12));
+                                }
+                                showDatePickerBottomSheet(
+                                  ctx: context,
+                                  text: toDateController.text.trim(),
+                                  onChange: (value) {
+                                    setState(() {
+                                      toDateController.text = value;
+                                    });
+                                  },
+                                  min: min,
+                                  max: DateTime(2050),
+                                  from: false,
+                                );
+                              },
+                              child: AppTextField(
+                                isEnabled: false,
+                                title: "Дата окончания",
+                                titleStyle: TextStyle(
                                   fontSize: Dimens.space14,
                                   color: Colors.black,
-                                  fontWeight: FontWeight.bold),
-                              controller: toDateController,
-                              hintText: "2025-10-05",
-                              textColor: Colors.black,
-                              suffixIcon: SvgPicture.asset(
-                                Assets.icons.calendar,
-                                height: Dimens.space14,
-                                width: Dimens.space14,
-                              ).paddingAll(value: Dimens.space10),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                controller: toDateController,
+                                hintText: "2025-10-05",
+                                textColor: Colors.black,
+                                suffixIcon: SvgPicture.asset(
+                                  Assets.icons.calendar,
+                                  height: Dimens.space14,
+                                  width: Dimens.space14,
+                                ).paddingAll(value: Dimens.space10),
+                              ),
                             ),
-                          ),
-                        ],
-                      )),
-                  Container(
-                    padding: EdgeInsets.all(Dimens.space20),
-                    decoration: BoxDecoration(
-                        color: AppColors.white,
-                        borderRadius: BorderRadius.circular(Dimens.space20)),
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: Dimens.space20, vertical: Dimens.space16),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(Dimens.space10),
-                          color: AppColors.backgroundColor),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text("Шаги"),
-                          Text(allQuote.toString()),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ),
-                  SizedBox(),
-                  BlocBuilder<AgentHomeCubit, AgentHomeState>(
-                    builder: (context, state) {
-                      return UniversalButton.filled(
-                          cornerRadius: Dimens.space20,
-                          text: "Зарегистрировать врача",
-                          onPressed: () {
-                            if (selectedPreparations.length <= 4) {
-                              showDialog(
+                      Container(
+                        padding: EdgeInsets.all(Dimens.space20),
+                        decoration: BoxDecoration(
+                          color: AppColors.white,
+                          borderRadius: BorderRadius.circular(Dimens.space20),
+                        ),
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: Dimens.space20,
+                            vertical: Dimens.space16,
+                          ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(Dimens.space10),
+                            color: AppColors.backgroundColor,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text("Шаги"),
+                              Text(allQuote.toString()),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(),
+                      BlocBuilder<AgentHomeCubit, AgentHomeState>(
+                        builder: (context, state) {
+                          return UniversalButton.filled(
+                            cornerRadius: Dimens.space20,
+                            text: "Зарегистрировать врача",
+                            onPressed: () async {
+                              if (!formKey.currentState!.validate()) {
+                                showDialog(
                                   context: context,
                                   builder: (context) {
                                     return AlertDialog(
-                                      title: Text("Ошибка", style: TextStyle(color: Colors.redAccent)),
-                                      content: Text(
-                                        "Для регистрации врача необходимо заполнить все поля и добавить минимум 5 препаратов",
-                                        style: TextStyle(fontSize: 16),
+                                      title: Text(
+                                        "Ошибка",
+                                        style: TextStyle(color: Colors.redAccent),
                                       ),
+                                      content: Text("Форма заполнена некорректно"),
                                       actions: [
                                         TextButton(
                                           onPressed: () {
@@ -762,77 +805,59 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                                         ),
                                       ],
                                     );
-                                  });
-                            } else {
-                              final names = nameController.text.split(" ");
-                              context.read<AddDoctorCubit>().addDoctor(
-                                  doctor: DoctorModel(
-                                      firstName: names[0],
-                                      lastName: names.length > 1 ? names[1] : "",
-                                      middleName: names.length > 2 ? names[2] : "",
-                                      email: emailController.text.trim(),
-                                      role: "DOCTOR",
-                                      password: passwordController.text.trim(),
-                                      phoneNumber: numberController.text
-                                          .trim()
-                                          .replaceAll(" ", ""),
-                                      phonePrefix: "998",
-                                      number:
-                                      "998${numberController.text.trim().replaceAll(" ", "")}",
-                                      workPlaceId: workplaceId,
-                                      birthDate: "2000-01-01",
-                                      gender: "MALE",
-                                      fieldName: special.toUpperCase(),
-                                      position: level,
-                                      districtId: locationId),
-                                  contract: AddContractModel(
-                                    doctorId: "",
-                                    startDate:
-                                    fromDateController.text.toString(),
-                                    endDate: toDateController.text.toString(),
-                                    agentId: "",
-                                    contractType: selectedContractType,
-                                    agentContractId: agentContractId ?? 0,
-                                    medicineWithQuantityDoctorDTOS: List.generate(
-                                      selectedPreparations.length,
-                                          (index) {
-                                        return MedicineWithQuantityDoctorDTOS(
-                                            medicineId:
-                                            selectedPreparations[index].id ?? 0,
-                                            quote:
-                                            quantity[index]);
-                                      },
-                                    ),
-                                  ));
-                              agentContractId++;
-                              showDialog(
+                                  },
+                                );
+                                return;
+                              }
+                              if (numberController.text.length == 12) {
+                                context.read<SignUpCubit>().checkNumber(
+                                  number: "998${numberController.text.replaceAll(" ", "").replaceAll("+", "")}",
+                                );
+                              } else {
+                                showDialog(
                                   context: context,
                                   builder: (context) {
                                     return AlertDialog(
-                                      title: Text("Успешно", style: TextStyle(color: Colors.greenAccent)),
-                                      content: Text(
-                                        "Вы успешно зарегистрировали врача",
+                                      title: Text(
+                                        "Ошибка",
+                                        style: TextStyle(color: Colors.redAccent),
                                       ),
+                                      content: Text("Введите номер телефона из 12 символов"),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: Text("Ок"),
+                                        ),
+                                      ],
                                     );
-                                  });
-                            }
-                          });
-                    },
+                                  },
+                                );
+                                return;
+                              }
+                              // Additional validations moved to BlocListener
+                            },
+                          );
+                        },
+                      ),
+                      SizedBox(height: Dimens.space20),
+                    ],
                   ),
-                  SizedBox(height: Dimens.space20),
-                ],
+                ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
 
-  void showInputAmount(
-      {required String name,
-        required int amount,
-        required ValueChanged<int> onChange}) async {
+  void showInputAmount({
+    required String name,
+    required int amount,
+    required ValueChanged<int> onChange,
+  }) async {
     final quantForm = GlobalKey<FormState>();
     amountController.text = amount.toString();
     showModalBottomSheet(
@@ -850,7 +875,9 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
               Text(
                 name,
                 style: TextStyle(
-                    fontSize: Dimens.space18, fontWeight: FontWeight.w500),
+                  fontSize: Dimens.space18,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
               AppTextField(
                 keyboardType: TextInputType.numberWithOptions(decimal: false),
@@ -872,8 +899,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                 text: "Сохранять",
                 onPressed: () {
                   if (quantForm.currentState!.validate()) {
-                    int number =
-                        int.tryParse(amountController.text.toString()) ?? 1;
+                    int number = int.tryParse(amountController.text.toString()) ?? 1;
                     onChange(number);
                     Navigator.pop(context);
                   }
@@ -884,22 +910,24 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
               SizedBox(height: Dimens.space50),
             ],
           ).paddingOnly(
-              left: Dimens.space30,
-              right: Dimens.space30,
-              top: Dimens.space20,
-              bottom: MediaQuery.viewInsetsOf(context).bottom),
+            left: Dimens.space30,
+            right: Dimens.space30,
+            top: Dimens.space20,
+            bottom: MediaQuery.viewInsetsOf(context).bottom,
+          ),
         );
       },
     );
   }
 
-  Future<void> showDatePickerBottomSheet(
-      {required BuildContext ctx,
-        required String text,
-        required ValueChanged<String> onChange,
-        required DateTime min,
-        required DateTime max,
-        required bool from}) async {
+  Future<void> showDatePickerBottomSheet({
+    required BuildContext ctx,
+    required String text,
+    required ValueChanged<String> onChange,
+    required DateTime min,
+    required DateTime max,
+    required bool from,
+  }) async {
     DateTime dateTime = DateTime.now().add(Duration(hours: 1));
     if (!from) {
       dateTime = min.add(Duration(hours: 5));
@@ -923,9 +951,10 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
               const Text(
                 "Выберите дату",
                 style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black),
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
               ),
               Expanded(
                 child: CupertinoDatePicker(
@@ -934,8 +963,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                   initialDateTime: dateTime,
                   maximumDate: from ? max : DateTime(2050),
                   minimumDate: from
-                      ? DateTime(DateTime.now().year, DateTime.now().month,
-                      DateTime.now().day)
+                      ? DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day)
                       : min,
                   onDateTimeChanged: (DateTime newDate) {
                     dateTime = newDate;
@@ -946,7 +974,9 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                 child: const Text(
                   "Готово",
                   style: TextStyle(
-                      color: Colors.black, fontWeight: FontWeight.w600),
+                    color: Colors.black,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 onPressed: () {
                   setState(() {
@@ -965,11 +995,9 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
   }
 
   String generatePassword() {
-    const String chars =
-        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const String chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     Random random = Random();
-    return List.generate(10, (index) => chars[random.nextInt(chars.length)])
-        .join();
+    return List.generate(10, (index) => chars[random.nextInt(chars.length)]).join();
   }
 
   void showContractType(ValueChanged<String> onChange) {}
@@ -1003,7 +1031,34 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
     }
     setState(() {});
   }
-}
 
-class DoctorLoaded {
+  void resetForm() {
+    nameController.clear();
+    // addressController.clear();
+    // workplaceController.clear();
+    doctorTypeController.clear();
+    doctorLevelController.clear();
+    emailController.clear();
+    numberController.clear();
+    // passwordController.clear();
+    fromDateController.clear();
+    toDateController.clear();
+    // recipeController.clear();
+    // amountController.clear();
+    // allQuote = 0;
+    agentId = 0;
+    // locationId = 0;
+    // workplaceId = 0;
+    // agentContractId = 1;
+    // selectedPreparations = [];
+    // quantity = [];
+    // location = LanguageModel(uz: "", ru: "", en: "");
+    doctorID = "";
+    // locationDTO = "";
+    // workplaceDTO = "";
+    special = "";
+    level = "";
+    isCreateDoctor = true;
+    setState(() {});
+  }
 }

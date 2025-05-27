@@ -71,6 +71,9 @@ class $AssetsIconsGen {
   /// File path: assets/icons/list.svg
   String get list => 'assets/icons/list.svg';
 
+  /// File path: assets/icons/list.svg
+  String get person_heart => 'assets/icons/person_heart.svg';
+
   /// File path: assets/icons/log_out.svg
   String get logOut => 'assets/icons/log_out.svg';
 

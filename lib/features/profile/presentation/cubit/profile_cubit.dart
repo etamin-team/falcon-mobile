@@ -13,31 +13,27 @@ class ProfileCubit extends Cubit<ProfileState> {
 
   ProfileCubit(this.profileRepositoryImpl) : super(ProfileInitial());
 
-  void getUserData() async {
-    print('00000-----------------------------------------1-------------------------------');
+  Future<void> getUserData() async {
 
     emit(ProfileLoading());
-    print('00000-----------------------------------------1-------------------------------');
 
     final request = await profileRepositoryImpl.getUserData();
     request.fold(
-      (l) => emit(ProfileError(failure: l)),
-      (r) async {
+          (l) => emit(ProfileError(failure: l)),
+          (r) async {
         DistrictModel? districtModel;
         WorkplaceModel? workplaceModel;
-        final district =
-            await profileRepositoryImpl.getDistrict(id: r.districtId??100);
+        final district = await profileRepositoryImpl.getDistrict(id: r.districtId ?? 100);
         district.fold(
-          (l) {},
-          (r) {
+              (l) {},
+              (r) {
             districtModel = r;
           },
         );
-        final workplace =
-            await profileRepositoryImpl.getWorkplace(id: r.workplaceId??1);
+        final workplace = await profileRepositoryImpl.getWorkplace(id: r.workplaceId ?? 1);
         workplace.fold(
-          (l) {},
-          (r) {
+              (l) {},
+              (r) {
             workplaceModel = r;
           },
         );

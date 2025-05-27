@@ -27,6 +27,7 @@ import 'package:wm_doctor/features/workplace/presentation/cubit/workplace_cubit.
 import 'core/network/interceptor.dart';
 import 'core/services/secure_storage.dart';
 import 'core/utils/dependencies_injection.dart';
+import 'features/med_agent/home/presentation/cubit/doctor/last_doctor_cubit.dart';
 import 'features/medicine/presentation/cubit/mnn_cubit.dart';
 
 void main() async {
@@ -159,6 +160,9 @@ class _MyAppState extends State<MyApp> {
         ),
         BlocProvider(
           create: (context) => sl<DoctorCubit>(),
+        ),
+        BlocProvider(
+          create: (context) => sl<LastDoctorCubit>(),
         ),
         BlocProvider(
           create: (context) => sl<ContractCubit>(),

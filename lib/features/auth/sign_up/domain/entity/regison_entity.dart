@@ -203,6 +203,7 @@ class RegionEntity {
 
 class DoctorTypes {
   static List<String> english = [
+    "All"
     "Neurologist",
     "Surgeon",
     "Pediatrician",
@@ -213,6 +214,7 @@ class DoctorTypes {
     "Traumatologist",
   ];
   static List<String> uzbek = [
+    "Barchasi"
     "Nevropatolog",
     "Jarroh",
     "Pediatr",
@@ -234,6 +236,7 @@ class DoctorTypes {
     "Травматолог",
   ];
   static List<String> specialists = [
+    "ALL",
     "NEUROLOGIST",
     "SURGEON",
     "PEDIATRICIAN",

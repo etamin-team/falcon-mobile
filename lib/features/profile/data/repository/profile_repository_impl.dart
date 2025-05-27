@@ -16,15 +16,12 @@ import '../../../../core/utils/dependencies_injection.dart';
 class ProfileRepositoryImpl implements ProfileRepository {
   @override
   Future<Either<Failure, UserModel>> getUserData() async {
-    print('00000-----------------------------------------1-------------------------------');
 
     String token = await SecureStorage().read(key: "accessToken") ?? "";
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
     String uuid = decodedToken["sub"];
-    print('00000-----------------------------------------1-------------------------------');
     final request =
         await sl<ApiClient>().getMethod(pathUrl: "/user/$uuid", isHeader: true);
-    print('00000-----------------------------------------1-------------------------------');
 
     if (request.isSuccess) {
       return Right(UserModel.fromJson(request.response));
@@ -56,7 +53,6 @@ class ProfileRepositoryImpl implements ProfileRepository {
         WorkplaceModel model = WorkplaceModel.fromJson(item);
         if (model.id == id) {
           return Right(model);
-          break;
         }
       }
     }
@@ -70,16 +66,13 @@ class ProfileRepositoryImpl implements ProfileRepository {
     String token = await SecureStorage().read(key: "accessToken") ?? "";
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
     String uuid = decodedToken["sub"];
-    print('000000111111111111111110--------------------------------11100000');
 
     final request =
     await sl<ApiClient>().getMethod(pathUrl: "/doctor/contract/doctor-id/$uuid", isHeader: true);
-    print('0000001111111111111111111100000');
 
     if (request.isSuccess) {
       return Right(ProfileDataModel.fromJson(request.response));
     }
-    print('0000001111111111111111111100000');
     return Left(Failure(
         errorMsg: request.response.toString(),
         statusCode: request.code ?? 500));
