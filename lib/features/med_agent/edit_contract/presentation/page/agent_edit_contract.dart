@@ -375,14 +375,12 @@ class _AgentEditContractState extends State<AgentEditContract> {
                                       name: value.name ?? "",
                                       amount: 1,
                                       onChange: (v) {
-                                        if (kDebugMode) {
-                                          print("----------------------->${value.name}");
-                                        }
-                                        setState(() {
-                                          selectedPreparations.add(value);
-                                          quantity.add(v);
-                                          calculate();
-                                        });
+                                        selectedPreparations.add(value);
+                                        preparations.remove(value);
+                                        quantity.add(int.parse(amountController.text));
+                                        preparations.last.quantity = v;
+                                        calculate();
+                                        setState(() {});
                                       }, min: 1,
                                     );
                                   },
@@ -390,12 +388,6 @@ class _AgentEditContractState extends State<AgentEditContract> {
                               },
                               child: AppTextField(
                                 textColor: Colors.black,
-                                validator: (value) {
-                                  if (selectedPreparations.isEmpty) {
-                                    return "Kamida bitta preparat tanlanishi kerak";
-                                  }
-                                  return null;
-                                },
                                 controller: recipeController,
                                 hintText: "Выберите препарат",
                                 suffixIcon: const Icon(
@@ -500,13 +492,6 @@ class _AgentEditContractState extends State<AgentEditContract> {
                   cornerRadius: 20,
                   text: "Предложить договор",
                   onPressed: () {
-                    if (selectedPreparations.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Kamida bitta preparat tanlang")),
-                      );
-                      return;
-                    }
-                    if (formKey.currentState != null && formKey.currentState!.validate()) {
                       context.read<EditContractCubit>().updateContract(
                         model: EditUploadModel(
                           id: widget.contractId ?? 0,
@@ -524,11 +509,7 @@ class _AgentEditContractState extends State<AgentEditContract> {
                           ),
                         ),
                       );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Iltimos, barcha maydonlarni to'ldiring")),
-                      );
-                    }
+                      // Navigator.pop(context);
                   },
                 ),
                 SizedBox(
@@ -585,11 +566,9 @@ class _AgentEditContractState extends State<AgentEditContract> {
               UniversalButton.filled(
                 text: "Сохранять",
                 onPressed: () {
-                  if (quantForm.currentState!.validate()) {
                     final number = int.parse(amountController.text);
                     onChange(number);
                     Navigator.pop(context);
-                  }
                 },
                 fontSize: 14,
                 cornerRadius: 20,

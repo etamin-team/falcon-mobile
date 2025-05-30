@@ -38,7 +38,7 @@ class _TemplatePage2State extends State<TemplatePage2> {
             child: Text(
               LocaleKeys.texts_back.tr(),
               style: TextStyle(
-                fontFamily: 'VelaSans',
+                  fontFamily: 'VelaSans',
                   fontWeight: FontWeight.w600,
                   fontSize: Dimens.space16,
                   color: AppColors.blueColor),
@@ -64,7 +64,7 @@ class _TemplatePage2State extends State<TemplatePage2> {
             //     title: "ТН W.M.", hint: "Виасарт", text: ""),
             ...List.generate(
               widget.model.preparations?.length??0,
-              (index) {
+                  (index) {
                 return Column(
                   spacing: Dimens.space10,
                   children: [
@@ -86,7 +86,7 @@ class _TemplatePage2State extends State<TemplatePage2> {
                           Text(
                             LocaleKeys.template_form_and_dose.tr(),
                             style: TextStyle(
-                              fontFamily: 'VelaSans',
+                                fontFamily: 'VelaSans',
                                 fontWeight: FontWeight.w700,
                                 fontSize: Dimens.space18,
                                 color: Colors.black87),
@@ -206,7 +206,7 @@ class _TemplatePage2State extends State<TemplatePage2> {
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: Text(
-                                  (  widget.model.preparations?[index].timesInDay??0)
+                                    (  widget.model.preparations?[index].timesInDay??0)
                                         .toString(),
                                     style: GoogleFonts.ubuntu(
                                         color: Colors.black87,
@@ -298,7 +298,7 @@ class _TemplatePage2State extends State<TemplatePage2> {
                   Text(
                     LocaleKeys.template_notes.tr(),
                     style: TextStyle(
-                      fontFamily: 'VelaSans',
+                        fontFamily: 'VelaSans',
                         fontWeight: FontWeight.w700,
                         fontSize: Dimens.space18,
                         color: Colors.black87),
@@ -331,8 +331,8 @@ class _TemplatePage2State extends State<TemplatePage2> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => CreateTemplate(
-                              model: widget.model,
-                            )));
+                          model: widget.model,
+                        )));
               },
             ),
             SizedBox(
@@ -362,7 +362,7 @@ class _TemplatePage2State extends State<TemplatePage2> {
           Text(
             title,
             style: TextStyle(
-              fontFamily: 'VelaSans',
+                fontFamily: 'VelaSans',
                 fontWeight: FontWeight.w700,
                 fontSize: Dimens.space18,
                 color: Colors.black87),

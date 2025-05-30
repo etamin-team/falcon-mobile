@@ -11,7 +11,7 @@ import '../../../../core/widgets/export.dart';
 class CreateRecepRepositoryImpl implements CreateRecepRepository {
   @override
   Future<Either<Failure, bool>> saveRecep({required RecepModel model}) async {
-    debugPrint(
+    print(
         "this is save recep model ============>> ${model.toJson().toString()}");
     final request = await sl<ApiClient>().postMethod(
         pathUrl: "/doctor/save-recipe", body: model.toJson(), isHeader: true);

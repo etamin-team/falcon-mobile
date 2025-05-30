@@ -58,13 +58,13 @@ class UploadTemplateModel {
       );
 
   Map<String, dynamic> toJson() => {
-        "name": name,
-        "diagnosis": diagnosis,
-        "preparations": List<dynamic>.from(preparations.map((x) => x.toJson())),
-        "note": note,
-        "doctorId": doctorId,
-        "saved": saved,
-      };
+    "name": name,
+    "diagnosis": diagnosis,
+    "preparations": List<dynamic>.from(preparations.map((x) => x.toJson())),
+    "note": note,
+    "doctorId": doctorId,
+    "saved": saved,
+  };
 }
 
 class Preparation {
@@ -76,7 +76,6 @@ class Preparation {
   String type;
   int medicineId;
   MedicineModel medicine;
-  List<dynamic>? inn;
 
   Preparation({
     required this.name,
@@ -86,20 +85,19 @@ class Preparation {
     required this.days,
     required this.type,
     required this.medicineId,
-    this.inn,
     required this.medicine,
   });
 
   Preparation copyWith(
-          {String? name,
-          String? amount,
-          int? quantity,
-          int? timesInDay,
-          int? days,
-          String? type,
-          int? medicineId,
-            MedicineModel? medicine,
-          List<dynamic>? inn}) =>
+      {String? name,
+        String? amount,
+        int? quantity,
+        int? timesInDay,
+        int? days,
+        String? type,
+        int? medicineId,
+        MedicineModel? medicine,
+}) =>
       Preparation(
         name: name ?? this.name,
         amount: amount ?? this.amount,
@@ -108,29 +106,29 @@ class Preparation {
         days: days ?? this.days,
         type: type ?? this.type,
         medicineId: medicineId ?? this.medicineId,
-        inn: inn ?? this.inn,
+
         medicine: medicine ?? this.medicine,
       );
 
   factory Preparation.fromJson(Map<String, dynamic> json) => Preparation(
-        name: json["name"],
-        amount: json["amount"],
-        quantity: json["quantity"],
-        timesInDay: json["timesInDay"],
-        days: json["days"],
-        type: json["type"],
-        medicineId: json["medicineId"],
-        medicine: MedicineModel.fromJson(json["medicine"]),
-      );
+    name: json["name"],
+    amount: json["amount"],
+    quantity: json["quantity"],
+    timesInDay: json["timesInDay"],
+    days: json["days"],
+    type: json["type"],
+    medicineId: json["medicineId"],
+    medicine: MedicineModel.fromJson(json["medicine"]),
+  );
 
   Map<String, dynamic> toJson() => {
-        "name": name,
-        "amount": amount,
-        "quantity": quantity,
-        "timesInDay": timesInDay,
-        "days": days,
-        "type": type,
-        "medicineId": medicineId,
-        "medicine": medicine.toJson(),
-      };
+    "name": name,
+    "amount": amount,
+    "quantity": quantity,
+    "timesInDay": timesInDay,
+    "days": days,
+    "type": type,
+    "medicineId": medicineId,
+    "medicine": medicine.toJson(),
+  };
 }

@@ -2,13 +2,14 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wm_doctor/core/extensions/widget_extensions.dart';
 import 'package:wm_doctor/core/widgets/export.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:wm_doctor/features/create_template/presentation/page/create_template.dart';
 import 'package:wm_doctor/features/preparad/presentation/page/preparad.dart';
 import 'package:wm_doctor/features/profile/presentation/cubit/profile_cubit.dart';
 
 import '../../../../gen/locale_keys.g.dart';
-import '../../../template/presentation/page/template.dart';
-import '../../../template/presentation/page/template_page2.dart';
+import '../../../template/presentation/page/templates.dart';
+import '../../../template/presentation/page/template_page.dart';
 import '../../data/model/template_model.dart';
 import '../cubit/home_cubit.dart';
 
@@ -146,7 +147,7 @@ class _HomePageState extends State<HomePage> {
                                 GestureDetector(
                                   onTap: () {
                                     Navigator.push(context, MaterialPageRoute(builder: (context)=>TemplatePage(onChange: (TemplateModel value) {  },)));
-
+                                    // Navigator.push(context, MaterialPageRoute(builder: (context)=>CreateRecep(List<MnnModel>)));
                                   },
                                   child: Text(
                                     LocaleKeys.home_all.tr(),
@@ -160,134 +161,172 @@ class _HomePageState extends State<HomePage> {
                               ],
                             ),
                             Expanded(
-                              child: state.list.isEmpty?Center(child: Text("TEMPLATES NOT AVAILABLE"),):Stack(
+                              child: state.list.isEmpty
+                                  ? Center(child: Text("TEMPLATES NOT AVAILABLE"))
+                                  : Stack(
                                 children: [
                                   SingleChildScrollView(
                                     child: Column(
                                       spacing: Dimens.space10,
                                       children: List.generate(
                                         state.list.length,
-                                        (index) {
+                                            (index) {
+                                          final template = state.list[index];
+                                          final hasPreparations = template.preparations != null && template.preparations!.isNotEmpty;
                                           return GestureDetector(
                                             onTap: () {
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) => TemplatePage2(
-                                                        model: state.list[index],
-                                                      )));
+                                              // Navigator.push(
+                                              //   context,
+                                              //   MaterialPageRoute(
+                                              //     builder: (context) => TemplatePage2(
+                                              //       model: template,
+                                              //     ),
+                                              //   ),
+                                              // );
                                             },
                                             child: Container(
-                                              padding:
-                                                  EdgeInsets.all(Dimens.space16),
+                                              padding: EdgeInsets.all(Dimens.space16),
                                               decoration: BoxDecoration(
-                                                  color:
-                                                      AppColors.backgroundColor,
-                                                  borderRadius:
-                                                      BorderRadius.circular(15)),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
+                                                color: AppColors.backgroundColor,
+                                                borderRadius: BorderRadius.circular(15),
+                                              ),
+                                              child: Row(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
-                                                  Text(
-                                                    state.list[index].name??"",
-                                                    style: TextStyle(
-                                                      fontFamily: 'VelaSans',
-                                                        fontSize: Dimens.space14,
-                                                        fontWeight:
-                                                            FontWeight.w800,
-                                                        color:
-                                                            AppColors.redAccent),
-                                                  ),
-                                                  Row(
-                                                    spacing: Dimens.space5,
-                                                    children: [
-                                                      Text(
-                                                        LocaleKeys.home_dose.tr(),
-                                                        style:
-                                                            TextStyle(
-                                                              fontFamily: 'VelaSans',
-                                                                fontSize: Dimens
-                                                                    .space12,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w600),
-                                                      ),
-                                                      Text(
-                                                        state
-                                                            .list[index]
-                                                            .preparations?[0]
-                                                            .amount??"",
-                                                        style:
-                                                            TextStyle(
-                                                              fontFamily: 'VelaSans',
-                                                                fontSize: Dimens
-                                                                    .space12,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w400),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  Row(
-                                                    spacing: Dimens.space5,
-                                                    children: [
-                                                      Text(
-                                                        LocaleKeys.home_type.tr(),
-                                                        style:
-                                                            TextStyle(
-                                                              fontFamily: 'VelaSans',
-                                                                fontSize: Dimens
-                                                                    .space12,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w600),
-                                                      ),
-                                                      Text(
-                                                        state.list[index]
-                                                            .preparations?[0].type??"",
-                                                        style:
-                                                            TextStyle(
-                                                              fontFamily: 'VelaSans',
-                                                                fontSize: Dimens
-                                                                    .space12,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w400),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  Row(
-                                                    spacing: Dimens.space5,
-                                                    children: [
-                                                      Text(
-                                                        LocaleKeys.home_note.tr(),
-                                                        style:
-                                                            TextStyle(
-                                                              fontFamily: 'VelaSans',
-                                                                fontSize: Dimens
-                                                                    .space12,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w600),
-                                                      ),
-                                                      Expanded(
-                                                        child: Text(
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                          state.list[index]
-                                                              .diagnosis??"",
-                                                          style:
-                                                              TextStyle(
-                                                                fontFamily: 'VelaSans',
-                                                                  fontSize: Dimens
-                                                                      .space12,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w400),
+                                                  Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Text(
+                                                          template.name ?? "",
+                                                          style: TextStyle(
+                                                            fontFamily: 'VelaSans',
+                                                            fontSize: Dimens.space14,
+                                                            fontWeight: FontWeight.w800,
+                                                            color: AppColors.redAccent,
+                                                          ),
                                                         ),
-                                                      ),
-                                                    ],
+                                                        Row(
+                                                          spacing: Dimens.space5,
+                                                          children: [
+                                                            Text(
+                                                              LocaleKeys.home_dose.tr(),
+                                                              style: TextStyle(
+                                                                fontFamily: 'VelaSans',
+                                                                fontSize: Dimens.space12,
+                                                                fontWeight: FontWeight.w600,
+                                                              ),
+                                                            ),
+                                                            Text(
+                                                              hasPreparations ? template.preparations![0].amount ?? "" : "N/A",
+                                                              style: TextStyle(
+                                                                fontFamily: 'VelaSans',
+                                                                fontSize: Dimens.space12,
+                                                                fontWeight: FontWeight.w400,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        Row(
+                                                          spacing: Dimens.space5,
+                                                          children: [
+                                                            Text(
+                                                              LocaleKeys.home_type.tr(),
+                                                              style: TextStyle(
+                                                                fontFamily: 'VelaSans',
+                                                                fontSize: Dimens.space12,
+                                                                fontWeight: FontWeight.w600,
+                                                              ),
+                                                            ),
+                                                            Text(
+                                                              hasPreparations ? template.preparations![0].type ?? "" : "N/A",
+                                                              style: TextStyle(
+                                                                fontFamily: 'VelaSans',
+                                                                fontSize: Dimens.space12,
+                                                                fontWeight: FontWeight.w400,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        Row(
+                                                          spacing: Dimens.space5,
+                                                          children: [
+                                                            Text(
+                                                              LocaleKeys.home_note.tr(),
+                                                              style: TextStyle(
+                                                                fontFamily: 'VelaSans',
+                                                                fontSize: Dimens.space12,
+                                                                fontWeight: FontWeight.w600,
+                                                              ),
+                                                            ),
+                                                            Expanded(
+                                                              child: Text(
+                                                                overflow: TextOverflow.ellipsis,
+                                                                template.diagnosis ?? "",
+                                                                style: TextStyle(
+                                                                  fontFamily: 'VelaSans',
+                                                                  fontSize: Dimens.space12,
+                                                                  fontWeight: FontWeight.w400,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  IconButton(
+                                                    onPressed: () {
+                                                      showCupertinoDialog(
+                                                        context: context,
+                                                        builder: (BuildContext ctx) {
+                                                          return CupertinoAlertDialog(
+                                                            title: Text(
+                                                              'Внимание!',
+                                                              style: TextStyle(
+                                                                fontWeight: FontWeight.bold,
+                                                                fontSize: Dimens.space18,
+                                                              ),
+                                                            ),
+                                                            content: Text(
+                                                              'Вы действительно хотите удалить этот шаблон?',
+                                                              style: TextStyle(fontSize: Dimens.space16),
+                                                            ),
+                                                            actions: [
+                                                              CupertinoDialogAction(
+                                                                child: Text(
+                                                                  'Отмена',
+                                                                  style: TextStyle(fontSize: Dimens.space14),
+                                                                ),
+                                                                onPressed: () {
+                                                                  Navigator.of(ctx).pop(); // Close the dialog
+                                                                },
+                                                              ),
+                                                              CupertinoDialogAction(
+                                                                isDefaultAction: true,
+                                                                child: Text(
+                                                                  'Удалить',
+                                                                  style: TextStyle(
+                                                                    fontSize: Dimens.space14,
+                                                                    color: Colors.red,
+                                                                  ),
+                                                                ),
+                                                                onPressed: () {
+                                                                  Navigator.of(ctx).pop(); // Close the dialog
+                                                                  // Call deleteTemplate from HomeCubit
+                                                                  context.read<HomeCubit>().deleteTemplate(id: template.id!.toInt());
+                                                                },
+                                                              ),
+                                                            ],
+                                                          );
+                                                        },
+                                                      );
+                                                    },
+                                                    icon: Icon(
+                                                      Icons.delete, // Changed to a delete icon for clarity
+                                                      color: AppColors.redAccent, // Match color with your theme
+                                                      size: Dimens.space16, // Adjust size as needed
+                                                    ),
                                                   ),
                                                 ],
                                               ),
@@ -309,15 +348,16 @@ class _HomePageState extends State<HomePage> {
                                         decoration: BoxDecoration(
                                           gradient: LinearGradient(
                                             begin: Alignment.topCenter,
-                                            end: Alignment.bottomCenter, colors: [],
+                                            end: Alignment.bottomCenter,
+                                            colors: [Colors.red.shade50.withAlpha(1), Colors.white], // Note: Empty colors list, consider fixing this
                                           ),
                                         ),
                                       ),
                                     ),
-                                  )
+                                  ),
                                 ],
                               ),
-                            )
+                            ),
                           ],
                         ),
                       ),
@@ -338,7 +378,7 @@ class _HomePageState extends State<HomePage> {
                                 builder: (context) => CreateTemplate()));
                       },
                     ),
-                  ).paddingAll(value: Dimens.space10)
+                  ).paddingAll(value: Dimens.space10),
                 ],
               ).paddingSymmetric(horizontal: Dimens.space20),
             );

@@ -3,6 +3,8 @@
 // ignore_for_file: constant_identifier_names
 
 abstract class  LocaleKeys {
+
+  static const create_template_select_medicine = 'create_template.select_medicine';
   static const texts_welcome = 'texts.welcome';
   static const texts_sign_up = 'texts.sign_up';
   static const texts_sign_in = 'texts.sign_in';
@@ -193,4 +195,8 @@ abstract class  LocaleKeys {
   static const med_agent = 'med_agent';
   static const create_recep_inns = 'create_recep.inns';
   static const create_recep_add_preparations = 'create_recep.add_preparations';
+
+  static var texts_no_medicines = 'texts.no_medicines';
+
+  static var create_recep_medicine = 'create_recep.medicine';
 }

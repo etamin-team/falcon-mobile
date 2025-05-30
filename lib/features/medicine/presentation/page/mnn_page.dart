@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter/material.dart';
 import 'package:wm_doctor/core/extensions/widget_extensions.dart';
 import 'package:wm_doctor/features/create_template/data/model/mnn_model.dart';
 
@@ -36,7 +35,7 @@ class _MNNPageState extends State<MNNPage> {
   final searchController = TextEditingController();
   late List<MnnModel> selectedItems;
   int currentPage = 1;
-  final int pageSize = 10;
+  final int pageSize = 30;
   bool hasMoreData = true;
   bool isLoading = false;
   final ScrollController _scrollController = ScrollController();

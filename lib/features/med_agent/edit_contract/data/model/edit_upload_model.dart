@@ -47,14 +47,14 @@ class EditUploadModel {
       EditUploadModel(
         id: json["id"],
         medicinesWithQuantities: List<MedicinesWithQuantity>.from(
-            json["medicinesWithQuantities"]
+            json["medicineWithQuantityDoctorDTOS"]
                 .map((x) => MedicinesWithQuantity.fromJson(x))),
 
       );
 
   Map<String, dynamic> toJson() => {
         "id": id,
-        "medicinesWithQuantities":
+        "medicineWithQuantityDoctorDTOS":
             List<dynamic>.from(medicinesWithQuantities.map((x) => x.toJson())),
 
       };

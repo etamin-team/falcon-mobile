@@ -23,17 +23,16 @@ class MnnModel {
     return MnnModel(
       id: json['id'] as int?,
       name: json['name'] as String?,
-      latinName: json['name'] as String?,
+      latinName: json['latinName'] as String?, // Fix mapping
       combination: json['combination'] as String?,
       type: json['type'] as String?,
       dosage: json['dosage'] as String?,
       wm_ru: json['wm_ru'] as String?,
       pharmacothera: json['pharmacothera'] as String?,
     );
+  }
 
-    }
-
-  get prescription => null;
+  String? get prescription => dosage; // Example: Use dosage as prescription
   Map<String, dynamic> toJson() {
     return {
       'id': id,

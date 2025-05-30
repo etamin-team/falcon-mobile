@@ -35,7 +35,18 @@ class CreateTemplateCubit extends Cubit<CreateTemplateState> {
       (r) => emit(CreateTemplateUploadSuccess()),
     );
   }
-
+  void getMedicines({required List<MnnModel> inn}) async {
+    List<String> newInn = inn
+        .where((e) => e.id != null) // Filter out null IDs
+        .map((e) => e.id!.toString())
+        .toList();
+    emit(CreateTemplateGetMedicineLoading());
+    final request = await createTemplateRepositoryImpl.getMedicine(inn: newInn);
+    request.fold(
+          (l) => emit(CreateTemplateGetMedicineError(failure: l)),
+          (r) => emit(CreateTemplateGetMedicineSuccess(list: r)),
+    );
+  }
   void updateTemplate({required TemplateModel model}) async {
     emit(UpdateTemplateUploadLoading());
     final request =

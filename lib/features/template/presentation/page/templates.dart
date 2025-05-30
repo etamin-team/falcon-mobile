@@ -6,11 +6,11 @@ import 'package:wm_doctor/core/network/api_client.dart';
 import 'package:wm_doctor/core/widgets/export.dart';
 import 'package:wm_doctor/features/home/data/model/template_model.dart';
 import 'package:wm_doctor/features/home/presentation/cubit/home_cubit.dart';
+import 'package:wm_doctor/features/template/presentation/page/template_page.dart';
 import 'package:wm_doctor/gen/locale_keys.g.dart';
 
 import '../../../../core/utils/dependencies_injection.dart';
 import '../../../create_template/presentation/page/create_template.dart';
-import 'template_page2.dart';
 
 class TemplatePage extends StatefulWidget {
   final bool isBottom;
@@ -75,28 +75,28 @@ class _TemplatePageState extends State<TemplatePage> {
             List<TemplateModel> savedList = list
                 .where(
                   (element) => (element.saved),
-                )
+            )
                 .toList();
             List<TemplateModel> templateList = list
                 .where(
                   (element) => (!element.saved),
-                )
+            )
                 .toList();
 
             if (searchController.text.isNotEmpty) {
               savedList = savedList
                   .where(
                     (element) => element.name!
-                        .toLowerCase()
-                        .startsWith(searchController.text.toLowerCase()),
-                  )
+                    .toLowerCase()
+                    .startsWith(searchController.text.toLowerCase()),
+              )
                   .toList();
               templateList = templateList
                   .where(
                     (element) => element.name!
-                        .toLowerCase()
-                        .startsWith(searchController.text.toLowerCase()),
-                  )
+                    .toLowerCase()
+                    .startsWith(searchController.text.toLowerCase()),
+              )
                   .toList();
             }
             if (filterBy == "byAlphabet") {
@@ -289,7 +289,7 @@ class _TemplatePageState extends State<TemplatePage> {
                           ),
                           ...List.generate(
                             savedList.length,
-                            (index) {
+                                (index) {
                               return InkWell(
                                 borderRadius: BorderRadius.circular(15),
                                 onTap: () {
@@ -301,8 +301,8 @@ class _TemplatePageState extends State<TemplatePage> {
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) => TemplatePage2(
-                                                  model: savedList[index],
-                                                )));
+                                              model: savedList[index],
+                                            )));
                                   }
                                 },
                                 child: Container(
@@ -315,7 +315,7 @@ class _TemplatePageState extends State<TemplatePage> {
                                   child: Row(
                                     spacing: Dimens.space10,
                                     mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment.spaceBetween,
                                     children: [
                                       Expanded(
                                         child: Text(
@@ -337,7 +337,7 @@ class _TemplatePageState extends State<TemplatePage> {
                                             Navigator.pop(context);
                                           } else {
                                             int i = list.indexWhere((p) =>
-                                                p.id == savedList[index].id);
+                                            p.id == savedList[index].id);
                                             if (i != -1) {
                                               list[i].saved = false;
                                             }
@@ -388,7 +388,7 @@ class _TemplatePageState extends State<TemplatePage> {
                           ),
                           ...List.generate(
                             templateList.length,
-                            (index) {
+                                (index) {
                               return InkWell(
                                 onTap: () {
                                   if (widget.isBottom) {
@@ -399,8 +399,8 @@ class _TemplatePageState extends State<TemplatePage> {
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) => TemplatePage2(
-                                                  model: templateList[index],
-                                                )));
+                                              model: templateList[index],
+                                            )));
                                   }
                                 },
                                 child: Container(
@@ -413,7 +413,7 @@ class _TemplatePageState extends State<TemplatePage> {
                                   child: Row(
                                     spacing: Dimens.space10,
                                     mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment.spaceBetween,
                                     children: [
                                       Expanded(
                                         child: Text(
@@ -436,7 +436,7 @@ class _TemplatePageState extends State<TemplatePage> {
                                             Navigator.pop(context);
                                           } else {
                                             int i = list.indexWhere((p) =>
-                                                p.id == templateList[index].id);
+                                            p.id == templateList[index].id);
                                             if (i != -1) {
                                               list[i].saved = true;
                                             }
@@ -475,17 +475,17 @@ class _TemplatePageState extends State<TemplatePage> {
       bottomNavigationBar: widget.isBottom
           ? null
           : UniversalButton.filled(
-              height: Dimens.space60,
-              cornerRadius: Dimens.space16,
-              text: LocaleKeys.template_add_template.tr(),
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => CreateTemplate()));
-              },
-            ).paddingOnly(
-              right: Dimens.space20,
-              left: Dimens.space20,
-              bottom: Dimens.space20),
+        height: Dimens.space60,
+        cornerRadius: Dimens.space16,
+        text: LocaleKeys.template_add_template.tr(),
+        onPressed: () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => CreateTemplate()));
+        },
+      ).paddingOnly(
+          right: Dimens.space20,
+          left: Dimens.space20,
+          bottom: Dimens.space20),
     );
   }
 

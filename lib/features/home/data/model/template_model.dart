@@ -1,3 +1,4 @@
+import '../../../create_template/data/model/medicine_model.dart';
 import '../../../profile/data/model/out_contract_model.dart';
 
 class TemplateModel {
@@ -47,6 +48,7 @@ class TemplateModel {
     };
   }
 }
+
 class TemplatePreparation {
   String? name;
   String? amount;
@@ -55,7 +57,7 @@ class TemplatePreparation {
   int? days;
   String? type;
   int? medicineId;
-  Medicine? medicine;
+  MedicineModel? medicine; // Changed from Medicine to MedicineModel
 
   TemplatePreparation({
     this.name,
@@ -70,14 +72,16 @@ class TemplatePreparation {
 
   factory TemplatePreparation.fromJson(Map<String, dynamic> json) {
     return TemplatePreparation(
-      name: json['name'],
-      amount: json['amount'],
-      quantity: json['quantity'],
-      timesInDay: json['timesInDay'],
-      days: json['days'],
-      type: json['type'],
-      medicineId: json['medicineId'],
-      medicine: json['medicine'] != null ? Medicine.fromJson(json['medicine']) : null,
+      name: json['name'] ?? "",
+      amount: json['amount'] ?? "",
+      quantity: json['quantity'] ?? 0,
+      timesInDay: json['timesInDay'] ?? 0,
+      days: json['days'] ?? 0,
+      type: json['type'] ?? "",
+      medicineId: json['medicineId'] ?? 0,
+      medicine: json['medicine'] != null
+          ? MedicineModel.fromJson(json['medicine'])
+          : null,
     );
   }
 

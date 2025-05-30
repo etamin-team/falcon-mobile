@@ -64,8 +64,8 @@ class _MedicinePageState extends State<MedicinePage> {
             if (searchController.text.isNotEmpty) {
               list = widget.medicine
                   .where((element) => (element.name ?? "")
-                      .toLowerCase()
-                      .startsWith(searchController.text.trim().toLowerCase()))
+                  .toLowerCase()
+                  .startsWith(searchController.text.trim().toLowerCase()))
                   .toList();
               /*list = state.list
                   .where((element) => (element.name ?? "")
@@ -100,75 +100,75 @@ class _MedicinePageState extends State<MedicinePage> {
                 ).paddingSymmetric(horizontal: Dimens.space20),
                 Expanded(
                   child: (searchController.text.trim().isNotEmpty &&
-                          list.isEmpty)
+                      list.isEmpty)
                       ? Center(
-                          child:
-                              Text("Qidiruv natijasida hechnarsa topilmadi!"),
-                        )
+                    child:
+                    Text("Qidiruv natijasida hechnarsa topilmadi!"),
+                  )
                       : SingleChildScrollView(
-                          padding:
-                              EdgeInsets.symmetric(horizontal: Dimens.space20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            spacing: Dimens.space10,
-                            children: List.generate(
-                              list.length,
-                              (index) {
-                                return GestureDetector(
-                                  onTap: () {
-                                    widget.model(list[index]);
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                        color: AppColors.white,
-                                        borderRadius: BorderRadius.circular(
-                                            Dimens.space10)),
-                                    // padding: EdgeInsets.symmetric(
-                                    //     horizontal: Dimens.space20,
-                                    //     vertical: Dimens.space16),
-                                    child: ListTile(
-                                      dense: true,
-                                      contentPadding: EdgeInsets.symmetric(
-                                          horizontal: Dimens.space20),
-                                      title: Tooltip(
-                                        message:
-                                            "${list[index].name ?? ""} (${list[index].prescription ?? 0} ${list[index].volume ?? ""})",
-                                        child: Row(
-                                          children: [
-                                            Expanded(
-                                              child: Text(
-                                                overflow: TextOverflow.ellipsis,
-                                                list[index].name ?? "",
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.w500,
-                                                    fontSize: Dimens.space14),
-                                              ),
-                                            ),
-                                            Text(
-                                              " (${list[index].prescription ?? 0} ${list[index].volume ?? ""})",
-                                              style: TextStyle(
-                                                  fontFamily: 'VelaSans',
-                                                  fontWeight: FontWeight.w600,
-                                                  fontSize: Dimens.space12),
-                                            ),
-                                          ],
+                    padding:
+                    EdgeInsets.symmetric(horizontal: Dimens.space20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      spacing: Dimens.space10,
+                      children: List.generate(
+                        list.length,
+                            (index) {
+                          return GestureDetector(
+                            onTap: () {
+                              widget.model(list[index]);
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  color: AppColors.white,
+                                  borderRadius: BorderRadius.circular(
+                                      Dimens.space10)),
+                              // padding: EdgeInsets.symmetric(
+                              //     horizontal: Dimens.space20,
+                              //     vertical: Dimens.space16),
+                              child: ListTile(
+                                dense: true,
+                                contentPadding: EdgeInsets.symmetric(
+                                    horizontal: Dimens.space20),
+                                title: Tooltip(
+                                  message:
+                                  "${list[index].name ?? ""} (${list[index].prescription ?? 0} ${list[index].volume ?? ""})",
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          overflow: TextOverflow.ellipsis,
+                                          list[index].name ?? "",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: Dimens.space14),
                                         ),
                                       ),
-                                      trailing: Text(
-                                        dataTranslate(
-                                            ctx: context,
-                                            model: checkMedicineType(
-                                                name: list[index].type ?? "")),
+                                      Text(
+                                        " (${list[index].prescription ?? 0} ${list[index].volume ?? ""})",
                                         style: TextStyle(
-                                            fontWeight: FontWeight.w800),
+                                            fontFamily: 'VelaSans',
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: Dimens.space12),
                                       ),
-                                    ),
+                                    ],
                                   ),
-                                );
-                              },
+                                ),
+                                trailing: Text(
+                                  dataTranslate(
+                                      ctx: context,
+                                      model: checkMedicineType(
+                                          name: list[index].type ?? "")),
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w800),
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
                 ),
                 SizedBox(
                   height: Dimens.space10,

@@ -5,4 +5,7 @@ import 'package:wm_doctor/features/home/data/model/template_model.dart';
 abstract class HomeRepository {
   Future<Either<Failure, List<TemplateModel>>> getTemplate(
       {required String saved, required String sortBy, required String searchText});
+
+  Future<Either<Failure, List<TemplateModel>>> deleteTemplate(
+      {required int id});
 }

@@ -420,17 +420,9 @@ class _AgentAddContractState extends State<AgentAddContract> {
                                     name: value1.name ?? "",
                                     amount: 1,
                                     onChange: (v) {
-                                      if (kDebugMode) {
-                                        print(
-                                            "----------------------->${value1.name}");
-                                      }
-                                      if (kDebugMode) {
-                                        print(
-                                            "----------------------->${amountController.text}");
-                                      }
                                       selectedPreparations.add(value1);
-                                      quantity.add(
-                                          int.parse(amountController.text));
+                                      preparations.remove(value1);
+                                      quantity.add(int.parse(amountController.text));
                                       preparations.last.quantity = v;
                                       if (formKey.currentState!.validate()) {}
                                       calculate();

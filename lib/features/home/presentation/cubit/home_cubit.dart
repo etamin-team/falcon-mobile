@@ -11,7 +11,8 @@ class HomeCubit extends Cubit<HomeState> {
 
   HomeCubit(this.homeRepositoryImpl) : super(HomeInitial());
 
-  void getTemplate({required String saved, required String sortBy, required String searchText}) async {
+  void getTemplate(
+      {required String saved, required String sortBy, required String searchText}) async {
     try {
       emit(HomeGetTemplateLoading());
       print("✅ HomeCubit: API so‘rov yuborilmoqda...");
@@ -31,7 +32,33 @@ class HomeCubit extends Cubit<HomeState> {
       );
     } catch (e) {
       print("❌ HomeCubit Exception: $e");
-      emit(HomeGetTemplateError(failure: Failure(errorMsg: e.toString(), statusCode: 500,)));
+      emit(HomeGetTemplateError(
+          failure: Failure(errorMsg: e.toString(), statusCode: 500,)));
+    }
+  }
+
+  void deleteTemplate(
+      {required int id}) async {
+    try {
+      emit(HomeGetTemplateLoading());
+      print("✅ HomeCubit: API so‘rov yuborilmoqda...");
+
+      final request = await homeRepositoryImpl.deleteTemplate(id: id);
+
+      request.fold(
+            (l) {
+          print("❌ API Xato: ${l.message}");
+          emit(HomeGetTemplateError(failure: l));
+        },
+            (r) {
+          print("✅ API Javob: ${r.length} ta template olindi.");
+          emit(HomeGetTemplateSuccess(list: r));
+        },
+      );
+    } catch (e) {
+      print("❌ HomeCubit Exception: $e");
+      emit(HomeGetTemplateError(
+          failure: Failure(errorMsg: e.toString(), statusCode: 500,)));
     }
   }
 }

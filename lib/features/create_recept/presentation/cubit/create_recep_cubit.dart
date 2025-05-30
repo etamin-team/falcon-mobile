@@ -15,6 +15,8 @@ class CreateRecepCubit extends Cubit<CreateRecepState> {
 
   void saveRecep({required RecepModel model}) async {
     emit(CreateRecepLoading());
+    print("_______________________________________________________________________");
+    print('model');
     final request = await createRecepRepositoryImpl.saveRecep(model: model);
     request.fold(
       (l) => emit(CreateRecepError(failure: l)),

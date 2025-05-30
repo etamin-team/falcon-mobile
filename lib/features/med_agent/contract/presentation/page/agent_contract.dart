@@ -50,8 +50,6 @@ class _AgentContractState extends State<AgentContract> {
     clearData();
     _debounce?.cancel();
     searchController.dispose();
-    context.read<ContractCubit>().getContracts();
-    context.read<RegionsCubit>().getRegions();
     super.dispose();
   }
 

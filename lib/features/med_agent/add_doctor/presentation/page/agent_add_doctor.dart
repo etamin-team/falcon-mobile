@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wm_doctor/core/extensions/widget_extensions.dart';
@@ -89,7 +90,9 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
     final result = await medicineRepositoryImpl.getMedicine();
     result.fold(
           (failure) {
-        print('Error: ${failure.errorMsg}');
+        if (kDebugMode) {
+          print('Error: ${failure.errorMsg}');
+        }
       },
           (list) {
         setState(() {
@@ -98,7 +101,6 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
       },
     );
   }
-
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -146,7 +148,6 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
         body: BlocConsumer<AddDoctorCubit, AddDoctorState>(
           listener: (context, state) {
             if (state is AddDoctorSuccess) {
-              print("success bo'ldi =================");
               context.read<AgentHomeCubit>().getData();
               context.read<ContractCubit>().getContracts();
               context.read<RegionsCubit>().getRegions();
@@ -222,6 +223,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                         );
                       },
                     );
+                    resetForm();
                   }else{
                     showDialog(
                       context: context,
@@ -561,7 +563,6 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                             ),
                             GestureDetector(
                               onTap: () {
-                                print(preparations.length);
                                 showMedicine(
                                   ctx: context,
                                   medicine: preparations,
@@ -571,9 +572,8 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                                       name: value1.name ?? "",
                                       amount: 1,
                                       onChange: (v) {
-                                        print("----------------------->${value1.name}");
-                                        print("----------------------->${amountController.text}");
                                         selectedPreparations.add(value1);
+                                        preparations.remove(value1);
                                         quantity.add(int.parse(amountController.text));
                                         preparations.last.quantity = v;
                                         if (formKey.currentState!.validate()) {}
@@ -614,7 +614,10 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                                     children: [
                                       GestureDetector(
                                         onTap: () {
+                                          preparations.add(selectedPreparations[index]);
+                                          quantity.removeAt(index);
                                           selectedPreparations.removeAt(index);
+                                          calculate();
                                           setState(() {});
                                         },
                                         child: SvgPicture.asset(

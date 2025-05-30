@@ -7,7 +7,6 @@ showMNN({
   required BuildContext ctx,
   required ValueChanged<MnnModel> model,
   required List<MnnModel> mnn,
-  required List medicine,
   required List<MnnModel> initialSelectedItems,
   required Function(List<MnnModel>) onSelectionComplete,
 }) {

@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
@@ -7,11 +8,12 @@ import 'package:toastification/toastification.dart';
 import 'package:wm_doctor/core/extensions/widget_extensions.dart';
 import 'package:wm_doctor/features/create_recept/data/model/recep_model.dart';
 import 'package:wm_doctor/features/create_recept/presentation/cubit/create_recep_cubit.dart';
+import 'package:wm_doctor/features/create_recept/presentation/page/receipt_success.dart';
 import 'package:wm_doctor/features/create_template/data/model/mnn_model.dart';
-import 'package:wm_doctor/features/main/presentation/page/main_page.dart';
+import 'package:wm_doctor/features/medicine/presentation/cubit/medicine_cubit.dart';
 import 'package:wm_doctor/features/medicine/presentation/page/medicine_dialog.dart';
 import 'package:wm_doctor/features/medicine/presentation/page/mnn_page.dart';
-import 'package:wm_doctor/features/template/presentation/page/template.dart';
+import 'package:wm_doctor/features/template/presentation/page/templates.dart';
 import '../../../../core/services/secure_storage.dart';
 import '../../../../core/utils/text_mask.dart';
 import '../../../../core/widgets/export.dart';
@@ -25,26 +27,40 @@ import '../../../home/data/model/template_model.dart';
 import '../../../home/presentation/cubit/home_cubit.dart';
 import '../../../medicine/presentation/page/mnn_dialog.dart';
 
-class PreparationContainerData {
+class PrepContainerData {
   List<MnnModel> selectedMNNs;
-
-  // preparations aslida ro'yhat emas 1 dona model bo'lishi kerak!!!
-  List<PreparationModel> preparations;
+  PreparationModel preparations;
+  List<PreparationModel> selectedPreparations;
   List<MedicineModel> medicineList;
 
-  PreparationContainerData({
+  PrepContainerData({
     List<MnnModel>? selectedMNNs,
-    List<PreparationModel>? preparations,
+    PreparationModel? preparation,
+    List<PreparationModel>? selectedPreparations,
     List<MedicineModel>? medicineList,
   })  : selectedMNNs = selectedMNNs ?? [],
-        preparations = preparations ?? [],
+        preparations = preparation ?? PreparationModel(name: '', amount: '', quantity: 0, timesInDay: 0, days: 0, type: '', medicineId: 0),
+        selectedPreparations = selectedPreparations ?? [],
         medicineList = medicineList ?? [];
+
+  PrepContainerData copyWith({
+    List<MnnModel>? selectedMNNs,
+    PreparationModel? preparation,
+    List<PreparationModel>? selectedPreparations,
+    List<MedicineModel>? medicineList,
+  }) {
+    return PrepContainerData(
+      selectedMNNs: selectedMNNs ?? this.selectedMNNs,
+      preparation: preparation ?? this.preparations,
+      selectedPreparations: selectedPreparations ?? this.selectedPreparations,
+      medicineList: medicineList ?? this.medicineList,
+    );
+  }
 }
 
 class CreateRecep extends StatefulWidget {
   final List<MnnModel> selectedMNNs;
-  const CreateRecep(this.selectedMNNs, {super.key});
-
+  const CreateRecep(this.selectedMNNs);
   @override
   State<CreateRecep> createState() => _CreateRecepState();
 }
@@ -65,41 +81,15 @@ class _CreateRecepState extends State<CreateRecep> {
   // List<PreparationModel> preparation = [];
   List<Widget> preparationContainers = [];
 
-  List<PreparationContainerData> preparationContainersData = [];
+  List<PrepContainerData> preparationContainersData = [];
 
   List<MnnModel> selectedMNN = MNNPage.getSelectedItems();
-
-  List<Map<String, dynamic>> preps = [
-    {
-      "name": "Paracetamol",
-      "amount": "500 mg",
-      "quantity": 2,
-      "timesInDay": 3,
-      "days": 7,
-      "inn": [
-        "Acetaminophen",
-        "Ibuprofen",
-        "Paracetamol",
-        "Aspirin",
-        "Acetaminophen"
-      ],
-      "type": "Tablet",
-      "medicineId": 1,
-    },
-  ];
+  List<PreparationModel> selectedPreparations = [];
 
   @override
   void initState() {
     context.read<CreateTemplateCubit>().getMedicine(inn: widget.selectedMNNs);
-
-    // Add initial PreparationContainerData
-    preparationContainersData.add(PreparationContainerData(
-      selectedMNNs: [],
-      preparations: [],
-      medicineList: medicineList,
-    ));
-    preparationContainers
-        .add(buildPreparationContainer(preparationContainersData.length - 1));
+    context.read<MedicineCubit>().getMedicine();
     super.initState();
   }
 
@@ -107,6 +97,7 @@ class _CreateRecepState extends State<CreateRecep> {
   void dispose() {
     super.dispose();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -129,7 +120,6 @@ class _CreateRecepState extends State<CreateRecep> {
               .read<HomeCubit>()
               .getTemplate(saved: "", sortBy: "", searchText: "");
         }
-
         if (state is CreateTemplateUploadError) {
           toastification.show(
             style: ToastificationStyle.flat,
@@ -159,15 +149,14 @@ class _CreateRecepState extends State<CreateRecep> {
                 if (lastAddIndex == -1) {
                   medicineList = cstate.list;
                 } else {
-                  preparationContainersData[lastAddIndex].medicineList =
-                      cstate.list;
+                  preparationContainersData[lastAddIndex].medicineList = cstate.list;
 
                   if (cstate.list.isNotEmpty) {
                     preparationContainersData[lastAddIndex].preparations = [
                       PreparationModel(
                         name: cstate.list.first.name ?? "",
                         amount:
-                            "${cstate.list.first.prescription} ${cstate.list.first.volume}",
+                        "${cstate.list.first.prescription} ${cstate.list.first.volume}",
                         quantity: 0,
                         timesInDay: 0,
                         days: 0,
@@ -175,12 +164,14 @@ class _CreateRecepState extends State<CreateRecep> {
                         type: cstate.list.first.type ?? "",
                         medicineId: cstate.list.first.id ?? 0,
                       ),
-                    ];
+                    ] as PreparationModel;
                   }
                   preparationContainers[lastAddIndex] =
                       buildPreparationContainer(lastAddIndex);
                 }
-                print("MEDDDD:::${cstate.list.toString()}");
+                if (kDebugMode) {
+                  print("MEDDDD:::${cstate.list.toString()}");
+                }
               });
             }
             /*if (cstate is CreateTemplateGetMedicineSuccess) {
@@ -201,8 +192,7 @@ class _CreateRecepState extends State<CreateRecep> {
                 selectedDate = null;
                 preparationContainersData.clear();
                 preparationContainers.clear();
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => MainPage()));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => ReceiptSuccessPage()));
               }
               if (state is SendTelegramError) {
                 toastification.show(
@@ -217,8 +207,14 @@ class _CreateRecepState extends State<CreateRecep> {
                   foregroundColor: Colors.white,
                 );
               }
+              if(state is SendTelegramSuccess){
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => ReceiptSuccessPage()));
+              }
 
-              print("Current state: ${state.runtimeType}");
+              if (kDebugMode) {
+                print("Current state: ${state.runtimeType}");
+              }
             },
             builder: (context, state) {
               if (state is CreateRecepLoading) {
@@ -250,7 +246,7 @@ class _CreateRecepState extends State<CreateRecep> {
                           padding: EdgeInsets.all(Dimens.space20),
                           decoration: BoxDecoration(
                               borderRadius:
-                                  BorderRadius.circular(Dimens.space20),
+                              BorderRadius.circular(Dimens.space20),
                               color: AppColors.white),
                           child: GestureDetector(
                             onTap: () {
@@ -267,37 +263,25 @@ class _CreateRecepState extends State<CreateRecep> {
                                     onChange: (TemplateModel value) {
                                       setState(() {
                                         templateName = value.name ?? "";
-                                        /*preparation = List.generate(
+                                        preparationContainersData = List.generate(
                                           value.preparations?.length ?? 0,
-                                          (index) => PreparationModel(
-                                              name: value.preparations?[index].name ??
-                                                  "",
-                                              amount: value.preparations?[index]
-                                                      .amount ??
-                                                  "",
-                                              quantity: value
-                                                      .preparations?[index]
-                                                      .quantity ??
-                                                  0,
-                                              timesInDay: value
-                                                      .preparations?[index]
-                                                      .timesInDay ??
-                                                  0,
-                                              days: value.preparations?[index].days ??
-                                                  0,
-                                              type: value.preparations?[index].type ??
-                                                  '',
-                                              inn: value.preparations?[index]
-                                                  .medicine?.inn,
-                                              medicineId:
-                                                  value.preparations?[index].medicineId ?? 0),
-                                        );*/
-                                        // preparation = value.preparations;
+                                              (index) => PrepContainerData(
+                                            selectedMNNs: selectedMNN,
+                                            medicineList: medicineList,
+                                            preparation: PreparationModel(name: value.name.toString(), amount: value.preparations![index].amount.toString(), medicineId: value.preparations![index].medicineId ?? 0, days: value.preparations![index].days ?? 0, timesInDay: value.preparations![index].timesInDay ?? 0, quantity: value.preparations![index].quantity ?? 0, type: value.preparations![index].type.toString(),),
+                                          ),
+                                        );
+                                        preparationContainers = List.generate(
+                                          value.preparations?.length ?? 0,
+                                              (index) => buildPreparationContainer(index),
+                                        );
                                         diagnosis.text = value.diagnosis ?? "";
                                         commentController.text =
                                             value.note ?? "";
-                                        print(
-                                            "Template has been imported!!!!!!!!!!!!!!!!!!!!!!!");
+                                        if (kDebugMode) {
+                                          print(
+                                              "Template has been imported!!!!!!!!!!!!!!!!!!!!!!!");
+                                        }
                                       });
                                     },
                                   );
@@ -311,10 +295,10 @@ class _CreateRecepState extends State<CreateRecep> {
                               decoration: BoxDecoration(
                                   color: AppColors.backgroundColor,
                                   borderRadius:
-                                      BorderRadius.circular(Dimens.space10)),
+                                  BorderRadius.circular(Dimens.space10)),
                               child: Row(
                                 mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                MainAxisAlignment.spaceBetween,
                                 spacing: Dimens.space10,
                                 children: [
                                   Expanded(
@@ -323,8 +307,8 @@ class _CreateRecepState extends State<CreateRecep> {
                                       overflow: TextOverflow.ellipsis,
                                       templateName == ""
                                           ? LocaleKeys
-                                              .create_recep_select_template
-                                              .tr()
+                                          .create_recep_select_template
+                                          .tr()
                                           : templateName,
                                       style: TextStyle(
                                           fontFamily: 'VelaSans',
@@ -345,7 +329,7 @@ class _CreateRecepState extends State<CreateRecep> {
                           padding: EdgeInsets.all(Dimens.space20),
                           decoration: BoxDecoration(
                               borderRadius:
-                                  BorderRadius.circular(Dimens.space20),
+                              BorderRadius.circular(Dimens.space20),
                               color: AppColors.white),
                           child: Column(
                             spacing: Dimens.space10,
@@ -368,7 +352,7 @@ class _CreateRecepState extends State<CreateRecep> {
                           padding: EdgeInsets.all(Dimens.space20),
                           decoration: BoxDecoration(
                               borderRadius:
-                                  BorderRadius.circular(Dimens.space20),
+                              BorderRadius.circular(Dimens.space20),
                               color: AppColors.white),
                           child: Column(
                             spacing: Dimens.space10,
@@ -447,7 +431,7 @@ class _CreateRecepState extends State<CreateRecep> {
                           padding: EdgeInsets.all(Dimens.space20),
                           decoration: BoxDecoration(
                               borderRadius:
-                                  BorderRadius.circular(Dimens.space20),
+                              BorderRadius.circular(Dimens.space20),
                               color: AppColors.white),
                           child: Column(
                             spacing: Dimens.space10,
@@ -471,24 +455,26 @@ class _CreateRecepState extends State<CreateRecep> {
                                   },
                                   controller: diagnosis,
                                   hintText:
-                                      LocaleKeys.create_recep_write_here.tr()),
+                                  LocaleKeys.create_recep_write_here.tr()),
                             ],
                           ),
                         ),
                         Column(
-                          children: preparationContainers, // Yangi containerlar shu yerda chiqariladi
+                          children:
+                          preparationContainers, // Yangi containerlar shu yerda chiqariladi
                         ),
                         UniversalButton.filled(
                           onPressed: addPreparationContainer,
                           cornerRadius: Dimens.space20,
                           backgroundColor: AppColors.blueAccent20,
-                          text: LocaleKeys.create_recep_add_preparations.tr(), textColor: AppColors.blueColor,
+                          text: LocaleKeys.create_recep_add_preparations.tr(),
+                          textColor: AppColors.blueColor,
                         ),
                         Container(
                           padding: EdgeInsets.all(Dimens.space20),
                           decoration: BoxDecoration(
                               borderRadius:
-                                  BorderRadius.circular(Dimens.space20),
+                              BorderRadius.circular(Dimens.space20),
                               color: AppColors.white),
                           child: Column(
                             spacing: Dimens.space10,
@@ -511,83 +497,13 @@ class _CreateRecepState extends State<CreateRecep> {
                                 },
                                 controller: commentController,
                                 hintText:
-                                    LocaleKeys.create_recep_write_here.tr(),
+                                LocaleKeys.create_recep_write_here.tr(),
                                 maxLines: 3,
                                 minLines: 3,
                               ),
                             ],
                           ),
                         ),
-
-                        ///TEMPLATE
-                        // UniversalButton.filled(
-                        //   text: LocaleKeys.create_recep_save_template.tr(),
-                        //   onPressed: () async {
-                        //     if (formKey.currentState!.validate()) {
-                        //       if (preparationContainersData.isEmpty) {
-                        //         toastification.show(
-                        //           style: ToastificationStyle.flat,
-                        //           context: context,
-                        //           alignment: Alignment.topCenter,
-                        //           title: Text(LocaleKeys
-                        //               .create_recep_add_medicine
-                        //               .tr()),
-                        //           autoCloseDuration: const Duration(seconds: 2),
-                        //           showProgressBar: false,
-                        //           primaryColor: Colors.white,
-                        //           backgroundColor: Colors.redAccent,
-                        //           foregroundColor: Colors.white,
-                        //         );
-                        //       } else {
-                        //         String token = await SecureStorage()
-                        //                 .read(key: "accessToken") ??
-                        //             "";
-                        //         Map<String, dynamic> decodedToken =
-                        //             JwtDecoder.decode(token);
-                        //         String docID = decodedToken["sub"];
-                        //
-                        //         // print(
-                        //         //     "Template saqlashdan oldin: $preparation"); // Tekshirish uchun
-                        //         context
-                        //             .read<CreateTemplateCubit>()
-                        //             .uploadTemplate(
-                        //               model: UploadTemplateModel(
-                        //                 name: diagnosis.text.trim(),
-                        //                 diagnosis: diagnosis.text.trim(),
-                        //                 preparations:
-                        //                     preparationContainersData.map(
-                        //                   (e) {
-                        //                     return Preparation(
-                        //                       name: e.preparations.first.name,
-                        //                       amount:
-                        //                           e.preparations.first.amount,
-                        //                       quantity:
-                        //                           e.preparations.first.quantity,
-                        //                       timesInDay: e.preparations.first
-                        //                           .timesInDay,
-                        //                       days: e.preparations.first.days,
-                        //                       type: e.preparations.first.type,
-                        //                       medicineId: e.preparations.first
-                        //                           .medicineId,
-                        //                     );
-                        //                   },
-                        //                 ).toList(),
-                        //                 note: commentController.text.trim(),
-                        //                 saved: true,
-                        //                 doctorId: docID,
-                        //               ),
-                        //             );
-                        //
-                        //         // print(
-                        //         //     "Template saqlashdan keyin: $preparation"); // Tekshirish uchun
-                        //       }
-                        //     }
-                        //   },
-                        //   fontSize: Dimens.space14,
-                        //   backgroundColor: AppColors.white,
-                        //   textColor: Colors.black,
-                        //   cornerRadius: Dimens.space20,
-                        // ),
                         UniversalButton.filled(
                           text: LocaleKeys.create_recep_send_recep.tr(),
                           onPressed: () async {
@@ -596,42 +512,52 @@ class _CreateRecepState extends State<CreateRecep> {
                                 birthDateController.text.isNotEmpty &&
                                 numberController.text.isNotEmpty &&
                                 preparationContainersData.isNotEmpty) {
-                              String message =
-                                  '💊 Пациент: ${nameController.text}\n\n'
-                                  'Дата рождения:   ${birthDateController.text}';
-                              message =
-                                  "$message\n\n🩺 Диагноз:\n${diagnosis.text}";
-                              message = "$message\n\n🗓 Рецепт:\n";
-                              for (var item1 in preparationContainersData) {
-                                String mnnLsString =
-                                    item1.selectedMNNs.isNotEmpty
-                                        ? "${item1.selectedMNNs}\n"
-                                        : "";
+                              String message = '💊 Пациент: ${nameController.text}\n\n'
+                                  'Дата рождения:   ${birthDateController.text}\n\n'
+                                  '🩺 Диагноз:\n${diagnosis.text}\n\n'
+                                  '🗓 Рецепт:\n';
 
-                                String preparationMessage = "";
-                                if (item1.preparations.isNotEmpty) {
-                                  var item = item1.preparations.first;
-                                  preparationMessage =
-                                      "$message\n✅ ${item.name} ${item.amount} ${item.quantity} ${item.type} * ${item.timesInDay} раз в день  (${item.days} дней)";
+                              String receiptDetails = '';
+
+                              // Har bir PrepContainerData uchun ma'lumotlarni ko‘rib chiqamiz
+                              for (var container in preparationContainersData) {
+
+                                if (container.selectedMNNs.isNotEmpty && container.selectedPreparations.isNotEmpty) {
+                                  for (int i = 0; i < container.selectedPreparations.length; i++) {
+                                    var prep = container.selectedPreparations[i];
+                                    // Agar MNNlar soni preparatlarga mos kelsa, ularni birlashtiramiz
+                                    String? mnnName = container.selectedMNNs.length > i ? container.selectedMNNs[i].name : '';
+                                    receiptDetails += '✅ [$mnnName] ${prep.name} ${prep.amount} ${prep.quantity} ${prep.type} * ${prep.timesInDay} раз в день  (${prep.days} дней)\n';
+                                  }
                                 }
-
-                                message = mnnLsString + preparationMessage;
+                                // 2-holat: Faqat preparatlar
+                                else if (container.selectedPreparations.isNotEmpty) {
+                                  for (var prep in container.selectedPreparations) {
+                                    receiptDetails += '✅ ${prep.name} ${prep.amount} ${prep.quantity} ${prep.type} * ${prep.timesInDay} раз в день  (${prep.days} дней)\n';
+                                  }
+                                }
+                                // 3-holat: Faqat MNNlar
+                                else if (container.selectedMNNs.isNotEmpty) {
+                                  for (var mnn in container.selectedMNNs) {
+                                    receiptDetails += '[${mnn.name}]\n';
+                                  }
+                                }
                               }
 
-                              message =
-                                  "$message\n\nПримечание: ${commentController.text}";
+                              // Agar receiptDetails bo‘sh bo‘lmasa, qo‘shish
+                              if (receiptDetails.isNotEmpty) {
+                                message += receiptDetails;
+                              } else {
+                                message += 'Hech qanday dori yoki MNN tanlanmagan\n';
+                              }
+
+                              // Примечание qo‘shish
+                              message += '\nПримечание: ${commentController.text}';
 
                               print("call back qaytdi");
-
                               context.read<CreateRecepCubit>().sendTelegramData(
-                                  number:
-                                      "998${numberController.text.trim().replaceAll(" ", "")}",
+                                  number: "998${numberController.text.trim().replaceAll(" ", "")}",
                                   message: message);
-                              createRecep();
-                              print("----------------------------------------");
-                              print("----------------------------------------");
-
-                              print(message);
                             }
                             if (nameController.text.isEmpty) {
                               toastification.show(
@@ -742,7 +668,7 @@ class _CreateRecepState extends State<CreateRecep> {
                   mode: CupertinoDatePickerMode.date,
                   dateOrder: DatePickerDateOrder.dmy,
                   initialDateTime:
-                      selectedDate == null ? DateTime.now() : selectedDate!,
+                  selectedDate == null ? DateTime.now() : selectedDate!,
                   minimumDate: DateTime(1900),
                   maximumDate: DateTime.now(),
                   onDateTimeChanged: (DateTime newDate) {
@@ -790,7 +716,7 @@ class _CreateRecepState extends State<CreateRecep> {
 
         scrollController.addListener(() {
           if (scrollController.position.pixels >=
-                  scrollController.position.maxScrollExtent * 0.8 &&
+              scrollController.position.maxScrollExtent * 0.8 &&
               !isLoading &&
               displayedMnn.length < mnn.length) {
             isLoading = true;
@@ -850,7 +776,7 @@ class _CreateRecepState extends State<CreateRecep> {
               mainAxisSize: MainAxisSize.min,
               children: List.generate(
                 types.length,
-                (index) {
+                    (index) {
                   return ListTile(
                     onTap: () {
                       onChange(types[index]);
@@ -868,48 +794,47 @@ class _CreateRecepState extends State<CreateRecep> {
   }
 
   void createRecep() async {
-    print("=================================================");
-    print("=================================================");
-    print("=================================================");
-    print("=================================================");
-    String token = await SecureStorage().read(key: "accessToken") ?? "";
-    Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
-    String docID = decodedToken["sub"];
-    context.read<CreateRecepCubit>().saveRecep(
-        model: RecepModel(
-            doctorId: docID,
-            firstName: nameController.text,
-            lastName: "",
-            dateOfBirth: selectedDate ?? DateTime.now(),
-            phoneNumber: numberController.text.trim().replaceAll(" ", ""),
-            phoneNumberPrefix: "+998",
-            dateCreation: DateTime.now(),
-            diagnosis: diagnosis.text.toString(),
-            comment: commentController.text,
-            telegramId: 0,
-            districtId: 100,
-            preparations:
-                List.generate(preparationContainersData.length, (index) {
-              PreparationModel? item =
-                  preparationContainersData[index].preparations.firstOrNull;
-              return Preparation(
-                  name: item?.name ?? "",
-                  amount: item?.amount ?? "",
-                  quantity: item?.quantity ?? 0,
-                  timesInDay: item?.timesInDay ?? 0,
-                  days: item?.days ?? 0,
-                  type: item?.type ?? "null",
-                  medicineId: item?.medicineId ?? 0,
-                  medicine: MedicineModel(id: item?.medicineId));
-            })));
+      print("=================================================");
+      print("=================================================");
+      print("=================================================");
+      print("=================================================");
+      String token = await SecureStorage().read(key: "accessToken") ?? "";
+      Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+      String docID = decodedToken["sub"];
+      context.read<CreateRecepCubit>().saveRecep(
+          model: RecepModel(
+              doctorId: docID,
+              firstName: nameController.text,
+              lastName: "",
+              dateOfBirth: selectedDate ?? DateTime.now(),
+              phoneNumber: numberController.text.trim().replaceAll(" ", ""),
+              phoneNumberPrefix: "+998",
+              dateCreation: DateTime.now(),
+              diagnosis: diagnosis.text.toString(),
+              comment: commentController.text,
+              telegramId: 0,
+              districtId: 100,
+              preparations:
+              List.generate(preparationContainersData.length, (index) {
+                PreparationModel? item = preparationContainersData[index].preparations;
+                return Preparation(
+                    name: item.name ,
+                    amount: item.amount ,
+                    quantity: item.quantity,
+                    timesInDay: item.timesInDay,
+                    days: item.days,
+                    type: item.type,
+                    medicineId: item.medicineId,
+                    medicine: MedicineModel(id: item.medicineId));
+              })));
   }
 
   // Container qo'shish uchun metod
   void addPreparationContainer() {
     setState(() {
-      PreparationContainerData newData = PreparationContainerData(
+      PrepContainerData newData = PrepContainerData(
         selectedMNNs: [],
-        preparations: [], // Default ma'lumotlardan nusxa olish
+        preparation: PreparationModel(name: "", amount: "", quantity: 0, timesInDay: 0, days: 0, type: "", medicineId: 0), // Default ma'lumotlardan nusxa olish
         medicineList: medicineList, // Default ma'lumotlardan nusxa olish
       );
       preparationContainersData.add(newData);
@@ -922,15 +847,13 @@ class _CreateRecepState extends State<CreateRecep> {
 
   Widget buildPreparationContainer(int index) {
     if (index >= preparationContainersData.length) {
-      return Container(
-        child: Text(
-          "Index error",
-          style: TextStyle(color: Colors.red),
-        ),
+      return Text(
+        "Index error",
+        style: TextStyle(color: Colors.red),
       );
     }
 
-    PreparationContainerData containerData = preparationContainersData[index];
+    PrepContainerData containerData = preparationContainersData[index];
 
     return Container(
       width: double.infinity,
@@ -955,17 +878,20 @@ class _CreateRecepState extends State<CreateRecep> {
                   color: Colors.black,
                 ),
               ),
-              if (index > 0)
-                GestureDetector(
-                  onTap: () {
-                    removePreparationContainer();
-                  },
-                  child: SvgPicture.asset(
-                    "assets/icons/minus.svg",
-                    height: 30,
-                    width: 30,
-                  ),
+              GestureDetector(
+                onTap: () {
+                  removePreparationContainer();
+                  setState(() {
+                    preparationContainersData.removeAt(index);
+                    preparationContainers.removeAt(index);
+                  });
+                },
+                child: SvgPicture.asset(
+                  "assets/icons/minus.svg",
+                  height: 30,
+                  width: 30,
                 ),
+              ),
             ],
           ),
           Column(
@@ -984,15 +910,17 @@ class _CreateRecepState extends State<CreateRecep> {
                     Navigator.pop(context);
                   },
                   mnn: [],
-                  medicine: [],
                   initialSelectedItems: containerData.selectedMNNs,
                   onSelectionComplete: (updatedList) async {
                     if (mounted) {
                       lastAddIndex = index;
-                      context.read<CreateTemplateCubit>().getMedicine(inn: updatedList);
+                      context
+                          .read<CreateTemplateCubit>()
+                          .getMedicine(inn: updatedList);
                       setState(() {
                         containerData.selectedMNNs = updatedList;
-                        preparationContainers[index] = buildPreparationContainer(index);
+                        preparationContainers[index] =
+                            buildPreparationContainer(index);
                       });
                     }
                   },
@@ -1005,16 +933,24 @@ class _CreateRecepState extends State<CreateRecep> {
               containerData.selectedMNNs.isNotEmpty
                   ? Wrap(
                 spacing: 8.0,
-                children: containerData.selectedMNNs
-                    .map(
-                      (mnn) => Chip(
-                    label: Text(
-                      mnn.name ?? "nullga tekshir",
-                      style: TextStyle(color: Colors.black),
-                    ),
+                runSpacing: 8.0,
+                crossAxisAlignment: WrapCrossAlignment.start,
+                children: containerData.selectedMNNs.map((mnn) => Chip(
+                  label: Text(
+                    mnn.name ?? "null",
+                    style: TextStyle(color: Colors.black),
                   ),
-                )
-                    .toList(),
+                  deleteIcon: Icon(Icons.remove_circle),
+                  deleteIconColor: AppColors.redAccent,
+                  backgroundColor: AppColors.backgroundColor,
+                  side: BorderSide.none,
+                  onDeleted: () {
+                    setState(() {
+                      containerData.selectedMNNs.remove(mnn);
+                      preparationContainers[index] = buildPreparationContainer(index);
+                    });
+                  },
+                )).toList(),
               )
                   : SizedBox.shrink(),
               Container(
@@ -1022,7 +958,7 @@ class _CreateRecepState extends State<CreateRecep> {
                   color: AppColors.backgroundColor,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                padding: EdgeInsets.symmetric(
+                padding:  EdgeInsets.symmetric(
                   horizontal: Dimens.space20,
                   vertical: Dimens.space16,
                 ),
@@ -1031,52 +967,94 @@ class _CreateRecepState extends State<CreateRecep> {
                   children: [
                     Expanded(
                       child: Text(
-                        overflow: TextOverflow.ellipsis,
-                        containerData.preparations.isNotEmpty
-                            ? containerData.preparations.first.name
+                        containerData.selectedPreparations.isNotEmpty
+                            ? containerData.selectedPreparations.first.name
                             : "Select medicine",
-                        style: TextStyle(
+                        style:  TextStyle(
                           fontFamily: 'VelaSans',
                           fontSize: Dimens.space14,
                           color: Colors.black,
                         ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
                     ),
                     GestureDetector(
                       onTap: () {
-                        if (containerData.preparations.isNotEmpty) {
-                          containerData.preparations.clear();
-                          setState(() {
-                            preparationContainers[index] = buildPreparationContainer(index);
-                          });
-                        } else {
-                          print("CreateRecept:::medicineList==>${containerData.medicineList}");
+                        print("Tapped Select Medicine for index: $index");
+                        print("Container medicineList: ${containerData.medicineList}");
+                        print("medicineList: ${medicineList.first.name}");
+
+                        if (medicineList.isEmpty) {
+                          print("Warning: Medicine list is empty for index $index");
+                          toastification.show(
+                            style: ToastificationStyle.flat,
+                            context: context,
+                            alignment: Alignment.topCenter,
+                            title: const Text("No medicines available to select"),
+                            autoCloseDuration: const Duration(seconds: 2),
+                            showProgressBar: false,
+                            primaryColor: Colors.white,
+                            backgroundColor: Colors.redAccent,
+                            foregroundColor: Colors.white,
+                          );
+                          return;
+                        }
+                        try {
                           showMedicine(
                             ctx: context,
                             model: (value) {
-                              containerData.preparations.add(
-                                PreparationModel(
-                                  name: value.name ?? "",
-                                  amount: "${value.prescription} ${value.volume}",
-                                  quantity: 1,
-                                  timesInDay: 1,
-                                  days: 1,
-                                  inn: value.inn,
-                                  type: value.type ?? "",
-                                  medicineId: value.id ?? 0,
-                                ),
-                              );
-                              setState(() {
-                                preparationContainers[index] = buildPreparationContainer(index);
-                              });
+                              if (value != null) {
+                                setState(() {
+                                  containerData = containerData.copyWith(
+                                    preparation: PreparationModel(
+                                      name: value.name ?? "Unknown",
+                                      amount: "${value.prescription ?? ''} ${value.volume ?? ''}".trim(),
+                                      quantity: 1,
+                                      timesInDay: 1,
+                                      days: 1,
+                                      inn: value.inn,
+                                      type: value.type ?? "Unknown",
+                                      medicineId: value.id ?? 0,
+                                    ),
+                                    selectedPreparations: [
+                                      PreparationModel(
+                                        name: value.name ?? "Unknown",
+                                        amount: "${value.prescription ?? ''} ${value.volume ?? ''}".trim(),
+                                        quantity: 1,
+                                        timesInDay: 1,
+                                        days: 1,
+                                        inn: value.inn,
+                                        type: value.type ?? "Unknown",
+                                        medicineId: value.id ?? 0,
+                                      ),
+                                    ],
+                                  );
+                                  preparationContainersData[index] = containerData;
+                                  preparationContainers[index] = buildPreparationContainer(index);
+                                });
+                              }
                               Navigator.pop(context);
                             },
-                            medicine: containerData.medicineList,
+                            medicine: medicineList,
+                          );
+                        } catch (e) {
+                          print("Error showing medicine dialog: $e");
+                          toastification.show(
+                            style: ToastificationStyle.flat,
+                            context: context,
+                            alignment: Alignment.topCenter,
+                            title: const Text("Error displaying medicines"),
+                            autoCloseDuration: const Duration(seconds: 2),
+                            showProgressBar: false,
+                            primaryColor: Colors.white,
+                            backgroundColor: Colors.redAccent,
+                            foregroundColor: Colors.white,
                           );
                         }
                       },
                       child: SvgPicture.asset(
-                        containerData.preparations.isEmpty
+                        containerData.selectedPreparations.isEmpty
                             ? "assets/icons/plus.svg"
                             : "assets/icons/minus.svg",
                         height: 24,
@@ -1086,7 +1064,7 @@ class _CreateRecepState extends State<CreateRecep> {
                   ],
                 ),
               ),
-              ...containerData.preparations.map((med) {
+              ...containerData.selectedPreparations.map((med) {
                 return Column(
                   children: [
                     Row(
@@ -1094,7 +1072,7 @@ class _CreateRecepState extends State<CreateRecep> {
                         Expanded(
                           child: GestureDetector(
                             child: Container(
-                              padding: EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                 horizontal: 20,
                                 vertical: 16,
                               ),
@@ -1104,7 +1082,7 @@ class _CreateRecepState extends State<CreateRecep> {
                               ),
                               child: Text(
                                 med.type,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 12,
                                 ),
@@ -1112,14 +1090,23 @@ class _CreateRecepState extends State<CreateRecep> {
                             ),
                           ),
                         ),
-                        SizedBox(width: 10),
+                        const SizedBox(width: 10),
                         Expanded(
                           child: GestureDetector(
                             onTap: () {
-                              // Placeholder for amount modification logic
+                              showInputAmount(
+                                name: med.name,
+                                amount: double.tryParse(med.amount) ?? 1.0,
+                                onChange: (value) {
+                                  setState(() {
+                                    med.amount = value.toString();
+                                    preparationContainers[index] = buildPreparationContainer(index);
+                                  });
+                                },
+                              );
                             },
                             child: Container(
-                              padding: EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                 horizontal: 20,
                                 vertical: 16,
                               ),
@@ -1132,7 +1119,7 @@ class _CreateRecepState extends State<CreateRecep> {
                                 children: [
                                   Text(
                                     med.amount,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontWeight: FontWeight.w600,
                                       fontSize: 12,
                                     ),
@@ -1152,6 +1139,7 @@ class _CreateRecepState extends State<CreateRecep> {
                             onChanged: (int value) {
                               setState(() {
                                 med.quantity = value;
+                                preparationContainers[index] = buildPreparationContainer(index);
                               });
                             },
                           ),
@@ -1162,6 +1150,7 @@ class _CreateRecepState extends State<CreateRecep> {
                             onChanged: (int value) {
                               setState(() {
                                 med.timesInDay = value;
+                                preparationContainers[index] = buildPreparationContainer(index);
                               });
                             },
                           ),
@@ -1172,6 +1161,7 @@ class _CreateRecepState extends State<CreateRecep> {
                             onChanged: (int value) {
                               setState(() {
                                 med.days = value;
+                                preparationContainers[index] = buildPreparationContainer(index);
                               });
                             },
                           ),
@@ -1219,7 +1209,7 @@ class _CreateRecepState extends State<CreateRecep> {
                     ),
                   ],
                 );
-              }).toList(),
+              }),
             ],
           ),
         ],
@@ -1239,4 +1229,143 @@ class _CreateRecepState extends State<CreateRecep> {
       }
     });
   }
+  void showMedicines({
+    required BuildContext ctx,
+    required Function(MedicineModel?) model,
+    required List<MedicineModel> medicine,
+  }) {
+    showModalBottomSheet(
+      isScrollControlled: true,
+      enableDrag: true,
+      showDragHandle: true,
+      context: ctx,
+      builder: (context) {
+        return Container(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.8,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "Select Medicine",
+                  style:  TextStyle(
+                    fontFamily: 'VelaSans',
+                    fontSize: Dimens.space18,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                if (medicine.isEmpty)
+                  Padding(
+                    padding:  EdgeInsets.all(Dimens.space20),
+                    child: Text(
+                      "No medicines available",
+                      style:  TextStyle(
+                        fontFamily: 'VelaSans',
+                        fontSize: Dimens.space16,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  )
+                else
+                  ...medicine.map((med) => ListTile(
+                    title: Text(
+                      med.name ?? "Unknown",
+                      style:  TextStyle(
+                        fontFamily: 'VelaSans',
+                        fontSize: Dimens.space16,
+                      ),
+                    ),
+                    subtitle: Text(
+                      "${med.prescription ?? ''} ${med.volume ?? ''}".trim(),
+                      style:  TextStyle(
+                        fontFamily: 'VelaSans',
+                        fontSize: Dimens.space14,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    onTap: () {
+                      model(med);
+                    },
+                  )),
+                SizedBox(height: Dimens.space20),
+              ],
+            ).paddingOnly(
+              left: Dimens.space20,
+              right: Dimens.space20,
+              top: Dimens.space20,
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+            ),
+          ),
+        );
+      },
+    );
+  }
+  void showInputAmount({
+    required String name,
+    required double amount,
+    required ValueChanged<double> onChange,
+  }) async {
+    final textController = TextEditingController();
+    final quantForm = GlobalKey<FormState>();
+    textController.text = amount.toString();
+    showModalBottomSheet(
+      isScrollControlled: true,
+      enableDrag: true,
+      showDragHandle: true,
+      context: context,
+      builder: (context) {
+        return Form(
+          key: quantForm,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            spacing: Dimens.space20,
+            children: [
+              Text(
+                name,
+                style:  TextStyle(
+                  fontSize: Dimens.space18,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              TextFormField(
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                validator: (value) {
+                  if (value?.isEmpty ?? true) {
+                    return "kamida 1 ta bo'lishi kerak";
+                  }
+                  double? number = double.tryParse(value!);
+                  if (number == null || number < 1) {
+                    return "0 bo'lmasligi kerak";
+                  }
+                  return null;
+                },
+                maxLength: 5,
+                controller: textController,
+                decoration: const InputDecoration(hintText: "1"),
+              ),
+              UniversalButton.filled(
+                text: "Сохранить",
+                onPressed: () {
+                  if (quantForm.currentState!.validate()) {
+                    double number = double.parse(textController.text.trim());
+                    onChange(number);
+                    Navigator.pop(context);
+                  }
+                },
+              ),
+              SizedBox(height: Dimens.space50),
+            ],
+          ).paddingOnly(
+            left: Dimens.space30,
+            right: Dimens.space30,
+            top: Dimens.space20,
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+        );
+      },
+    );
+  }
+
 }
