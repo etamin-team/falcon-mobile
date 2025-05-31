@@ -1,5 +1,7 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:wm_doctor/features/home/presentation/page/HomePage.dart';
+import 'package:wm_doctor/gen/locale_keys.g.dart';
 
 import '../../../../core/widgets/export.dart';
 import '../../../main/presentation/page/main_page.dart';
@@ -24,7 +26,7 @@ class _ReceiptSuccessPageState extends State<ReceiptSuccessPage>{
               SizedBox(height: 20),
               Text(
                 textAlign: TextAlign.center,
-                'Рецент успешно\nотправлен!',
+                LocaleKeys.create_recep_send_recep_successful.tr(),
                 style: TextStyle(
                   fontSize: 30,
                   fontWeight: FontWeight.bold,
@@ -34,7 +36,7 @@ class _ReceiptSuccessPageState extends State<ReceiptSuccessPage>{
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));
+                  Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
                   shadowColor: AppColors.blueColor,
@@ -44,7 +46,7 @@ class _ReceiptSuccessPageState extends State<ReceiptSuccessPage>{
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: Text('НА ГЛАВНУЮ',style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
+                child: Text(LocaleKeys.create_recep_success_button.tr(),style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
               ),
             ],
           ),

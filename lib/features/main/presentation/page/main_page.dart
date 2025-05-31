@@ -150,19 +150,19 @@ class _MainPageState extends State<MainPage> {
                 items: [
                   _buildBottomNavigationBarItem(
                     icon: 'assets/icons/home.svg',
-                    label: 'Главная',
+                    label: LocaleKeys.main_main.tr(),
                     index: 0,
                     isSelected: state.selectedIndex == 0,
                   ),
                   _buildBottomNavigationBarItem(
                     icon: 'assets/icons/document.svg',
-                    label: 'Договора',
+                    label: LocaleKeys.main_contracts.tr(),
                     index: 1,
                     isSelected: state.selectedIndex == 1,
                   ),
                   _buildBottomNavigationBarItem(
                     icon: 'assets/icons/profile.svg',
-                    label: 'Профиль',
+                    label: LocaleKeys.main_profile.tr(),
                     index: 2,
                     isSelected: state.selectedIndex == 2,
                   ),

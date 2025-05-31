@@ -9,18 +9,6 @@ showMedicine({
   required ValueChanged<MedicineModel> model,
   required List<MedicineModel> medicine,
 }) async {
-  if (medicine.isEmpty) {
-    toastification.show(
-      context: ctx,
-      title: Text("No medicines available"),
-      autoCloseDuration: const Duration(seconds: 2),
-      style: ToastificationStyle.flat,
-      primaryColor: Colors.white,
-      backgroundColor: Colors.redAccent,
-      foregroundColor: Colors.white,
-    );
-    return;
-  }
   showModalBottomSheet(
     context: ctx,
     enableDrag: true,

@@ -1,9 +1,12 @@
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:toastification/toastification.dart';
+import 'package:wm_doctor/core/model/language_model.dart';
 import 'package:wm_doctor/core/widgets/export.dart';
 import 'package:wm_doctor/features/med_agent/profile/domain/utility/agent_profile_utility.dart';
 import 'package:wm_doctor/features/med_agent/profile/presentation/cubit/agent_profile_data/agent_profile_data_cubit.dart';
+import 'package:wm_doctor/gen/locale_keys.g.dart';
 
 import '../../../../../core/widgets/custom_progress_bar.dart';
 import '../../../../auth/sign_up/presentation/widgets/language.dart';
@@ -109,7 +112,7 @@ class _AgentProfileState extends State<AgentProfile> with AgentProfileUtility {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                "Продажа в уп. за прошлый месяц",
+                                LocaleKeys.med_profile_sales_in_pack_for_last_month.tr(),
                                 style: TextStyle(fontSize: Dimens.space12),
                               ),
                               Text(
@@ -131,7 +134,7 @@ class _AgentProfileState extends State<AgentProfile> with AgentProfileUtility {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                "Квота",
+                                LocaleKeys.med_profile_quote.tr(),
                                 style: TextStyle(fontSize: Dimens.space12),
                               ),
                               Text(
@@ -153,7 +156,7 @@ class _AgentProfileState extends State<AgentProfile> with AgentProfileUtility {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                "% выполнения",
+                                LocaleKeys.med_profile_percent_completion.tr(),
                                 style: TextStyle(fontSize: Dimens.space12),
                               ),
                               Text(
@@ -189,13 +192,13 @@ class _AgentProfileState extends State<AgentProfile> with AgentProfileUtility {
                                 child: Row(
                                   children: [
                                     Text(
-                                      "Подкл. врачей ",
+                                      LocaleKeys.med_profile_connected_doctors.tr(),
                                       style: TextStyle(
                                           fontSize: Dimens.space12,
                                           fontWeight: FontWeight.bold),
                                     ),
                                     Text(
-                                      "(всего)",
+                                      LocaleKeys.med_profile_total.tr(),
                                       style: TextStyle(
                                           fontSize: Dimens.space12,
                                           fontWeight: FontWeight.w400,
@@ -222,13 +225,15 @@ class _AgentProfileState extends State<AgentProfile> with AgentProfileUtility {
                                 child: Row(
                                   children: [
                                     Text(
-                                      "Подкл. врачей ",
+                                      LocaleKeys.med_profile_connected_doctors.tr(),
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
                                           fontSize: Dimens.space12,
                                           fontWeight: FontWeight.bold),
                                     ),
                                     Text(
-                                      "(за тек. месяц)",
+                                      LocaleKeys.med_profile_for_current_month.tr(),
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
                                           fontSize: Dimens.space12,
                                           fontWeight: FontWeight.w400,
@@ -255,13 +260,13 @@ class _AgentProfileState extends State<AgentProfile> with AgentProfileUtility {
                                 child: Row(
                                   children: [
                                     Text(
-                                      "Подкл. договоров ",
+                                      LocaleKeys.med_profile_connected_contracts.tr(),
                                       style: TextStyle(
                                           fontSize: Dimens.space12,
                                           fontWeight: FontWeight.bold),
                                     ),
                                     Text(
-                                      "(всего)",
+                                      LocaleKeys.med_profile_total.tr(),
                                       style: TextStyle(
                                           fontSize: Dimens.space12,
                                           fontWeight: FontWeight.w400,
@@ -288,13 +293,13 @@ class _AgentProfileState extends State<AgentProfile> with AgentProfileUtility {
                                 child: Row(
                                   children: [
                                     Text(
-                                      "Подкл. договоров ",
+                                      LocaleKeys.med_profile_connected_contracts.tr(),
                                       style: TextStyle(
                                           fontSize: Dimens.space12,
                                           fontWeight: FontWeight.bold),
                                     ),
                                     Text(
-                                      "(за тек. месяц)",
+                                      LocaleKeys.med_profile_for_current_month.tr(),
                                       style: TextStyle(
                                           fontSize: Dimens.space12,
                                           fontWeight: FontWeight.w400,
@@ -321,13 +326,13 @@ class _AgentProfileState extends State<AgentProfile> with AgentProfileUtility {
                                 child: Row(
                                   children: [
                                     Text(
-                                      "Выписано рецептов ",
+                                      LocaleKeys.med_profile_written_recipes.tr(),
                                       style: TextStyle(
                                           fontSize: Dimens.space12,
                                           fontWeight: FontWeight.bold),
                                     ),
                                     Text(
-                                      "(за тек. месяц)",
+                                      LocaleKeys.med_profile_total.tr(),
                                       style: TextStyle(
                                           fontSize: Dimens.space12,
                                           fontWeight: FontWeight.w400,
@@ -354,13 +359,13 @@ class _AgentProfileState extends State<AgentProfile> with AgentProfileUtility {
                                 child: Row(
                                   children: [
                                     Text(
-                                      "Выписано препаратов ",
+                                      LocaleKeys.med_profile_written_recipes.tr(),
                                       style: TextStyle(
                                           fontSize: Dimens.space12,
                                           fontWeight: FontWeight.bold),
                                     ),
                                     Text(
-                                      "(за тек. месяц)",
+                                      LocaleKeys.med_profile_for_current_month.tr(),
                                       style: TextStyle(
                                           fontSize: Dimens.space12,
                                           fontWeight: FontWeight.w400,
@@ -390,7 +395,6 @@ class _AgentProfileState extends State<AgentProfile> with AgentProfileUtility {
                         spacing: Dimens.space10,
                         children: [
                           Theme(
-
                             data: Theme.of(context)
                                 .copyWith(dividerColor: Colors.transparent, splashColor: Colors.transparent),
                             child: ExpansionTile(
@@ -520,7 +524,7 @@ class _AgentProfileState extends State<AgentProfile> with AgentProfileUtility {
                           children: [
                             SvgPicture.asset(Assets.icons.person),
                             Text(
-                              "Личная информация",
+                            LocaleKeys.med_profile_personal_information.tr(),
                               style: TextStyle(
                                   fontFamily: 'VelaSans',
                                   fontSize: Dimens.space18,
@@ -539,32 +543,26 @@ class _AgentProfileState extends State<AgentProfile> with AgentProfileUtility {
                               color: AppColors.backgroundColor,
                               borderRadius:
                                   BorderRadius.circular(Dimens.space10)),
-                          child: Text(
-                            formatDate(DateTime.parse(state.model.dateOfBirth ??
-                                DateTime.now().toString())),
-                            style: TextStyle(
-                                fontFamily: 'VelaSans',
-                                fontSize: Dimens.space14,
-                                fontWeight: FontWeight.w400),
-                          ),
-                        ),
-                        SizedBox(
-                          height: Dimens.space10,
-                        ),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: Dimens.space14,
-                              vertical: Dimens.space16),
-                          decoration: BoxDecoration(
-                              color: AppColors.backgroundColor,
-                              borderRadius:
-                                  BorderRadius.circular(Dimens.space10)),
-                          child: Text(
-                            formatPhoneNumber(state.model.number),
-                            style: TextStyle(
-                                fontFamily: 'VelaSans',
-                                fontSize: Dimens.space14,
-                                fontWeight: FontWeight.w400),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            spacing: Dimens.space10,
+                            children: [
+                              Text(
+                                LocaleKeys.med_profile_birthdate.tr(),
+                                style: TextStyle(
+                                    fontFamily: 'VelaSans',
+                                    fontSize: Dimens.space14,
+                                    fontWeight: FontWeight.w400),
+                              ),
+                              Text(
+                                formatDate(DateTime.parse(state.model.dateOfBirth ??
+                                    DateTime.now().toString())),
+                                style: TextStyle(
+                                    fontFamily: 'VelaSans',
+                                    fontSize: Dimens.space14,
+                                    fontWeight: FontWeight.w400),
+                              ),
+                            ],
                           ),
                         ),
                         SizedBox(
@@ -583,6 +581,47 @@ class _AgentProfileState extends State<AgentProfile> with AgentProfileUtility {
                             spacing: Dimens.space10,
                             children: [
                               Text(
+                                LocaleKeys.med_profile_phone_number.tr(),
+                                style: TextStyle(
+                                    fontFamily: 'VelaSans',
+                                    fontSize: Dimens.space14,
+                                    fontWeight: FontWeight.w400),
+                              ),
+                              Text(
+                                formatPhoneNumber(state.model.number),
+                                style: TextStyle(
+                                    fontFamily: 'VelaSans',
+                                    fontSize: Dimens.space14,
+                                    fontWeight: FontWeight.w400),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: Dimens.space10,
+                        ),
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: Dimens.space14,
+                              vertical: Dimens.space16),
+                          decoration: BoxDecoration(
+                              color: AppColors.backgroundColor,
+                              borderRadius:
+                                  BorderRadius.circular(Dimens.space10)),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            spacing: Dimens.space10,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  LocaleKeys.med_profile_adress.tr(),
+                                  style: TextStyle(
+                                      fontFamily: 'VelaSans',
+                                      fontSize: Dimens.space14,
+                                      fontWeight: FontWeight.w400),
+                                ),
+                              ),
+                              Text(
                                 placeName,
                                 style: TextStyle(
                                     fontFamily: 'VelaSans',
@@ -599,7 +638,7 @@ class _AgentProfileState extends State<AgentProfile> with AgentProfileUtility {
                                         context: context,
                                         type: ToastificationType.success,
                                         alignment: Alignment.topCenter,
-                                        title: Text("Адрес обновлен"),
+                                        title: Text(LocaleKeys.med_profile_adress_updated.tr(),),
                                         autoCloseDuration:
                                             const Duration(seconds: 3),
                                         showProgressBar: false,
@@ -679,14 +718,16 @@ class _AgentProfileState extends State<AgentProfile> with AgentProfileUtility {
                               spacing: Dimens.space10,
                               children: [
                                 Text(
-                                  "Пароль:",
+                                  LocaleKeys.med_profile_password.tr(),
+                                  overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                       fontFamily: 'VelaSans',
                                       fontSize: Dimens.space14,
                                       fontWeight: FontWeight.w400),
                                 ),
                                 Text(
-                                  "Сбросить пароль",
+                                  LocaleKeys.med_profile_reset_password.tr(),
+                                  overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                       fontFamily: 'VelaSans',
                                       color: Colors.red,
@@ -717,14 +758,14 @@ class _AgentProfileState extends State<AgentProfile> with AgentProfileUtility {
                               spacing: Dimens.space10,
                               children: [
                                 Text(
-                                  "Язык",
+                                  LocaleKeys.med_profile_language.tr(),
                                   style: TextStyle(
                                       fontFamily: 'VelaSans',
                                       fontSize: Dimens.space14,
                                       fontWeight: FontWeight.w400),
                                 ),
                                 Text(
-                                  "Русский",
+                                  LocaleKeys.med_profile_select_language.tr(),
                                   style: TextStyle(
                                       fontFamily: 'VelaSans',
                                       color: AppColors.black,
@@ -755,7 +796,7 @@ class _AgentProfileState extends State<AgentProfile> with AgentProfileUtility {
                         children: [
                           SvgPicture.asset(Assets.icons.logOut),
                           Text(
-                            "Выйти из аккаунта",
+                            LocaleKeys.med_profile_log_out.tr(),
                             style: TextStyle(
                                 fontFamily: 'VelaSans',
                                 color: AppColors.white,

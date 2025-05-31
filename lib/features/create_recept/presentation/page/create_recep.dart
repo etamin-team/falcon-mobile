@@ -558,6 +558,7 @@ class _CreateRecepState extends State<CreateRecep> {
                               context.read<CreateRecepCubit>().sendTelegramData(
                                   number: "998${numberController.text.trim().replaceAll(" ", "")}",
                                   message: message);
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => ReceiptSuccessPage()));
                             }
                             if (nameController.text.isEmpty) {
                               toastification.show(
@@ -900,7 +901,7 @@ class _CreateRecepState extends State<CreateRecep> {
             children: [
               SizedBox(height: 5),
               UniversalButton.filled(
-                text: "Select MNN",
+                text: LocaleKeys.create_recep_select_mnn.tr(),
                 onPressed: () => showMNN(
                   ctx: context,
                   model: (value) {
@@ -969,7 +970,7 @@ class _CreateRecepState extends State<CreateRecep> {
                       child: Text(
                         containerData.selectedPreparations.isNotEmpty
                             ? containerData.selectedPreparations.first.name
-                            : "Select medicine",
+                            : LocaleKeys.create_recep_select_medicine.tr(),
                         style:  TextStyle(
                           fontFamily: 'VelaSans',
                           fontSize: Dimens.space14,
@@ -981,10 +982,6 @@ class _CreateRecepState extends State<CreateRecep> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        print("Tapped Select Medicine for index: $index");
-                        print("Container medicineList: ${containerData.medicineList}");
-                        print("medicineList: ${medicineList.first.name}");
-
                         if (medicineList.isEmpty) {
                           print("Warning: Medicine list is empty for index $index");
                           toastification.show(

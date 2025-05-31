@@ -359,11 +359,11 @@ class _CreateTemplateState extends State<CreateTemplate> {
                               style: ToastificationStyle.flat,
                               context: context,
                               alignment: Alignment.topCenter,
-                              title: const Text("Template created successfully!"),
+                              title: Text(LocaleKeys.create_template_template_created.tr()),
                               autoCloseDuration: const Duration(seconds: 2),
                               showProgressBar: false,
                               primaryColor: Colors.white,
-                              backgroundColor: Colors.greenAccent,
+                              backgroundColor: Colors.green,
                               foregroundColor: Colors.white,
                             );
                             Navigator.pop(context);
@@ -457,7 +457,7 @@ class _CreateTemplateState extends State<CreateTemplate> {
             children: [
                SizedBox(height: 5),
               UniversalButton.filled(
-                text: "Select MNN",
+                text: LocaleKeys.create_recep_select_mnn.tr(),
                 onPressed: () => showMNN(
                   ctx: context,
                   model: (value) {
@@ -526,7 +526,7 @@ class _CreateTemplateState extends State<CreateTemplate> {
                       child: Text(
                         containerData.selectedPreparations.isNotEmpty
                             ? containerData.selectedPreparations.first.name
-                            : "Select medicine",
+                            : LocaleKeys.create_recep_select_medicine.tr(),
                         style:  TextStyle(
                           fontFamily: 'VelaSans',
                           fontSize: Dimens.space14,

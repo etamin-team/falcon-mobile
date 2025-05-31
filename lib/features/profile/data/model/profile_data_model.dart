@@ -1,5 +1,4 @@
 
-import '../../../med_agent/contract/data/model/contract_model.dart';
 import 'out_contract_model.dart';
 
 class ProfileDataModel {

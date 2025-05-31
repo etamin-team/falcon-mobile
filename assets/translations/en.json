@@ -1,6 +1,6 @@
 {
   "texts": {
-    "welcome": "Welcome to Application",
+    "welcome": "Welcome",
     "sign_up": "Sign Up",
     "sign_in": "Sign In",
     "back": "Back",
@@ -79,11 +79,11 @@
     "enter_password": "Enter password",
     "password": "Password"
   },
-
   "main": {
     "main": "Home",
     "create_recep": "Create Prescription",
     "profile": "Profile",
+    "contracts": "Contracts",
     "main_error": "Something went wrong, please try again.",
     "refresh": "Refresh"
   },
@@ -111,7 +111,11 @@
     "enter_number": "Enter the correct number.",
     "select": "Select",
     "inns": "List of INNs",
-    "add_preparations": "Add Preparations"
+    "add_preparations": "Add Preparations",
+    "select_mnn": "Select MNN",
+    "select_medicine": "Select Medicine",
+    "send_recep_successful": "Receipt Successfully Sent!",
+    "success_button" : "Ready"
   },
   "create_template": {
     "edit_template": "Edit Template",
@@ -137,7 +141,15 @@
     "note": "Note:",
     "create_template": "Create Template",
     "refresh": "Refresh",
-    "home_error": "Something went wrong, please try again."
+    "home_error": "Something went wrong, please try again.",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "exit": "Log Out",
+    "template_created": "Template Created Successfully",
+    "delete_attention": "Attention!",
+    "delete_attention_text": "Are you sure you want to delete this template?",
+    "exit_attention_text": "Are you sure you want to exit?",
+    "templates_not_available" : "Templates are not available"
   },
   "profile": {
     "statistic": "Statistics",
@@ -200,11 +212,38 @@
     "notes": "Notes",
     "edit": "Edit"
   },
-  "med_agent": {
-    "add_doctor": {
-      "enter_name_doctor": "Enter the doctor's first and last name.",
-      "hint_name_doctor": "Doctor's Full Name"
-    }
+  "med_home": {
+    "greeting": "Hello, ",
+    "add_doctor": "Add Doctor",
+    "edit_contract": "Edit Contract",
+    "contract_offer": "Contract Offer",
+    "last_connections": "Last Connections",
+    "search_name_region_workplace_speciality": "Name, Region, Workplace, Specialization"
+  },
+  "med_contract": {
+    "title" : "Contracts",
+    "filters" : "Filters",
+    "search" : "Doctor Name",
+    "all" : "All"
+  },
+  "med_profile": {
+    "sales_in_pack_for_last_month" : "Sales in package for the last month",
+    "quote": "Quota",
+    "percent_completion": "% Completion",
+    "total" : "(total)",
+    "for_current_month" : "(for the current month)",
+    "connected_doctors" : "Connected doctors",
+    "connected_contracts" : "Connected contracts",
+    "written_recipes" : "Written recipes",
+    "personal_information" : "Personal Information",
+    "phone_number" : "Phone Number",
+    "birthdate" : "Date Of Birth",
+    "adress" : "Adress",
+    "adress_updated" : "Address Updated",
+    "password" : "Password",
+    "reset_password" : "Reset Password",
+    "language" : "Select",
+    "select_language" : "Select Language",
+    "log_out" : "Log Out"
   }
-
 }

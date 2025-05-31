@@ -9,7 +9,6 @@ import 'package:wm_doctor/features/profile/presentation/cubit/profile_cubit.dart
 
 import '../../../../gen/locale_keys.g.dart';
 import '../../../template/presentation/page/templates.dart';
-import '../../../template/presentation/page/template_page.dart';
 import '../../data/model/template_model.dart';
 import '../cubit/home_cubit.dart';
 
@@ -23,9 +22,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   void initState() {
-    context
-        .read<HomeCubit>()
-        .getTemplate(saved: "", sortBy: "", searchText: "");
+    context.read<HomeCubit>().getTemplate(saved: "", sortBy: "", searchText: "");
     super.initState();
   }
 
@@ -162,7 +159,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                             Expanded(
                               child: state.list.isEmpty
-                                  ? Center(child: Text("TEMPLATES NOT AVAILABLE"))
+                                  ? Center(child: Text(LocaleKeys.home_template_not_available.tr()))
                                   : Stack(
                                 children: [
                                   SingleChildScrollView(
@@ -282,20 +279,20 @@ class _HomePageState extends State<HomePage> {
                                                         builder: (BuildContext ctx) {
                                                           return CupertinoAlertDialog(
                                                             title: Text(
-                                                              'Внимание!',
+                                                              LocaleKeys.home_delete_attention.tr(),
                                                               style: TextStyle(
                                                                 fontWeight: FontWeight.bold,
                                                                 fontSize: Dimens.space18,
                                                               ),
                                                             ),
                                                             content: Text(
-                                                              'Вы действительно хотите удалить этот шаблон?',
+                                                                LocaleKeys.home_delete_attention_text.tr(),
                                                               style: TextStyle(fontSize: Dimens.space16),
                                                             ),
                                                             actions: [
                                                               CupertinoDialogAction(
                                                                 child: Text(
-                                                                  'Отмена',
+                                                                  LocaleKeys.home_cancel.tr(),
                                                                   style: TextStyle(fontSize: Dimens.space14),
                                                                 ),
                                                                 onPressed: () {
@@ -305,7 +302,7 @@ class _HomePageState extends State<HomePage> {
                                                               CupertinoDialogAction(
                                                                 isDefaultAction: true,
                                                                 child: Text(
-                                                                  'Удалить',
+                                                                  LocaleKeys.home_delete.tr(),
                                                                   style: TextStyle(
                                                                     fontSize: Dimens.space14,
                                                                     color: Colors.red,
@@ -315,6 +312,9 @@ class _HomePageState extends State<HomePage> {
                                                                   Navigator.of(ctx).pop(); // Close the dialog
                                                                   // Call deleteTemplate from HomeCubit
                                                                   context.read<HomeCubit>().deleteTemplate(id: template.id!.toInt());
+
+                                                                  CircularProgressIndicator();
+                                                                  // Navigator.pop(context);
                                                                 },
                                                               ),
                                                             ],
@@ -337,19 +337,19 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                   ),
                                   Positioned(
-                                    height: 150,
+                                    height: 200,
                                     left: 0,
                                     right: 0,
                                     bottom: 0,
                                     child: IgnorePointer(
                                       ignoring: true,
                                       child: Container(
-                                        height: 100,
+                                        height: 200,
                                         decoration: BoxDecoration(
                                           gradient: LinearGradient(
                                             begin: Alignment.topCenter,
                                             end: Alignment.bottomCenter,
-                                            colors: [Colors.red.shade50.withAlpha(1), Colors.white], // Note: Empty colors list, consider fixing this
+                                            colors: [Colors.white.withAlpha(10), Colors.white], // Note: Empty colors list, consider fixing this
                                           ),
                                         ),
                                       ),
@@ -389,11 +389,6 @@ class _HomePageState extends State<HomePage> {
                 spacing: Dimens.space20,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    LocaleKeys.home_home_error.tr(),
-                    style: TextStyle(
-                        fontSize: Dimens.space14, fontWeight: FontWeight.w500),
-                  ),
                   UniversalButton.outline(
                     height: 50,
                     width: 200,

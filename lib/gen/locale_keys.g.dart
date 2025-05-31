@@ -197,6 +197,49 @@ abstract class  LocaleKeys {
   static const create_recep_add_preparations = 'create_recep.add_preparations';
 
   static var texts_no_medicines = 'texts.no_medicines';
-
   static var create_recep_medicine = 'create_recep.medicine';
+  static var home_template_not_available = 'home.templates_not_available';
+  static var create_recep_select_medicine = 'create_recep.select_medicine';
+  static var create_recep_select_mnn = 'create_recep.select_mnn';
+  static var create_recep_send_recep_successful = 'create_recep.send_recep_successful';
+  static var create_recep_success_button = 'create_recep.success_button';
+  static var create_template_template_created = 'create_template.template_created';
+  static var home_delete_attention = 'home.delete_attention';
+  static var home_delete_attention_text = 'home.delete_attention_text';
+  static var home_cancel = 'home.cancel';
+  static var home_delete = 'home.delete';
+  static var home_exit = 'home.exit';
+  static var home_exit_attention_text = 'home.exit_attention_text';
+
+  static var med_home_greeting = 'med_home.greeting';
+  static var med_home_refresh = 'med_home.refresh';
+  static var med_home_home_error = 'med_home.home_error';
+  static var med_home_add_doctor = 'med_home.add_doctor';
+  static var med_home_edit_contract = 'med_home.edit_contract';
+  static var med_home_contract_offer = 'med_home.contract_offer';
+  static var med_home_last_connections = 'med_home.last_connections';
+  static var main_contracts = 'main.contracts';
+  static var med_contract_title = 'med_contract.title';
+  static var med_contract_filters = 'med_contract.filters';
+  static var med_contract_search = 'med_contract.search';
+  static var med_home_search_name_region_workplace_speciality = 'med_home.search_name_region_workplace_speciality';
+  static var med_contract_all = 'med_contract.all';
+  static var med_profile_sales_in_pack_for_last_month = 'med_profile.sales_in_pack_for_last_month';
+  static var med_profile_quote = 'med_profile.quote';
+  static var med_profile_percent_completion = 'med_profile.percent_completion';
+  static var med_profile_total = 'med_profile.total';
+  static var med_profile_for_current_month = 'med_profile.for_current_month';
+  static var med_profile_connected_doctors = 'med_profile.connected_doctors';
+  static var med_profile_connected_contracts = 'med_profile.connected_contracts';
+  static var med_profile_written_recipes = 'med_profile.written_recipes';
+  static var med_profile_personal_information = 'med_profile.personal_information';
+  static var med_profile_birthdate = 'med_profile.birthdate';
+  static var med_profile_phone_number = 'med_profile.phone_number';
+  static var med_profile_password = 'med_profile.password';
+  static var med_profile_reset_password = 'med_profile.reset_password';
+  static var med_profile_language = 'med_profile.language';
+  static var med_profile_select_language = 'med_profile.select_language';
+  static var med_profile_log_out = 'med_profile.log_out';
+  static var med_profile_adress = 'med_profile.adress';
+  static var med_profile_adress_updated = 'med_profile.adress_updated';
 }

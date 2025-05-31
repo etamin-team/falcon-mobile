@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
@@ -6,6 +7,7 @@ import 'package:wm_doctor/core/network/api_client.dart';
 import '../../../../../core/services/secure_storage.dart';
 import '../../../../../core/utils/dependencies_injection.dart';
 import '../../../../../core/widgets/export.dart';
+import '../../../../../gen/locale_keys.g.dart';
 import '../../../../auth/sign_up/presentation/page/sign_page.dart';
 import '../../../../profile/data/model/user_model.dart';
 import '../../presentation/page/agent_profile.dart';
@@ -49,23 +51,23 @@ mixin AgentProfileUtility on State<AgentProfile> {
       context: ctx,
       builder: (BuildContext context) {
         return CupertinoAlertDialog(
-          title: Text('Внимание!',
+          title: Text(LocaleKeys.home_delete_attention.tr(),
               style: TextStyle(
                   fontWeight: FontWeight.bold, fontSize: Dimens.space18)),
           content: Text(
-            'Вы действительно хотите выйти?',
+          LocaleKeys.home_delete_attention_text.tr(),
             style: TextStyle(fontSize: Dimens.space16),
           ),
           actions: [
             CupertinoDialogAction(
-              child: Text('Отмена',     style: TextStyle(fontSize: Dimens.space14),),
+              child: Text(LocaleKeys.home_cancel.tr(),     style: TextStyle(fontSize: Dimens.space14),),
               onPressed: () {
                 Navigator.of(context).pop(); // Dialogni yopish
               },
             ),
             CupertinoDialogAction(
               isDefaultAction: true,
-              child: Text('Выход',     style: TextStyle(fontSize: Dimens.space14,color: Colors.red),),
+              child: Text(LocaleKeys.home_exit.tr(),     style: TextStyle(fontSize: Dimens.space14,color: Colors.red),),
               onPressed: () async{
                 await FlutterSecureStorage().deleteAll();
                 Navigator.pushAndRemoveUntil(

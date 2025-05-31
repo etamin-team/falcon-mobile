@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wm_doctor/core/widgets/export.dart';
@@ -7,6 +8,7 @@ import 'package:wm_doctor/features/med_agent/contract/presentation/page/agent_co
 import 'package:wm_doctor/features/med_agent/contract_details/presentation/cubit/contract_details_cubit.dart';
 import 'package:wm_doctor/features/med_agent/home/presentation/cubit/agent_home_cubit.dart';
 import 'package:wm_doctor/features/med_agent/home/presentation/widgets/doctors.dart';
+import 'package:wm_doctor/gen/locale_keys.g.dart';
 
 import '../../../../../core/utils/dependencies_injection.dart';
 import '../../../../../core/widgets/custom_progress_bar.dart';
@@ -44,7 +46,7 @@ class _AgentHomePageState extends State<AgentHomePage> {
                   Row(
                     children: [
                       Text(
-                        "Здравствуйте,  ",
+                        LocaleKeys.home_greeting.tr(),
                         style: TextStyle(
                             fontWeight: FontWeight.w800,
                             fontSize: Dimens.space20,
@@ -66,7 +68,7 @@ class _AgentHomePageState extends State<AgentHomePage> {
             return Row(
               children: [
                 Text(
-                  "Здравствуйте, ",
+                  LocaleKeys.home_greeting.tr(),
                   style: TextStyle(
                       fontFamily: "VelaSans",
                       fontWeight: FontWeight.w800,
@@ -111,7 +113,7 @@ class _AgentHomePageState extends State<AgentHomePage> {
                               children: [
                                 SvgPicture.asset(Assets.icons.stethoscope),
                                 Text(
-                                  "Добавить врача",
+                                  LocaleKeys.med_home_add_doctor.tr(),
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: Dimens.space16),
@@ -140,7 +142,7 @@ class _AgentHomePageState extends State<AgentHomePage> {
                               children: [
                                 SvgPicture.asset(Assets.icons.pills),
                                 Text(
-                                  "Изменить договор",
+                                  LocaleKeys.med_home_edit_contract.tr(),
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: Dimens.space16),
@@ -176,7 +178,7 @@ class _AgentHomePageState extends State<AgentHomePage> {
                               children: [
                                 SvgPicture.asset(Assets.icons.person_heart),
                                 Text(
-                                  "Предложить договор",
+                                  LocaleKeys.med_home_contract_offer.tr(),
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: Dimens.space16),
@@ -340,7 +342,7 @@ class _AgentHomePageState extends State<AgentHomePage> {
                             children: [
                               SvgPicture.asset(Assets.icons.stars),
                               Text(
-                                "Последние подключения",
+                                LocaleKeys.med_home_last_connections.tr(),
                                 style: TextStyle(
                                     fontSize: Dimens.space18,
                                     fontWeight: FontWeight.bold),
@@ -351,7 +353,7 @@ class _AgentHomePageState extends State<AgentHomePage> {
                             isEnabled: false,
                               prefixIcon: Icon(CupertinoIcons.search),
                               controller: TextEditingController(),
-                              hintText: "Ф.И.О, Район, ЛПУ, Специальность"),
+                              hintText: LocaleKeys.med_home_search_name_region_workplace_speciality.tr(),),
                           ...List.generate(
                             state.lastList.take(5).toList().length,
                             (index) {

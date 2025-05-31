@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,6 +14,7 @@ import 'package:wm_doctor/core/widgets/export.dart';
 import 'package:wm_doctor/features/auth/sign_up/data/model/region_model.dart';
 import 'package:wm_doctor/features/auth/sign_up/domain/entity/regison_entity.dart';
 import 'package:wm_doctor/features/med_agent/contract/data/model/contract_model.dart';
+import 'package:wm_doctor/gen/locale_keys.g.dart';
 
 class AgentContract extends StatefulWidget {
   const AgentContract({super.key});
@@ -66,6 +68,7 @@ class _AgentContractState extends State<AgentContract> {
   @override
   void initState() {
     context.read<ContractCubit>().getContracts();
+    context.read<RegionsCubit>().getRegions();
     // Listen to RegionsCubit state changes
     context.read<RegionsCubit>().stream.listen((state) {
       if (state is DistrictsSuccess) {
@@ -153,7 +156,7 @@ class _AgentContractState extends State<AgentContract> {
       appBar: AppBar(
         forceMaterialTransparency: true,
         title: Text(
-          "Договора",
+          LocaleKeys.med_contract_title.tr(),
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: Dimens.space30),
         ),
       ),
@@ -173,7 +176,7 @@ class _AgentContractState extends State<AgentContract> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    "Регион",
+                    LocaleKeys.med_contract_filters.tr(),
                     style: TextStyle(
                         fontWeight: FontWeight.w600, fontSize: Dimens.space18),
                   ),
@@ -327,7 +330,7 @@ class _AgentContractState extends State<AgentContract> {
                       _onFilterChanged();
                     },
                     controller: searchController,
-                    hintText: "Ф.И.О. врача",
+                    hintText: LocaleKeys.med_contract_search.tr(),
                     prefixIcon: const Icon(Icons.search),
                     suffixIcon: searchController.text.isNotEmpty
                         ? IconButton(
@@ -361,7 +364,7 @@ class _AgentContractState extends State<AgentContract> {
                           children: [
                             SvgPicture.asset(Assets.icons.list),
                             Text(
-                              "Все",
+                              LocaleKeys.med_contract_all.tr(),
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: Dimens.space18),

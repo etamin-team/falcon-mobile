@@ -82,7 +82,7 @@ class _ProfilePageState extends State<ProfilePage> with ProfileUtility {
           }
 
           return RefreshIndicator(
-              onRefresh: _onRefresh,
+            onRefresh: _onRefresh,
             child: Scaffold(
               backgroundColor: AppColors.backgroundColor,
               appBar: AppBar(
@@ -143,7 +143,7 @@ class _ProfilePageState extends State<ProfilePage> with ProfileUtility {
                                 padding: EdgeInsets.all(Dimens.space20),
                                 decoration: BoxDecoration(
                                     borderRadius:
-                                        BorderRadius.circular(Dimens.space20),
+                                    BorderRadius.circular(Dimens.space20),
                                     color: AppColors.white),
                                 child: Column(
                                   children: [
@@ -173,7 +173,7 @@ class _ProfilePageState extends State<ProfilePage> with ProfileUtility {
                                               Dimens.space10)),
                                       child: Row(
                                         mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                         spacing: Dimens.space10,
                                         children: [
                                           Text(
@@ -207,7 +207,7 @@ class _ProfilePageState extends State<ProfilePage> with ProfileUtility {
                                               Dimens.space10)),
                                       child: Row(
                                         mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                        MainAxisAlignment.spaceBetween,
                                         spacing: Dimens.space10,
                                         children: [
                                           Text(
@@ -265,7 +265,7 @@ class _ProfilePageState extends State<ProfilePage> with ProfileUtility {
                                   padding: EdgeInsets.all(Dimens.space20),
                                   decoration: BoxDecoration(
                                       borderRadius:
-                                          BorderRadius.circular(Dimens.space20),
+                                      BorderRadius.circular(Dimens.space20),
                                       color: AppColors.white),
                                   child: Column(
                                     spacing: Dimens.space10,
@@ -281,27 +281,27 @@ class _ProfilePageState extends State<ProfilePage> with ProfileUtility {
                                       ...List.generate(
                                         outState.model.outOfContractMedicineAmount
                                             .length,
-                                        (index) {
+                                            (index) {
                                           return Container(
                                             decoration: BoxDecoration(
                                                 color: AppColors.backgroundColor,
                                                 borderRadius:
-                                                    BorderRadius.circular(
-                                                        Dimens.space10)),
+                                                BorderRadius.circular(
+                                                    Dimens.space10)),
                                             child: Container(
                                               padding: EdgeInsets.symmetric(
                                                   horizontal: Dimens.space20,
                                                   vertical: Dimens.space14),
                                               decoration: BoxDecoration(
                                                   color:
-                                                      AppColors.backgroundColor,
+                                                  AppColors.backgroundColor,
                                                   borderRadius:
-                                                      BorderRadius.circular(
-                                                          Dimens.space10)),
+                                                  BorderRadius.circular(
+                                                      Dimens.space10)),
                                               child: Row(
                                                 mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
+                                                MainAxisAlignment
+                                                    .spaceBetween,
                                                 children: [
                                                   Expanded(
                                                     child: Text(
@@ -323,7 +323,7 @@ class _ProfilePageState extends State<ProfilePage> with ProfileUtility {
                                                   Text(outState
                                                       .model
                                                       .outOfContractMedicineAmount[
-                                                          index]
+                                                  index]
                                                       .amount
                                                       .toString()),
                                                 ],
@@ -372,7 +372,7 @@ class _ProfilePageState extends State<ProfilePage> with ProfileUtility {
                                 decoration: BoxDecoration(
                                     color: AppColors.backgroundColor,
                                     borderRadius:
-                                        BorderRadius.circular(Dimens.space10)),
+                                    BorderRadius.circular(Dimens.space10)),
                                 child: Text(
                                   formatDate(DateTime.parse(
                                       state.model.dateOfBirth ??
@@ -393,7 +393,7 @@ class _ProfilePageState extends State<ProfilePage> with ProfileUtility {
                                 decoration: BoxDecoration(
                                     color: AppColors.backgroundColor,
                                     borderRadius:
-                                        BorderRadius.circular(Dimens.space10)),
+                                    BorderRadius.circular(Dimens.space10)),
                                 child: Text(
                                   formatPhoneNumber(state.model.number),
                                   style: TextStyle(
@@ -412,10 +412,10 @@ class _ProfilePageState extends State<ProfilePage> with ProfileUtility {
                                 decoration: BoxDecoration(
                                     color: AppColors.backgroundColor,
                                     borderRadius:
-                                        BorderRadius.circular(Dimens.space10)),
+                                    BorderRadius.circular(Dimens.space10)),
                                 child: Row(
                                   mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  MainAxisAlignment.spaceBetween,
                                   spacing: Dimens.space10,
                                   children: [
                                     Text(
@@ -440,7 +440,7 @@ class _ProfilePageState extends State<ProfilePage> with ProfileUtility {
                                                   .profile_address_updated
                                                   .tr()),
                                               autoCloseDuration:
-                                                  const Duration(seconds: 3),
+                                              const Duration(seconds: 3),
                                               showProgressBar: false,
                                               primaryColor: Colors.white,
                                               backgroundColor: Colors.green,
@@ -476,10 +476,10 @@ class _ProfilePageState extends State<ProfilePage> with ProfileUtility {
                                 decoration: BoxDecoration(
                                     color: AppColors.backgroundColor,
                                     borderRadius:
-                                        BorderRadius.circular(Dimens.space10)),
+                                    BorderRadius.circular(Dimens.space10)),
                                 child: Row(
                                   mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  MainAxisAlignment.spaceBetween,
                                   spacing: Dimens.space10,
                                   children: [
                                     Text(
@@ -509,10 +509,10 @@ class _ProfilePageState extends State<ProfilePage> with ProfileUtility {
                                 decoration: BoxDecoration(
                                     color: AppColors.backgroundColor,
                                     borderRadius:
-                                        BorderRadius.circular(Dimens.space10)),
+                                    BorderRadius.circular(Dimens.space10)),
                                 child: Row(
                                   mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  MainAxisAlignment.spaceBetween,
                                   spacing: Dimens.space10,
                                   children: [
                                     Text(
@@ -549,10 +549,10 @@ class _ProfilePageState extends State<ProfilePage> with ProfileUtility {
                                   decoration: BoxDecoration(
                                       color: AppColors.backgroundColor,
                                       borderRadius:
-                                          BorderRadius.circular(Dimens.space10)),
+                                      BorderRadius.circular(Dimens.space10)),
                                   child: Row(
                                     mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment.spaceBetween,
                                     spacing: Dimens.space10,
                                     children: [
                                       Text(
@@ -588,10 +588,10 @@ class _ProfilePageState extends State<ProfilePage> with ProfileUtility {
                                   decoration: BoxDecoration(
                                       color: AppColors.backgroundColor,
                                       borderRadius:
-                                          BorderRadius.circular(Dimens.space10)),
+                                      BorderRadius.circular(Dimens.space10)),
                                   child: Row(
                                     mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment.spaceBetween,
                                     spacing: Dimens.space10,
                                     children: [
                                       Text(
@@ -628,11 +628,11 @@ class _ProfilePageState extends State<ProfilePage> with ProfileUtility {
                           child: Container(
                             alignment: Alignment.center,
                             padding:
-                                EdgeInsets.symmetric(vertical: Dimens.space16),
+                            EdgeInsets.symmetric(vertical: Dimens.space16),
                             width: double.infinity,
                             decoration: BoxDecoration(
                                 borderRadius:
-                                    BorderRadius.circular(Dimens.space16),
+                                BorderRadius.circular(Dimens.space16),
                                 color: Colors.red),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,

@@ -135,7 +135,7 @@ class Medicine {
       nameUzLatin: json['nameUzLatin'],
       nameRussian: json['nameRussian'],
       imageUrl: json['imageUrl'],
-      inn: json['mnn'] != null ? List<String>.from(json['mnn']) : null,
+      inn: List<String>.from(json['mnn']),
       cip: json['cip'],
       quantity: json['quantity'],
       prescription: json['prescription'],

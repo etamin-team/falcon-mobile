@@ -19,6 +19,7 @@ import 'package:wm_doctor/features/med_agent/add_doctor/presentation/cubit/add_d
 import 'package:wm_doctor/features/med_agent/home/presentation/cubit/agent_home_cubit.dart';
 import 'package:wm_doctor/features/med_agent/profile/presentation/cubit/agent_profile_data/agent_profile_data_cubit.dart';
 import 'package:wm_doctor/features/medicine/data/repository/medicine_repository_impl.dart';
+import 'package:wm_doctor/features/medicine/presentation/cubit/medicine_cubit.dart';
 import 'package:wm_doctor/features/medicine/presentation/page/medicine_dialog.dart';
 import 'package:wm_doctor/features/profile/presentation/cubit/profile_cubit.dart';
 import 'package:wm_doctor/features/regions/presentation/cubit/regions_cubit.dart';
@@ -84,6 +85,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
     medicineRepositoryImpl = sl<MedicineRepositoryImpl>();
     loadMedicines();
     context.read<RegionsCubit>().getRegions();
+    context.read<MedicineCubit>().getMedicine();
   }
 
   void loadMedicines() async {
@@ -211,7 +213,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                       builder: (context) {
                         return AlertDialog(
                           title: Text("Успешно",
-                              style: TextStyle(color: Colors.greenAccent)),
+                              style: TextStyle(color: Colors.green)),
                           content: Text("Вы успешно зарегистрировали врача"),
                           actions: [
                             TextButton(
