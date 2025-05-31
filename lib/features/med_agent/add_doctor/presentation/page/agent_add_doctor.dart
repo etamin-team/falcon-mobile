@@ -25,6 +25,7 @@ import 'package:wm_doctor/features/profile/presentation/cubit/profile_cubit.dart
 import 'package:wm_doctor/features/regions/presentation/cubit/regions_cubit.dart';
 import 'package:wm_doctor/features/regions/presentation/page/regions_dialog.dart';
 import 'package:wm_doctor/features/workplace/presentation/page/workplace_dialog.dart';
+import '../../../../../gen/locale_keys.g.dart';
 import '../../../../auth/sign_up/data/repository/sign_up_repository_impl.dart';
 import '../../../contract/presentation/cubit/contract_cubit.dart';
 import '../../data/repository/add_doctor_repository_impl.dart';
@@ -124,7 +125,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
           forceMaterialTransparency: true,
           automaticallyImplyLeading: false,
           title: Text(
-            "Добавить врача",
+            LocaleKeys.med_add_doctor_title.tr(),
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: Dimens.space28,
@@ -136,7 +137,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                 Navigator.pop(context);
               },
               child: Text(
-                "Назад",
+                LocaleKeys.med_add_doctor_back.tr(),
                 style: TextStyle(
                   color: Colors.blueAccent,
                   fontSize: Dimens.space18,
@@ -231,14 +232,14 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                       context: context,
                       builder: (context) {
                         return AlertDialog(
-                          title: Text("Ошибка", style: TextStyle(color: Colors.redAccent)),
-                          content: Text("Номер телефона уже зарегистрирован"),
+                          title: Text(LocaleKeys.med_add_doctor_error_title.tr(), style: TextStyle(color: Colors.redAccent)),
+                          content: Text(LocaleKeys.med_add_doctor_error_text.tr()),
                           actions: [
                             TextButton(
                               onPressed: () {
                                 Navigator.pop(context);
                               },
-                              child: Text("Ок"),
+                              child: Text(LocaleKeys.med_add_doctor_ok.tr()),
                             ),
                           ],
                         );
@@ -269,12 +270,12 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                             AppTextField(
                               validator: (value) {
                                 if (value.toString().isEmpty) {
-                                  return "Введите имя и фамилию врача.";
+                                  return LocaleKeys.med_add_doctor_enter_name.tr();
                                 }
                                 return null;
                               },
                               controller: nameController,
-                              hintText: "Ф.И.О. врача",
+                              hintText: LocaleKeys.med_add_doctor_hint_name.tr(),
                             ),
                             GestureDetector(
                               onTap: () {
@@ -293,12 +294,12 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                                 textColor: Colors.black,
                                 validator: (value) {
                                   if (value.toString().isEmpty) {
-                                    return "Выберите район";
+                                    return LocaleKeys.med_add_doctor_select_region.tr();
                                   }
                                   return null;
                                 },
                                 controller: addressController,
-                                hintText: "Район",
+                                hintText: LocaleKeys.med_add_doctor_select_region_hint.tr(),
                                 suffixIcon: Icon(
                                   CupertinoIcons.chevron_down,
                                   color: Colors.black,
@@ -324,12 +325,12 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                                 textColor: Colors.black,
                                 validator: (value) {
                                   if (value.toString().isEmpty) {
-                                    return "Выберите место работы";
+                                    return LocaleKeys.med_add_doctor_select_workplace.tr();
                                   }
                                   return null;
                                 },
                                 controller: workplaceController,
-                                hintText: "Место работы",
+                                hintText: LocaleKeys.med_add_doctor_select_workplace_hint.tr(),
                                 suffixIcon: Icon(
                                   CupertinoIcons.chevron_down,
                                   color: Colors.black,
@@ -354,12 +355,12 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                                 textColor: Colors.black,
                                 validator: (value) {
                                   if (value.toString().isEmpty) {
-                                    return "Выберите специальность";
+                                    return LocaleKeys.med_add_doctor_select_speciality.tr();
                                   }
                                   return null;
                                 },
                                 controller: doctorTypeController,
-                                hintText: "Специальность",
+                                hintText: LocaleKeys.med_add_doctor_select_speciality_hint.tr(),
                                 suffixIcon: Icon(
                                   CupertinoIcons.chevron_down,
                                   color: Colors.black,
@@ -383,12 +384,12 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                                 textColor: Colors.black,
                                 validator: (value) {
                                   if (value.toString().isEmpty) {
-                                    return "Выберите должность";
+                                    return LocaleKeys.med_add_doctor_select_position.tr();
                                   }
                                   return null;
                                 },
                                 controller: doctorLevelController,
-                                hintText: "Должность",
+                                hintText: LocaleKeys.med_add_doctor_select_position_hint.tr(),
                                 suffixIcon: Icon(
                                   CupertinoIcons.chevron_down,
                                   color: Colors.black,
@@ -399,7 +400,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                             ),
                             SizedBox(),
                             Text(
-                              "Контактные данные врача",
+                              LocaleKeys.med_add_doctor_info_doctor.tr(),
                               style: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: Dimens.space18,
@@ -413,18 +414,18 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                                 RegExp regex = RegExp(pattern);
                                 if (!regex.hasMatch(value.toString()) &&
                                     value.toString().isNotEmpty) {
-                                  return "Emailni to'g'ri kriiting";
+                                  return LocaleKeys.med_add_doctor_enter_email.tr();
                                 }
                                 return null;
                               },
                               controller: emailController,
-                              hintText: "Почта (muhim emas)",
+                              hintText: LocaleKeys.med_add_doctor_email.tr(),
                             ),
                             AppTextField(
                               keyboardType: TextInputType.phone,
                               validator: (value) {
                                 if (value.toString().isEmpty) {
-                                  return "Введите номер телефона";
+                                  return LocaleKeys.med_add_doctor_enter_number.tr();
                                 }
                                 return null;
                               },
@@ -438,7 +439,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                             ),
                             SizedBox(height: Dimens.space10),
                             Text(
-                              "Временный пароль",
+                              LocaleKeys.med_add_doctor_temporary_password.tr(),
                               style: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: Dimens.space18,
@@ -447,7 +448,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                             AppTextField(
                               validator: (value) {
                                 if (value.toString().isEmpty) {
-                                  return "Введите пароль";
+                                  return LocaleKeys.med_add_doctor_temporary_password_hint.tr();
                                 }
                                 return null;
                               },
@@ -472,7 +473,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                                         );
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           const SnackBar(
-                                            content: Text('Скопировано'),
+                                            content: Text("MessageCopied"),
                                             duration: Duration(seconds: 1),
                                           ),
                                         );
@@ -499,7 +500,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             Text(
-                              "Тип Контракта",
+                              LocaleKeys.med_add_doctor_contract_type.tr(),
                               style: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: Dimens.space18,
@@ -514,7 +515,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                               child: DropdownButtonHideUnderline(
                                 child: DropdownButton<String>(
                                   hint: Text(
-                                    "Select Contract Type",
+                                    LocaleKeys.med_add_doctor_contract_type_hint.tr(),
                                     style: TextStyle(
                                       fontSize: 16,
                                       color: Colors.grey[600],
@@ -557,7 +558,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             Text(
-                              "Пакет",
+                              LocaleKeys.med_add_doctor_packs.tr(),
                               style: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: Dimens.space18,
@@ -589,7 +590,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                               child: AppTextField(
                                 textColor: Colors.black,
                                 controller: recipeController,
-                                hintText: "Выберите препарат",
+                                hintText: LocaleKeys.med_add_doctor_select_pack.tr(),
                                 suffixIcon: Icon(
                                   CupertinoIcons.add_circled_solid,
                                   color: Colors.blueAccent,
@@ -674,7 +675,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "Условия пакета",
+                              LocaleKeys.med_add_doctor_pack_required.tr(),
                               style: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: Dimens.space18,
@@ -703,7 +704,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                               },
                               child: AppTextField(
                                 isEnabled: false,
-                                title: "Дата начала",
+                                title: LocaleKeys.med_add_doctor_data_start.tr(),
                                 titleStyle: TextStyle(
                                   fontSize: Dimens.space14,
                                   fontWeight: FontWeight.bold,
@@ -741,7 +742,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                               },
                               child: AppTextField(
                                 isEnabled: false,
-                                title: "Дата окончания",
+                                title: LocaleKeys.med_add_doctor_data_finish.tr(),
                                 titleStyle: TextStyle(
                                   fontSize: Dimens.space14,
                                   color: Colors.black,
@@ -778,7 +779,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text("Шаги"),
+                              Text(LocaleKeys.med_add_doctor_step.tr()),
                               Text(allQuote.toString()),
                             ],
                           ),
@@ -789,7 +790,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                         builder: (context, state) {
                           return UniversalButton.filled(
                             cornerRadius: Dimens.space20,
-                            text: "Зарегистрировать врача",
+                            text: LocaleKeys.med_add_doctor_register.tr(),
                             onPressed: () async {
                               if (!formKey.currentState!.validate()) {
                                 showDialog(
@@ -797,16 +798,16 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                                   builder: (context) {
                                     return AlertDialog(
                                       title: Text(
-                                        "Ошибка",
+                                        LocaleKeys.med_add_doctor_error_title.tr(),
                                         style: TextStyle(color: Colors.redAccent),
                                       ),
-                                      content: Text("Форма заполнена некорректно"),
+                                      content: Text(LocaleKeys.med_add_doctor_error_text.tr()),
                                       actions: [
                                         TextButton(
                                           onPressed: () {
                                             Navigator.pop(context);
                                           },
-                                          child: Text("Ок"),
+                                          child: Text(LocaleKeys.med_add_doctor_ok.tr()),
                                         ),
                                       ],
                                     );

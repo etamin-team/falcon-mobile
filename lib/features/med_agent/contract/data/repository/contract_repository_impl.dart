@@ -43,7 +43,6 @@ class ContractRepositoryImpl implements ContractRepository {
 
       // Construct the URL with query parameters directly
       String pathUrl = "/med-agent/$uuid/contracts?districtId=$districtId&workPlaceId=$workPlaceId&firstName=$firstName&lastName=$lastName&middleName=$middleName${fieldName=='ALL'?'':'&fieldName=$fieldName'}";
-
       final request = await sl<ApiClient>().getMethod(
         pathUrl: pathUrl,
         isHeader: true,

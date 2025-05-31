@@ -242,4 +242,38 @@ abstract class  LocaleKeys {
   static var med_profile_log_out = 'med_profile.log_out';
   static var med_profile_adress = 'med_profile.adress';
   static var med_profile_adress_updated = 'med_profile.adress_updated';
+
+  static var med_add_doctor_title = 'med_add_doctor.title';
+  static var med_add_doctor_hint_name = 'med_add_doctor.hint_name';
+  static var med_add_doctor_enter_name = 'med_add_doctor.enter_name';
+  static var med_add_doctor_select_region = 'med_add_doctor.select_region';
+  static var med_add_doctor_select_region_hint = 'med_add_doctor.select_region_hint';
+  static var med_add_doctor_select_workplace = 'med_add_doctor.select_workplace';
+  static var med_add_doctor_select_workplace_hint = 'med_add_doctor.select_workplace_hint';
+  static var med_add_doctor_select_speciality = 'med_add_doctor.select_speciality';
+  static var med_add_doctor_select_speciality_hint = 'med_add_doctor.select_speciality_hint';
+  static var med_add_doctor_select_position = 'med_add_doctor.select_position';
+  static var med_add_doctor_select_position_hint = 'med_add_doctor.select_position_hint';
+  static var med_add_doctor_info_doctor = 'med_add_doctor.info_doctor';
+  static var med_add_doctor_email = 'med_add_doctor.email';
+  static var med_add_doctor_enter_number = 'med_add_doctor.enter_number';
+  static var med_add_doctor_enter_email = 'med_add_doctor.enter_email';
+  static var med_add_doctor_temporary_password = 'med_add_doctor.temporary_password';
+  static var med_add_doctor_temporary_password_hint = 'med_add_doctor.temporary_password_hint';
+  static var med_add_doctor_contract_type = 'med_add_doctor.contract_type';
+  static var med_add_doctor_contract_type_hint = 'med_add_doctor.contract_type_hint';static var med_add_doctor_packs = 'med_add_doctor.packs';
+  static var med_add_doctor_select_pack = 'med_add_doctor.select_pack';
+  static var med_add_doctor_pack_required = 'med_add_doctor.pack_required';
+  static var med_add_doctor_data_start = 'med_add_doctor.data_start';
+  static var med_add_doctor_data_finish = 'med_add_doctor.data_finish';
+  static var med_add_doctor_step = 'med_add_doctor.step';
+  static var med_add_doctor_register = 'med_add_doctor.register';
+  static var med_add_doctor_back = 'med_add_doctor.back';
+  static var med_add_doctor_success_title = 'med_add_doctor.success_title';
+  static var med_add_doctor_success_text = 'med_add_doctor.success_text';
+  static var med_add_doctor_ok = 'med_add_doctor.ok';
+  static var med_add_doctor_error_title = 'med_add_doctor.error_title';
+  static var med_add_doctor_error_text = 'med_add_doctor.error_text';
+  static var med_add_doctor_error_text_number = 'med_add_doctor.error_text_number';
+  static var med_add_doctor_copied = 'med_add_doctor.copied';
 }
