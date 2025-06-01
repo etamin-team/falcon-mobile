@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wm_doctor/core/extensions/widget_extensions.dart';
 import 'package:wm_doctor/core/model/language_model.dart';
+import 'package:wm_doctor/core/utils/data_translate.dart';
 import 'package:wm_doctor/core/utils/dependencies_injection.dart';
 import 'package:wm_doctor/core/utils/text_mask.dart';
 import 'package:wm_doctor/core/widgets/export.dart';
@@ -104,6 +105,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
       },
     );
   }
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -213,14 +215,14 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                       context: context,
                       builder: (context) {
                         return AlertDialog(
-                          title: Text("Успешно",
+                          title: Text(LocaleKeys.med_add_doctor_success_title.tr(),
                               style: TextStyle(color: Colors.green)),
-                          content: Text("Вы успешно зарегистрировали врача"),
+                          content: Text(LocaleKeys.med_add_doctor_success_text.tr()),
                           actions: [
                             TextButton(
                               onPressed: () {
                                 Navigator.pop(context);},
-                              child: Text("Ок"),
+                              child: Text(LocaleKeys.med_add_doctor_ok.tr()),
                             ),
                           ],
                         );
@@ -282,11 +284,20 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                                 showRegions(
                                   ctx: context,
                                   onChange: (value) {
-                                    addressController.text = value.uz;
-                                    if (formKey.currentState!.validate()) {}
+                                    addressController.text = dataTranslate(
+                                      ctx: context,
+                                      model: LanguageModel(
+                                        uz: value.uz,
+                                        ru: value.ru,
+                                        en: value.en,
+                                      ),
+                                    );
+                                    setState(() {
+                                    }); // Update UI if needed
                                   },
                                   districtId: (value) {
                                     locationId = value;
+                                    print('Selected district ID: $value'); // Debug
                                   },
                                 );
                               },
@@ -344,8 +355,14 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                                 showDoctorTypeList(
                                   ctx: context,
                                   onchange: (value) {
-                                    doctorTypeController.text = value.uz;
-                                    special = value.en;
+                                    doctorTypeController.text = dataTranslate(ctx: context, model: LanguageModel(
+                                        uz: value.uz,
+                                        ru: value.ru,
+                                        en: value.en));
+                                    special = dataTranslate(ctx: context, model: LanguageModel(
+                                        uz: value.uz,
+                                        ru: value.ru,
+                                        en: value.en));;
                                     if (formKey.currentState!.validate()) {}
                                   },
                                   realType: (value) {},
@@ -374,8 +391,14 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                                 showDoctorPositionList(
                                   ctx: context,
                                   onchange: (value) {
-                                    doctorLevelController.text = value.uz;
-                                    level = value.uz;
+                                    doctorLevelController.text = dataTranslate(ctx: context, model: LanguageModel(
+                                        uz: value.uz,
+                                        ru: value.ru,
+                                        en: value.en));
+                                    level = dataTranslate(ctx: context, model: LanguageModel(
+                                        uz: value.uz,
+                                        ru: value.ru,
+                                        en: value.en));;
                                     if (formKey.currentState!.validate()) {}
                                   },
                                 );

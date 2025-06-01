@@ -10,7 +10,6 @@ import 'package:wm_doctor/features/create_template/data/model/upload_template_mo
 import 'package:wm_doctor/features/create_template/presentation/cubit/create_template_cubit.dart';
 import 'package:wm_doctor/features/home/data/model/PreparationModel.dart';
 import 'package:wm_doctor/features/medicine/presentation/cubit/medicine_cubit.dart';
-import 'package:wm_doctor/features/medicine/presentation/page/mnn_dialog.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/services/secure_storage.dart';
@@ -18,6 +17,7 @@ import '../../../../core/widgets/export.dart';
 import '../../../../core/widgets/number_picker.dart';
 import '../../../../gen/locale_keys.g.dart';
 import '../../../home/data/model/template_model.dart';
+import '../../../home/presentation/cubit/home_cubit.dart';
 import '../../../medicine/presentation/page/medicine_dialog.dart';
 
 class PreparationContainerData {
@@ -89,6 +89,9 @@ class _CreateTemplateState extends State<CreateTemplate> {
     return BlocConsumer<CreateTemplateCubit, CreateTemplateState>(
       listener: (context, state) {
         if (state is CreateTemplateUploadSuccess) {
+          context
+              .read<HomeCubit>()
+              .getTemplate(saved: "", sortBy: "", searchText: "");
           setState(() {
             templateName = "";
             diagnosis.text = "";
@@ -103,6 +106,9 @@ class _CreateTemplateState extends State<CreateTemplate> {
           });
         }
         if (state is CreateTemplateUploadError) {
+          context
+              .read<HomeCubit>()
+              .getTemplate(saved: "", sortBy: "", searchText: "");
           toastification.show(
             style: ToastificationStyle.flat,
             context: context,
@@ -115,6 +121,9 @@ class _CreateTemplateState extends State<CreateTemplate> {
             foregroundColor: Colors.white,
           );
         } else if (state is CreateTemplateGetMedicineError) {
+          context
+              .read<HomeCubit>()
+              .getTemplate(saved: "", sortBy: "", searchText: "");
           toastification.show(
             style: ToastificationStyle.flat,
             context: context,
@@ -126,7 +135,9 @@ class _CreateTemplateState extends State<CreateTemplate> {
             backgroundColor: Colors.redAccent,
             foregroundColor: Colors.white,
           );
-        } else if (state is CreateTemplateGetMedicineSuccess) {
+        } else if (state is CreateTemplateGetMedicineSuccess) {context
+            .read<HomeCubit>()
+            .getTemplate(saved: "", sortBy: "", searchText: "");
           setState(() {
             print("Received medicines: ${state.list}");
             medicineList = state.list;
@@ -143,6 +154,9 @@ class _CreateTemplateState extends State<CreateTemplate> {
       },
       builder: (context, state) {
         if (state is CreateTemplateUploadLoading) {
+          context
+              .read<HomeCubit>()
+              .getTemplate(saved: "", sortBy: "", searchText: "");
           return const Scaffold(body: Center(child: CircularProgressIndicator()));
         }
         return Scaffold(
@@ -160,20 +174,6 @@ class _CreateTemplateState extends State<CreateTemplate> {
                 color: Colors.black,
               ),
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text(
-                  LocaleKeys.texts_back.tr(),
-                  style:  TextStyle(
-                    fontFamily: 'VelaSans',
-                    fontWeight: FontWeight.w600,
-                    fontSize: Dimens.space16,
-                    color: AppColors.blueColor,
-                  ),
-                ),
-              ).paddingOnly(right: Dimens.space20),
-            ],
           ),
           body: SingleChildScrollView(
             child: Form(
@@ -290,6 +290,9 @@ class _CreateTemplateState extends State<CreateTemplate> {
                   UniversalButton.filled(
                     text: LocaleKeys.create_template_save_template.tr(),
                     onPressed: () async {
+                      print("DATA: ${preparationContainersData.length}");
+                      print("MNN: ${preparationContainersData.first.selectedMNNs.length}");
+                      print("Medicine: ${preparationContainersData.first.selectedPreparations.length}");
                       if (formKey.currentState!.validate()) {
                         if (preparationContainersData.every((e) => e.preparation.name.isEmpty)) {
                           toastification.show(
@@ -319,8 +322,7 @@ class _CreateTemplateState extends State<CreateTemplate> {
                             type: e.preparation.type,
                             medicineId: e.preparation.medicineId,
                             medicine: MedicineModel(id: e.preparation.medicineId),
-                          ))
-                              .toList();
+                          )).toList();
 
                           if (widget.model != null) {
                             context.read<CreateTemplateCubit>().updateTemplate(
@@ -366,7 +368,10 @@ class _CreateTemplateState extends State<CreateTemplate> {
                               backgroundColor: Colors.green,
                               foregroundColor: Colors.white,
                             );
-                            Navigator.pop(context);
+                            Navigator.pop(context,true);
+                            print("DATA: ${preparationContainersData.length}");
+                            print("MNN: ${preparationContainersData.first.selectedMNNs.length}");
+                            print("Medicine: ${preparationContainersData.first.selectedPreparations.length}");
                           }
                         }
                       }
@@ -456,60 +461,6 @@ class _CreateTemplateState extends State<CreateTemplate> {
             spacing: Dimens.space10,
             children: [
                SizedBox(height: 5),
-              UniversalButton.filled(
-                text: LocaleKeys.create_recep_select_mnn.tr(),
-                onPressed: () => showMNN(
-                  ctx: context,
-                  model: (value) {
-                    if (mounted) {
-                      setState(() {});
-                    }
-                    Navigator.pop(context);
-                  },
-                  mnn: [],
-                  initialSelectedItems: containerData.selectedMNNs,
-                  onSelectionComplete: (updatedList) async {
-                    if (mounted) {
-                      print("Setting lastAddIndex to $index");
-                      lastAddIndex = index;
-                      context.read<CreateTemplateCubit>().getMedicine(inn: updatedList);
-                      setState(() {
-                        containerData.selectedMNNs = updatedList;
-                        preparationContainers[index] = buildPreparationContainer(index);
-                      });
-                    }
-                  },
-                ),
-                fontSize: Dimens.space14,
-                backgroundColor: AppColors.backgroundColor,
-                textColor: Colors.black,
-                cornerRadius: Dimens.space10,
-              ),
-              containerData.selectedMNNs.isNotEmpty
-                  ? Wrap(
-                spacing: 8.0,
-                runSpacing: 8.0,
-                crossAxisAlignment: WrapCrossAlignment.start,
-                children: containerData.selectedMNNs
-                    .map((mnn) => Chip(
-                  label: Text(
-                    mnn.name ?? "null",
-                    style: const TextStyle(color: Colors.black),
-                  ),
-                  deleteIcon: const Icon(Icons.remove_circle),
-                  deleteIconColor: AppColors.redAccent,
-                  backgroundColor: AppColors.backgroundColor,
-                  side: BorderSide.none,
-                  onDeleted: () {
-                    setState(() {
-                      containerData.selectedMNNs.remove(mnn);
-                      preparationContainers[index] = buildPreparationContainer(index);
-                    });
-                  },
-                ))
-                    .toList(),
-              )
-                  : const SizedBox.shrink(),
               Container(
                 decoration: BoxDecoration(
                   color: AppColors.backgroundColor,
@@ -538,78 +489,70 @@ class _CreateTemplateState extends State<CreateTemplate> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        print("Tapped Select Medicine for index: $index");
-                        print("Container medicineList: ${containerData.medicineList}");
-                        print("medicineList: ${medicineList.first.name}");
-
-                          if (medicineList.isEmpty) {
-                            print("Warning: Medicine list is empty for index $index");
-                            toastification.show(
-                              style: ToastificationStyle.flat,
-                              context: context,
-                              alignment: Alignment.topCenter,
-                              title: const Text("No medicines available to select"),
-                              autoCloseDuration: const Duration(seconds: 2),
-                              showProgressBar: false,
-                              primaryColor: Colors.white,
-                              backgroundColor: Colors.redAccent,
-                              foregroundColor: Colors.white,
-                            );
-                            return;
-                          }
-                          try {
-                            showMedicine(
-                              ctx: context,
-                              model: (value) {
-                                if (value != null) {
-                                  setState(() {
-                                    containerData = containerData.copyWith(
-                                      preparation: PreparationModel(
-                                        name: value.name ?? "Unknown",
-                                        amount: "${value.prescription ?? ''} ${value.volume ?? ''}".trim(),
-                                        quantity: 1,
-                                        timesInDay: 1,
-                                        days: 1,
-                                        inn: value.inn,
-                                        type: value.type ?? "Unknown",
-                                        medicineId: value.id ?? 0,
-                                      ),
-                                      selectedPreparations: [
-                                        PreparationModel(
-                                          name: value.name ?? "Unknown",
-                                          amount: "${value.prescription ?? ''} ${value.volume ?? ''}".trim(),
-                                          quantity: 1,
-                                          timesInDay: 1,
-                                          days: 1,
-                                          inn: value.inn,
-                                          type: value.type ?? "Unknown",
-                                          medicineId: value.id ?? 0,
-                                        ),
-                                      ],
-                                    );
-                                    preparationContainersData[index] = containerData;
-                                    preparationContainers[index] = buildPreparationContainer(index);
-                                  });
-                                }
-                                Navigator.pop(context);
-                              },
-                              medicine: medicineList,
-                            );
-                          } catch (e) {
-                            print("Error showing medicine dialog: $e");
-                            toastification.show(
-                              style: ToastificationStyle.flat,
-                              context: context,
-                              alignment: Alignment.topCenter,
-                              title: const Text("Error displaying medicines"),
-                              autoCloseDuration: const Duration(seconds: 2),
-                              showProgressBar: false,
-                              primaryColor: Colors.white,
-                              backgroundColor: Colors.redAccent,
-                              foregroundColor: Colors.white,
-                            );
-                          }
-                        },
+                        if (medicineList.isEmpty) {
+                          toastification.show(
+                            style: ToastificationStyle.flat,
+                            context: context,
+                            alignment: Alignment.topCenter,
+                            title: const Text("No medicines available to select"),
+                            autoCloseDuration: const Duration(seconds: 2),
+                            showProgressBar: false,
+                            primaryColor: Colors.white,
+                            backgroundColor: Colors.redAccent,
+                            foregroundColor: Colors.white,
+                          );
+                          return;
+                        }
+                        try {
+                          showMedicine(
+                            ctx: context,
+                            model: (value) {
+                              setState(() {
+                                containerData = containerData.copyWith(
+                                  preparation: PreparationModel(
+                                    name: value.name ?? "Unknown",
+                                    amount: "${value.prescription ?? ''} ${value.volume ?? ''}".trim(),
+                                    quantity: 1,
+                                    timesInDay: 1,
+                                    days: 1,
+                                    inn: value.inn,
+                                    type: value.type ?? "Unknown",
+                                    medicineId: value.id ?? 0,
+                                  ),
+                                  selectedPreparations: [
+                                    PreparationModel(
+                                      name: value.name ?? "Unknown",
+                                      amount: "${value.prescription ?? ''} ${value.volume ?? ''}".trim(),
+                                      quantity: 1,
+                                      timesInDay: 1,
+                                      days: 1,
+                                      inn: value.inn,
+                                      type: value.type ?? "Unknown",
+                                      medicineId: value.id ?? 0,
+                                    ),
+                                  ],
+                                );
+                                preparationContainersData[index] = containerData;
+                                preparationContainers[index] = buildPreparationContainer(index);
+                              });
+                              Navigator.pop(context);
+                            },
+                            medicine: medicineList,
+                          );
+                        } catch (e) {
+                          toastification.show(
+                            style: ToastificationStyle.flat,
+                            context: context,
+                            alignment: Alignment.topCenter,
+                            title: const Text("Error displaying medicines"),
+                            autoCloseDuration: const Duration(seconds: 2),
+                            showProgressBar: false,
+                            primaryColor: Colors.white,
+                            backgroundColor: Colors.redAccent,
+                            foregroundColor: Colors.white,
+                          );
+                        }
+                      },
                       child: SvgPicture.asset(
                         containerData.selectedPreparations.isEmpty
                             ? "assets/icons/plus.svg"
@@ -774,80 +717,18 @@ class _CreateTemplateState extends State<CreateTemplate> {
     );
   }
 
-  void showMedicine({
-    required BuildContext ctx,
-    required Function(MedicineModel?) model,
-    required List<MedicineModel> medicine,
-  }) {
-    showModalBottomSheet(
-      isScrollControlled: true,
-      enableDrag: true,
-      showDragHandle: true,
-      context: ctx,
-      builder: (context) {
-        return Container(
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.8,
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  "Select Medicine",
-                  style:  TextStyle(
-                    fontFamily: 'VelaSans',
-                    fontSize: Dimens.space18,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                if (medicine.isEmpty)
-                  Padding(
-                    padding:  EdgeInsets.all(Dimens.space20),
-                    child: Text(
-                      "No medicines available",
-                      style:  TextStyle(
-                        fontFamily: 'VelaSans',
-                        fontSize: Dimens.space16,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  )
-                else
-                  ...medicine.map((med) => ListTile(
-                    title: Text(
-                      med.name ?? "Unknown",
-                      style:  TextStyle(
-                        fontFamily: 'VelaSans',
-                        fontSize: Dimens.space16,
-                      ),
-                    ),
-                    subtitle: Text(
-                      "${med.prescription ?? ''} ${med.volume ?? ''}".trim(),
-                      style:  TextStyle(
-                        fontFamily: 'VelaSans',
-                        fontSize: Dimens.space14,
-                        color: Colors.grey,
-                      ),
-                    ),
-                    onTap: () {
-                      model(med);
-                    },
-                  )),
-                 SizedBox(height: Dimens.space20),
-              ],
-            ).paddingOnly(
-              left: Dimens.space20,
-              right: Dimens.space20,
-              top: Dimens.space20,
-              bottom: MediaQuery.of(context).viewInsets.bottom,
-            ),
-          ),
-        );
-      },
-    );
-  }
 
+  void removePreparationContainer() {
+    setState(() {
+      if (preparationContainers.isNotEmpty) {
+        preparationContainers.removeAt(preparationContainers.length - 1);
+        if (preparationContainersData.isNotEmpty) {
+          preparationContainersData
+              .removeAt(preparationContainersData.length - 1);
+        }
+      }
+    });
+  }
   void showInputAmount({
     required String name,
     required double amount,
@@ -901,7 +782,7 @@ class _CreateTemplateState extends State<CreateTemplate> {
                   }
                 },
               ),
-               SizedBox(height: Dimens.space50),
+              SizedBox(height: Dimens.space50),
             ],
           ).paddingOnly(
             left: Dimens.space30,
@@ -912,48 +793,5 @@ class _CreateTemplateState extends State<CreateTemplate> {
         );
       },
     );
-  }
-
-  void showMedicineTypeList({required ValueChanged<String> onChange}) {
-    List<String> types = ["PILLS", "TYPE2", "TYPE3"];
-    showModalBottomSheet(
-      isScrollControlled: true,
-      enableDrag: true,
-      showDragHandle: true,
-      builder: (context) {
-        return Container(
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.sizeOf(context).height * 0.8,
-          ),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: List.generate(
-                types.length,
-                    (index) => ListTile(
-                  onTap: () {
-                    onChange(types[index]);
-                    Navigator.pop(context);
-                  },
-                  title: Text(types[index]),
-                ),
-              ),
-            ).paddingOnly(bottom: Dimens.space20),
-          ),
-        );
-      },
-      context: context,
-    );
-  }
-
-  void removePreparationContainer() {
-    setState(() {
-      if (preparationContainers.isNotEmpty) {
-        preparationContainers.removeAt(preparationContainers.length - 1);
-        if (preparationContainersData.isNotEmpty) {
-          preparationContainersData.removeAt(preparationContainersData.length - 1);
-        }
-      }
-    });
   }
 }

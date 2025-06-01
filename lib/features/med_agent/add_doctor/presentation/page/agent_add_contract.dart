@@ -19,6 +19,7 @@ import 'package:wm_doctor/features/profile/presentation/cubit/profile_cubit.dart
 import 'package:wm_doctor/features/med_agent/contract/presentation/cubit/contract_cubit.dart';
 import 'package:wm_doctor/features/med_agent/home/presentation/cubit/agent_home_cubit.dart';
 import 'package:wm_doctor/features/med_agent/profile/presentation/cubit/agent_profile_data/agent_profile_data_cubit.dart';
+import 'package:wm_doctor/gen/locale_keys.g.dart';
 
 import '../../../../regions/presentation/cubit/regions_cubit.dart';
 import 'doctors_dialog.dart';
@@ -61,6 +62,7 @@ class _AgentAddContractState extends State<AgentAddContract> {
   String locationDTO = "";
   String workplaceDTO = "";
   String special = "";
+  bool remember = false;
   String level = "";
   final formKey = GlobalKey<FormState>();
   List<String> contractTypesList = ["KZ", "SU", "SB", "GZ", "RECIPE"];
@@ -105,7 +107,7 @@ class _AgentAddContractState extends State<AgentAddContract> {
       appBar: AppBar(
         forceMaterialTransparency: true,
         automaticallyImplyLeading: false,
-        title: Text("Добавить договор",
+        title: Text(LocaleKeys.med_add_doctor_contract_title.tr(),
             style: TextStyle(
                 fontWeight: FontWeight.bold, fontSize: Dimens.space28)),
         actions: [
@@ -114,7 +116,7 @@ class _AgentAddContractState extends State<AgentAddContract> {
                 Navigator.pop(context);
               },
               child: Text(
-                "Назад",
+                LocaleKeys.med_add_doctor_back.tr(),
                 style: TextStyle(
                     color: Colors.blueAccent,
                     fontSize: Dimens.space18,
@@ -125,6 +127,8 @@ class _AgentAddContractState extends State<AgentAddContract> {
       ),
       body: BlocConsumer<AddDoctorCubit, AddDoctorState>(
         listener: (context, state) {
+          print("success bo'ldi =================");
+
           if (state is AddDoctorSuccess) {
             if (kDebugMode) {
               print("success bo'ldi =================");
@@ -199,7 +203,8 @@ class _AgentAddContractState extends State<AgentAddContract> {
                               return null;
                             },
                             controller: nameController,
-                            hintText: "Выберите врача",
+                            hintText:
+                                LocaleKeys.med_add_doctor_select_doctor.tr(),
                             suffixIcon: Icon(
                               CupertinoIcons.chevron_down,
                               color: Colors.black,
@@ -235,20 +240,22 @@ class _AgentAddContractState extends State<AgentAddContract> {
                         AppTextField(
                           textColor: Colors.black,
                           controller: doctorTypeController,
-                          hintText: "Специальность",
+                          hintText:
+                              LocaleKeys.med_add_doctor_select_speciality.tr(),
                           hintColor: Colors.black87,
                           isEnabled: false,
                         ),
                         AppTextField(
                           textColor: Colors.black,
                           controller: doctorLevelController,
-                          hintText: "Должность",
+                          hintText:
+                              LocaleKeys.med_add_doctor_select_position.tr(),
                           hintColor: Colors.black87,
                           isEnabled: false,
                         ),
                         SizedBox(),
                         Text(
-                          "Контактные данные врача",
+                          LocaleKeys.med_add_doctor_info_doctor.tr(),
                           style: TextStyle(
                               fontWeight: FontWeight.w600,
                               fontSize: Dimens.space18),
@@ -283,50 +290,6 @@ class _AgentAddContractState extends State<AgentAddContract> {
                             controller: numberController,
                             textColor: Colors.black,
                             hintText: "90 123 45 67"),
-
-                        ///Password
-                        // Text(
-                        //   "Временный пароль",
-                        //   style: TextStyle(
-                        //       fontWeight: FontWeight.w600,
-                        //       fontSize: Dimens.space18),
-                        // ),
-                        // AppTextField(
-                        //   validator: (value) {
-                        //     if (value.toString().isEmpty) {
-                        //       return "---------";
-                        //     }
-                        //     return null;
-                        //   },
-                        //   controller: passwordController,
-                        //   hintText: "********",
-                        //   suffixIcon: Row(
-                        //     mainAxisSize: MainAxisSize.min,
-                        //     spacing: Dimens.space10,
-                        //     children: [
-                        //       GestureDetector(
-                        //           onTap: () {
-                        //             passwordController.text = generatePassword();
-                        //             setState(() {});
-                        //           },
-                        //           child: SvgPicture.asset(Assets.icons.repeat)),
-                        //       GestureDetector(
-                        //           onTap: () {
-                        //             if (passwordController.text.isNotEmpty) {
-                        //               Clipboard.setData(ClipboardData(
-                        //                   text: passwordController.text));
-                        //               ScaffoldMessenger.of(context)
-                        //                   .showSnackBar(const SnackBar(
-                        //                 content: Text('Скопировано'),
-                        //                 duration: Duration(seconds: 1),
-                        //               ));
-                        //             }
-                        //           },
-                        //           child: SvgPicture.asset(Assets.icons.copy)),
-                        //       SizedBox(width: Dimens.space5),
-                        //     ],
-                        //   ),
-                        // ),
                       ],
                     ),
                   ),
@@ -340,7 +303,7 @@ class _AgentAddContractState extends State<AgentAddContract> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Text(
-                          "Тип Контракта",
+                          LocaleKeys.med_add_doctor_contract_type.tr(),
                           style: TextStyle(
                               fontWeight: FontWeight.w600,
                               fontSize: Dimens.space18),
@@ -354,7 +317,8 @@ class _AgentAddContractState extends State<AgentAddContract> {
                           child: DropdownButtonHideUnderline(
                             child: DropdownButton<String>(
                               hint: Text(
-                                "Select Contract Type",
+                                LocaleKeys.med_add_doctor_contract_type_hint
+                                    .tr(),
                                 style: TextStyle(
                                     fontSize: 16, color: Colors.grey[600]),
                               ),
@@ -400,11 +364,35 @@ class _AgentAddContractState extends State<AgentAddContract> {
                       spacing: Dimens.space10,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Text(
-                          "Пакет",
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: Dimens.space18),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              LocaleKeys.med_add_doctor_packs.tr(),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: Dimens.space18),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  remember = !remember;
+                                  print(remember);
+                                });
+                              },
+                              child: Container(
+                                padding: EdgeInsets.all(10),
+                                child: Icon(
+                                  remember
+                                      ? CupertinoIcons.bookmark_fill
+                                      : CupertinoIcons.bookmark,
+                                  color: remember
+                                      ? CupertinoColors.activeBlue
+                                      : CupertinoColors.systemGrey,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                         GestureDetector(
                           onTap: () {
@@ -422,7 +410,8 @@ class _AgentAddContractState extends State<AgentAddContract> {
                                     onChange: (v) {
                                       selectedPreparations.add(value1);
                                       preparations.remove(value1);
-                                      quantity.add(int.parse(amountController.text));
+                                      quantity.add(
+                                          int.parse(amountController.text));
                                       preparations.last.quantity = v;
                                       if (formKey.currentState!.validate()) {}
                                       calculate();
@@ -440,7 +429,8 @@ class _AgentAddContractState extends State<AgentAddContract> {
                               return null;
                             },
                             controller: recipeController,
-                            hintText: "Выберите препарат",
+                            hintText:
+                                LocaleKeys.med_add_doctor_select_pack.tr(),
                             suffixIcon: Icon(
                               CupertinoIcons.add_circled_solid,
                               color: Colors.blueAccent,
@@ -468,6 +458,8 @@ class _AgentAddContractState extends State<AgentAddContract> {
                                   GestureDetector(
                                       onTap: () {
                                         setState(() {
+                                          preparations
+                                              .add(selectedPreparations[index]);
                                           selectedPreparations.removeAt(index);
                                         });
                                       },
@@ -523,7 +515,7 @@ class _AgentAddContractState extends State<AgentAddContract> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Условия пакета",
+                            LocaleKeys.med_add_doctor_pack_required.tr(),
                             style: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: Dimens.space18),
@@ -555,7 +547,7 @@ class _AgentAddContractState extends State<AgentAddContract> {
                                 return null;
                               },
                               isEnabled: false,
-                              title: "Дата начала",
+                              title: LocaleKeys.med_add_doctor_data_start.tr(),
                               titleStyle: TextStyle(
                                   fontSize: Dimens.space14,
                                   fontWeight: FontWeight.bold),
@@ -597,7 +589,7 @@ class _AgentAddContractState extends State<AgentAddContract> {
                                 return null;
                               },
                               isEnabled: false,
-                              title: "Дата окончания",
+                              title: LocaleKeys.med_add_doctor_data_finish.tr(),
                               titleStyle: TextStyle(
                                   fontSize: Dimens.space14,
                                   color: Colors.black,
@@ -628,7 +620,7 @@ class _AgentAddContractState extends State<AgentAddContract> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text("Шаги"),
+                          Text(LocaleKeys.med_add_doctor_step.tr()),
                           Text(allQuote.toString()),
                         ],
                       ),
@@ -639,112 +631,93 @@ class _AgentAddContractState extends State<AgentAddContract> {
                     builder: (context, state) {
                       return UniversalButton.filled(
                           cornerRadius: Dimens.space20,
-                          text: "Зарегистрировать врача",
+                          text: LocaleKeys.med_add_doctor_register.tr(),
                           onPressed: () {
                             if (nameController.text.isNotEmpty) {
-                                if (selectedPreparations.length > 4) {
-                                  if (fromDateController.text.isNotEmpty &&
-                                      toDateController.text.isNotEmpty) {
-                                    final names = nameController.text.split(
-                                        " ");
-                                    context.read<AddDoctorCubit>().addDoctor(
-                                        doctor: DoctorModel(
-                                            firstName: names[0],
-                                            lastName:
-                                            names.length > 1 ? names[1] : "",
-                                            middleName:
-                                            names.length > 2 ? names[2] : "",
-                                            email: emailController.text.trim(),
-                                            role: "DOCTOR",
-                                            password:
-                                            passwordController.text.trim(),
-                                            phoneNumber: numberController.text
-                                                .trim()
-                                                .replaceAll(" ", ""),
-                                            phonePrefix: "998",
-                                            number:
-                                            "998${numberController.text
-                                                .trim()
-                                                .replaceAll(" ", "")}",
-                                            workPlaceId: workplaceId,
-                                            birthDate: "2000-01-01",
-                                            gender: "MALE",
-                                            fieldName: special.toUpperCase(),
-                                            position: level,
-                                            districtId: locationId),
-                                        contract: AddContractModel(
-                                          doctorId: doctorID,
-                                          startDate:
-                                          fromDateController.text.toString(),
-                                          endDate:
-                                          toDateController.text.toString(),
-                                          agentId: "",
-                                          contractType: selectedContractType,
-                                          agentContractId: agentContractId,
-                                          medicineWithQuantityDoctorDTOS:
-                                          List.generate(
-                                            selectedPreparations.length,
-                                                (index) {
-                                              return MedicineWithQuantityDoctorDTOS(
-                                                  medicineId:
-                                                  selectedPreparations[index]
-                                                      .id ??
-                                                      0,
-                                                  quote: quantity[index]);
-                                            },
-                                          ),
+                              if (selectedPreparations.length > 4) {
+                                if (fromDateController.text.isNotEmpty &&
+                                    toDateController.text.isNotEmpty) {
+                                  final names = nameController.text.split(" ");
+                                  context.read<AddDoctorCubit>().addDoctor(
+                                      doctor: DoctorModel(
+                                          firstName: names[0],
+                                          lastName:
+                                              names.length > 1 ? names[1] : "",
+                                          middleName:
+                                              names.length > 2 ? names[2] : "",
+                                          email: emailController.text.trim(),
+                                          role: "DOCTOR",
+                                          password:
+                                              passwordController.text.trim(),
+                                          phoneNumber: numberController.text
+                                              .trim()
+                                              .replaceAll(" ", ""),
+                                          phonePrefix: "998",
+                                          number:
+                                              "998${numberController.text.trim().replaceAll(" ", "")}",
+                                          workPlaceId: workplaceId,
+                                          birthDate: "2000-01-01",
+                                          gender: "MALE",
+                                          fieldName: special.toUpperCase(),
+                                          position: level,
+                                          districtId: locationId),
+                                      contract: AddContractModel(
+                                        doctorId: doctorID,
+                                        startDate:
+                                            fromDateController.text.toString(),
+                                        endDate:
+                                            toDateController.text.toString(),
+                                        agentId: "",
+                                        contractType: selectedContractType,
+                                        agentContractId: agentContractId,
+                                        medicineWithQuantityDoctorDTOS:
+                                            List.generate(
+                                          selectedPreparations.length,
+                                          (index) {
+                                            return MedicineWithQuantityDoctorDTOS(
+                                                medicineId:
+                                                    selectedPreparations[index]
+                                                            .id ??
+                                                        0,
+                                                quote: quantity[index]);
+                                          },
                                         ),
-                                        isCreateDoctor: isCreateDoctor,
-                                        doctorId: doctorID);
-                                    agentContractId++;
-                                    resetForm();
-                                    showDialog(
-                                        context: context,
-                                        builder: (context) {
-                                          return AlertDialog(
-                                            title: Text("Успешно",
-                                                style: TextStyle(
-                                                    color: Colors.greenAccent)),
-                                            content: Text(
-                                              "Вы успешно добавили договра в систему",
-                                            ),
-                                          );
-                                        });
-                                  }
-                                  else {
-                                    showDialog(
-                                        context: context,
-                                        builder: (context) {
-                                          return AlertDialog(
-                                            title: Text("Ошибка",
-                                                style: TextStyle(
-                                                    color: Colors.redAccent)),
-                                            content: Text(
-                                              "Для регистрации врача необходимо заполнить все поля",
-                                              style: TextStyle(fontSize: 16),
-                                            ),
-                                            actions: [
-                                              TextButton(
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                },
-                                                child: Text("Ок"),
-                                              ),
-                                            ],
-                                          );
-                                        });
-                                  }
-                                }
-                                else {
+                                      ),
+                                      isCreateDoctor: isCreateDoctor,
+                                      doctorId: doctorID);
+                                  agentContractId++;
+                                  resetForm(remember);
                                   showDialog(
                                       context: context,
                                       builder: (context) {
                                         return AlertDialog(
-                                          title: Text("Ошибка",
+                                          title: Text(
+                                              LocaleKeys
+                                                  .med_add_doctor_success_title
+                                                  .tr(),
+                                              style: TextStyle(
+                                                  color: Colors.greenAccent)),
+                                          content: Text(
+                                            LocaleKeys
+                                                .med_add_doctor_success_text
+                                                .tr(),
+                                          ),
+                                        );
+                                      });
+                                } else {
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return AlertDialog(
+                                          title: Text(
+                                              LocaleKeys
+                                                  .med_add_doctor_error_title
+                                                  .tr(),
                                               style: TextStyle(
                                                   color: Colors.redAccent)),
                                           content: Text(
-                                            "Для регистрации врача необходимо заполнить все поля и добавить минимум 5 препаратов",
+                                            LocaleKeys.med_add_doctor_error_text
+                                                .tr(),
                                             style: TextStyle(fontSize: 16),
                                           ),
                                           actions: [
@@ -759,15 +732,50 @@ class _AgentAddContractState extends State<AgentAddContract> {
                                       });
                                 }
                               } else {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        title: Text(
+                                            LocaleKeys
+                                                .med_add_doctor_error_title
+                                                .tr(),
+                                            style: TextStyle(
+                                                color: Colors.redAccent)),
+                                        content: Text(
+                                          LocaleKeys
+                                              .med_add_doctor_error_text_prep
+                                              .tr(),
+                                          style: TextStyle(fontSize: 16),
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: Text(LocaleKeys
+                                                .med_add_doctor_ok
+                                                .tr()),
+                                          ),
+                                        ],
+                                      );
+                                    });
+                              }
+                            } else {
                               showDialog(
                                   context: context,
                                   builder: (context) {
                                     return AlertDialog(
-                                      title: Text("Выберите врача",
+                                      title: Text(
+                                          LocaleKeys
+                                              .med_add_doctor_select_doctor
+                                              .tr(),
                                           style: TextStyle(
                                               color: Colors.redAccent)),
                                       content: Text(
-                                        "Для регистрации врача выберите врача",
+                                        LocaleKeys
+                                            .med_add_doctor_error_text_doctor
+                                            .tr(),
                                         style: TextStyle(fontSize: 16),
                                       ),
                                       actions: [
@@ -885,8 +893,8 @@ class _AgentAddContractState extends State<AgentAddContract> {
           child: Column(
             children: [
               const SizedBox(height: 30),
-              const Text(
-                "Выберите дату",
+              Text(
+                LocaleKeys.sign_up_select_date.tr(),
                 style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -908,8 +916,8 @@ class _AgentAddContractState extends State<AgentAddContract> {
                 ),
               ),
               CupertinoButton(
-                child: const Text(
-                  "Готово",
+                child: Text(
+                  LocaleKeys.texts_ready.tr(),
                   style: TextStyle(
                       color: Colors.black, fontWeight: FontWeight.w600),
                 ),
@@ -967,20 +975,35 @@ class _AgentAddContractState extends State<AgentAddContract> {
     setState(() {});
   }
 
-  void resetForm() {
+  void resetForm(bool save) {
     // Clear all TextEditingControllers
-    nameController.clear();
-    addressController.clear();
-    workplaceController.clear();
-    doctorTypeController.clear();
-    doctorLevelController.clear();
-    emailController.clear();
-    numberController.clear();
-    passwordController.clear();
-    fromDateController.clear();
-    toDateController.clear();
-    recipeController.clear();
-    amountController.clear();
+    if (save) {
+      nameController.clear();
+      addressController.clear();
+      workplaceController.clear();
+      doctorTypeController.clear();
+      doctorLevelController.clear();
+      emailController.clear();
+      numberController.clear();
+      passwordController.clear();
+      fromDateController.clear();
+      toDateController.clear();
+    } else {
+      nameController.clear();
+      addressController.clear();
+      workplaceController.clear();
+      doctorTypeController.clear();
+      doctorLevelController.clear();
+      emailController.clear();
+      numberController.clear();
+      passwordController.clear();
+      fromDateController.clear();
+      toDateController.clear();
+      selectedPreparations = [];
+      recipeController.clear();
+      amountController.clear();
+      loadMedicines();
+    }
 
     // Reset numbers to their initial values
     allQuote = 0;
@@ -990,8 +1013,6 @@ class _AgentAddContractState extends State<AgentAddContract> {
     agentContractId = 1; // Initial value was 1
 
     // Clear lists
-    selectedPreparations = [];
-    quantity = [];
 
     // Reset custom objects and strings to their initial values
     location = LanguageModel(uz: "", ru: "", en: "");

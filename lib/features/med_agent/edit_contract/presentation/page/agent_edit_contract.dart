@@ -1,14 +1,17 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wm_doctor/core/extensions/widget_extensions.dart';
 import 'package:wm_doctor/core/model/language_model.dart';
 import 'package:wm_doctor/features/create_template/data/model/medicine_model.dart';
+import 'package:wm_doctor/features/home/presentation/page/HomePage.dart';
 import 'package:wm_doctor/features/med_agent/edit_contract/data/model/edit_model.dart';
 import 'package:wm_doctor/features/med_agent/edit_contract/data/model/edit_upload_model.dart';
 import 'package:wm_doctor/features/med_agent/edit_contract/presentation/cubit/edit_contract_cubit.dart';
 import '../../../../../core/utils/dependencies_injection.dart';
 import '../../../../../core/widgets/export.dart';
+import '../../../../../gen/locale_keys.g.dart';
 import '../../../../auth/sign_up/data/model/workplace_model.dart';
 import '../../../../medicine/data/repository/medicine_repository_impl.dart';
 import '../../../../medicine/presentation/page/medicine_dialog.dart';
@@ -29,13 +32,13 @@ class AgentEditContract extends StatefulWidget {
 
   const AgentEditContract(
       {super.key,
-        this.profileModel,
-        this.workplaceModel,
-        this.contractId,
-        this.doctorStatsModel,
-        this.outContractModel,
-        required this.model,
-        this.districtModel});
+      this.profileModel,
+      this.workplaceModel,
+      this.contractId,
+      this.doctorStatsModel,
+      this.outContractModel,
+      required this.model,
+      this.districtModel});
 
   @override
   State<AgentEditContract> createState() => _AgentEditContractState();
@@ -61,8 +64,6 @@ class _AgentEditContractState extends State<AgentEditContract> {
   double allQuote = 0;
   final formKey = GlobalKey<FormState>();
 
-
-
   @override
   void initState() {
     location = LanguageModel(
@@ -78,22 +79,19 @@ class _AgentEditContractState extends State<AgentEditContract> {
     if (widget.profileModel != null) {
       medicine = List.generate(
         widget.profileModel?.medicineWithQuantityDoctorDTOS.length ?? 0,
-            (index) {
+        (index) {
           return EditContractModel(
               name: widget.profileModel?.medicineWithQuantityDoctorDTOS[index]
-                  .medicine.name ??
+                      .medicine.name ??
                   "",
               id: widget.profileModel?.medicineWithQuantityDoctorDTOS[index]
-                  .medicine.id ??
+                      .medicine.id ??
                   0,
               quantity: widget.profileModel
-                  ?.medicineWithQuantityDoctorDTOS[index].quote ??
+                      ?.medicineWithQuantityDoctorDTOS[index].quote ??
                   0,
-              selled: widget
-                  .profileModel
-                  ?.medicineWithQuantityDoctorDTOS[index]
-                  .contractMedicineDoctorAmount
-                  .amount ??
+              selled: widget.profileModel?.medicineWithQuantityDoctorDTOS[index]
+                      .contractMedicineDoctorAmount.amount ??
                   0);
         },
       );
@@ -102,18 +100,20 @@ class _AgentEditContractState extends State<AgentEditContract> {
     loadMedicines();
     super.initState();
   }
+
   Future<void> loadMedicines() async {
     final result = await medicineRepositoryImpl.getMedicine();
     result.fold(
-          (failure) {
+      (failure) {
         if (kDebugMode) {
           print('Error: ${failure.errorMsg}');
         }
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to load medicines: ${failure.errorMsg}')),
+          SnackBar(
+              content: Text('Failed to load medicines: ${failure.errorMsg}')),
         );
       },
-          (list) {
+      (list) {
         setState(() {
           preparations = list;
           _updateSelectedPreparations();
@@ -128,7 +128,7 @@ class _AgentEditContractState extends State<AgentEditContract> {
       final updatedQuantities = <int>[];
       for (var selected in selectedPreparations) {
         final matchingMedicine = preparations.firstWhere(
-              (medicine) => medicine.id == selected.id,
+          (medicine) => medicine.id == selected.id,
           orElse: () => selected,
         );
         updatedPreparations.add(matchingMedicine);
@@ -150,9 +150,9 @@ class _AgentEditContractState extends State<AgentEditContract> {
         forceMaterialTransparency: true,
         automaticallyImplyLeading: false,
         title: Text(
-          "Изменить договор",
+          LocaleKeys.med_add_doctor_edit_contract.tr(),
           style:
-          TextStyle(fontWeight: FontWeight.bold, fontSize: Dimens.space24),
+              TextStyle(fontWeight: FontWeight.bold, fontSize: Dimens.space24),
         ),
         actions: [
           TextButton(
@@ -160,7 +160,7 @@ class _AgentEditContractState extends State<AgentEditContract> {
                 Navigator.pop(context);
               },
               child: Text(
-                "Назад",
+                LocaleKeys.med_add_doctor_back.tr(),
                 style: TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: Dimens.space18,
@@ -173,13 +173,12 @@ class _AgentEditContractState extends State<AgentEditContract> {
       ),
       body: BlocConsumer<EditContractCubit, EditContractState>(
         listener: (context, state) {
-          if(state is EditContractSuccess){
-            Navigator.pop(context);
+          if (state is EditContractSuccess) {
             Navigator.pop(context);
           }
         },
         builder: (context, state) {
-          if(state is EditContractLoading){
+          if (state is EditContractLoading) {
             return Center(
               child: CircularProgressIndicator(),
             );
@@ -211,23 +210,15 @@ class _AgentEditContractState extends State<AgentEditContract> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text("Регион: ${widget.districtModel?.name ?? 'Noma\'lum'}"),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 16,
-                        ),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: AppColors.backgroundColor,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text("Место работы: ${widget.workplaceModel?.name ?? 'Noma\'lum'}"),
+                            Text(
+                                LocaleKeys.med_add_doctor_select_region_hint.tr() + ": ",
+                                style: TextStyle(
+                                    fontSize: Dimens.space14,
+                                    fontWeight: FontWeight.bold),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                                " ${widget.districtModel?.name ?? 'Noma\'lum'}"),
                           ],
                         ),
                       ),
@@ -244,7 +235,38 @@ class _AgentEditContractState extends State<AgentEditContract> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              "Специальность: ${widget.model.fieldName?.toString() ?? 'Noma\'lum'}",
+                              LocaleKeys.med_add_doctor_select_workplace_hint.tr() + ": ",
+                              style: TextStyle(
+                                  fontSize: Dimens.space14,
+                                  fontWeight: FontWeight.bold),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                                " ${widget.workplaceModel?.name ?? 'Noma\'lum'}"),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 16,
+                        ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: AppColors.backgroundColor,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              LocaleKeys.med_add_doctor_select_speciality.tr() + ": ",
+                              style: TextStyle(
+                                  fontSize: Dimens.space14,
+                                  fontWeight: FontWeight.bold),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                              "${widget.model.fieldName?.toString() ?? 'Noma\'lum'}",
                               overflow: TextOverflow.fade,
                             ),
                           ],
@@ -263,7 +285,15 @@ class _AgentEditContractState extends State<AgentEditContract> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              "Имя врача: ${widget.model.firstName} ${widget.model.lastName}",
+                              LocaleKeys.med_add_doctor_name_of_doctor.tr() + ": ",
+                              style: TextStyle(
+                                  fontSize: Dimens.space14,
+                                  fontWeight: FontWeight.bold),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                              "${widget.model.firstName} ${widget.model.lastName}",
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ],
                         ),
@@ -281,31 +311,32 @@ class _AgentEditContractState extends State<AgentEditContract> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Text(
-                        "Изменить старые пакеты",
+                        LocaleKeys.med_add_doctor_edit_old_packs.tr(),
                         style: TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: Dimens.space18),
                       ),
                       ...List.generate(
                         medicine.length,
-                            (index) {
+                        (index) {
                           return Container(
                             padding: EdgeInsets.symmetric(
                                 horizontal: Dimens.space20,
                                 vertical: Dimens.space16),
                             decoration: BoxDecoration(
                                 borderRadius:
-                                BorderRadius.circular(Dimens.space10),
+                                    BorderRadius.circular(Dimens.space10),
                                 color: AppColors.backgroundColor),
                             child: Row(
                               spacing: Dimens.space10,
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Expanded(
-                                  child: Text( overflow: TextOverflow.ellipsis,
+                                  child: Text(
+                                    overflow: TextOverflow.ellipsis,
                                     medicine[index].name,
                                     style:
-                                    TextStyle(fontWeight: FontWeight.w600),
+                                        TextStyle(fontWeight: FontWeight.w600),
                                   ),
                                 ),
                                 Text("${medicine[index].quantity}"),
@@ -317,7 +348,8 @@ class _AgentEditContractState extends State<AgentEditContract> {
                                         onChange: (int value) {
                                           medicine[index].quantity = value;
                                           setState(() {});
-                                        }, min: medicine[index].selled);
+                                        },
+                                        min: medicine[index].selled);
                                   },
                                   child: SvgPicture.asset(
                                     Assets.icons.pen,
@@ -332,7 +364,6 @@ class _AgentEditContractState extends State<AgentEditContract> {
                     ],
                   ),
                 ),
-
                 Container(
                   padding: EdgeInsets.all(Dimens.space20),
                   decoration: BoxDecoration(
@@ -351,8 +382,8 @@ class _AgentEditContractState extends State<AgentEditContract> {
                           spacing: 10,
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            const Text(
-                              "Добавить новые пакеты",
+                            Text(
+                              LocaleKeys.med_add_doctor_add_new_packs.tr(),
                               style: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 18,
@@ -362,7 +393,9 @@ class _AgentEditContractState extends State<AgentEditContract> {
                               onTap: () {
                                 if (preparations.isEmpty) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text("Preparatlar mavjud emas")),
+                                    SnackBar(
+                                        content:
+                                            Text("No Data Found")),
                                   );
                                   return;
                                 }
@@ -377,11 +410,13 @@ class _AgentEditContractState extends State<AgentEditContract> {
                                       onChange: (v) {
                                         selectedPreparations.add(value);
                                         preparations.remove(value);
-                                        quantity.add(int.parse(amountController.text));
+                                        quantity.add(
+                                            int.parse(amountController.text));
                                         preparations.last.quantity = v;
                                         calculate();
                                         setState(() {});
-                                      }, min: 1,
+                                      },
+                                      min: 1,
                                     );
                                   },
                                 );
@@ -389,17 +424,18 @@ class _AgentEditContractState extends State<AgentEditContract> {
                               child: AppTextField(
                                 textColor: Colors.black,
                                 controller: recipeController,
-                                hintText: "Выберите препарат",
+                                hintText: LocaleKeys.med_add_doctor_select_pack.tr(),
                                 suffixIcon: const Icon(
                                   CupertinoIcons.add_circled_solid,
                                   color: Colors.blueAccent,
                                 ),
                                 hintColor: Colors.black87,
                                 isEnabled: false,
-                              ),),
+                              ),
+                            ),
                             ...List.generate(
                               selectedPreparations.length,
-                                  (index) {
+                              (index) {
                                 return Container(
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 20,
@@ -411,12 +447,14 @@ class _AgentEditContractState extends State<AgentEditContract> {
                                   ),
                                   child: Row(
                                     spacing: 10,
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       GestureDetector(
                                         onTap: () {
                                           setState(() {
-                                            selectedPreparations.removeAt(index);
+                                            selectedPreparations
+                                                .removeAt(index);
                                             quantity.removeAt(index);
                                             calculate();
                                           });
@@ -429,8 +467,10 @@ class _AgentEditContractState extends State<AgentEditContract> {
                                       ),
                                       Expanded(
                                         child: Text(
-                                          selectedPreparations[index].name ?? "",
-                                          style: const TextStyle(fontWeight: FontWeight.w600),
+                                          selectedPreparations[index].name ??
+                                              "",
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.w600),
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                       ),
@@ -438,14 +478,17 @@ class _AgentEditContractState extends State<AgentEditContract> {
                                       GestureDetector(
                                         onTap: () {
                                           showInputAmount(
-                                            name: selectedPreparations[index].name ?? "",
+                                            name: selectedPreparations[index]
+                                                    .name ??
+                                                "",
                                             amount: quantity[index],
                                             onChange: (int value) {
                                               setState(() {
                                                 quantity[index] = value;
                                                 calculate();
                                               });
-                                            }, min: 1,
+                                            },
+                                            min: 1,
                                           );
                                         },
                                         child: SvgPicture.asset(
@@ -463,7 +506,6 @@ class _AgentEditContractState extends State<AgentEditContract> {
                           ],
                         ),
                       ),
-
                     ],
                   ),
                 ),
@@ -474,7 +516,8 @@ class _AgentEditContractState extends State<AgentEditContract> {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 16),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
                       color: AppColors.backgroundColor,
@@ -482,7 +525,7 @@ class _AgentEditContractState extends State<AgentEditContract> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text("Шаги"),
+                        Text( LocaleKeys.med_add_doctor_step.tr()),
                         Text(allQuote.toStringAsFixed(2)),
                       ],
                     ),
@@ -490,26 +533,64 @@ class _AgentEditContractState extends State<AgentEditContract> {
                 ),
                 UniversalButton.filled(
                   cornerRadius: 20,
-                  text: "Предложить договор",
+                  text:  LocaleKeys.med_add_doctor_offer_contract.tr(),
                   onPressed: () {
-                      context.read<EditContractCubit>().updateContract(
-                        model: EditUploadModel(
-                          id: widget.contractId ?? 0,
-                          medicinesWithQuantities: List.generate(
-                            selectedPreparations.length,
-                                (index) => MedicinesWithQuantity(
-                              medicineId: selectedPreparations[index].id ?? 0,
-                              quote: quantity[index],
-                              agentContractId: widget.profileModel?.agentId ?? 0,
-                              contractMedicineDoctorAmount: ContractMedicineAmountEdit(
-                                id: selectedPreparations[index].id ?? 0,
-                                amount: quantity[index],
+                    context.read<EditContractCubit>().updateContract(
+                          model: EditUploadModel(
+                            id: widget.contractId ?? 0,
+                            medicinesWithQuantities: List.generate(
+                              selectedPreparations.length,
+                              (index) => MedicinesWithQuantity(
+                                medicineId: selectedPreparations[index].id ?? 0,
+                                quote: quantity[index],
+                                agentContractId:
+                                    widget.profileModel?.agentId ?? 0,
+                                contractMedicineDoctorAmount:
+                                    ContractMedicineAmountEdit(
+                                  id: selectedPreparations[index].id ?? 0,
+                                  amount: quantity[index],
+                                ),
                               ),
                             ),
                           ),
+                        );
+                    CupertinoAlertDialog(
+                      title: Text(LocaleKeys.home_delete_attention.tr(),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: Dimens.space18)),
+                      content: Text(
+                        LocaleKeys.home_exit_attention_text.tr(),
+                        style: TextStyle(fontSize: Dimens.space16),
+                      ),
+                      actions: [
+                        CupertinoDialogAction(
+                          child: Text(
+                            LocaleKeys.home_cancel.tr(),
+                            style: TextStyle(fontSize: Dimens.space14),
+                          ),
+                          onPressed: () {
+                            Navigator.of(context).pop(); // Dialogni yopish
+                          },
                         ),
-                      );
-                      // Navigator.pop(context);
+                        CupertinoDialogAction(
+                          isDefaultAction: true,
+                          child: Text(
+                            LocaleKeys.home_exit.tr(),
+                            style: TextStyle(
+                                fontSize: Dimens.space14, color: Colors.red),
+                          ),
+                          onPressed: () async {
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => HomePage()),
+                              (route) => false,
+                            );
+                          },
+                        ),
+                      ],
+                    );
                   },
                 ),
                 SizedBox(
@@ -523,12 +604,11 @@ class _AgentEditContractState extends State<AgentEditContract> {
     );
   }
 
-  void showInputAmount({
-    required String name,
-    required int amount,
-    required ValueChanged<int> onChange,
-    required min
-  }) {
+  void showInputAmount(
+      {required String name,
+      required int amount,
+      required ValueChanged<int> onChange,
+      required min}) {
     final quantForm = GlobalKey<FormState>();
     amountController.text = amount.toString();
     showModalBottomSheet(
@@ -551,7 +631,8 @@ class _AgentEditContractState extends State<AgentEditContract> {
                 ),
               ),
               AppTextField(
-                keyboardType: const TextInputType.numberWithOptions(decimal: false),
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: false),
                 validator: (value) {
                   final number = int.tryParse(value!);
                   if (value.isEmpty || number! < 1) {
@@ -566,9 +647,9 @@ class _AgentEditContractState extends State<AgentEditContract> {
               UniversalButton.filled(
                 text: "Сохранять",
                 onPressed: () {
-                    final number = int.parse(amountController.text);
-                    onChange(number);
-                    Navigator.pop(context);
+                  final number = int.parse(amountController.text);
+                  onChange(number);
+                  Navigator.pop(context);
                 },
                 fontSize: 14,
                 cornerRadius: 20,
@@ -585,6 +666,7 @@ class _AgentEditContractState extends State<AgentEditContract> {
       },
     );
   }
+
   void calculate() {
     print("asasas++++ ${selectedContractType}");
     int i = 0;

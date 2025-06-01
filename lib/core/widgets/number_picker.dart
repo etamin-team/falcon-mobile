@@ -16,7 +16,7 @@ class CupertinoNumberPicker extends StatefulWidget {
 class _CupertinoNumberPickerState extends State<CupertinoNumberPicker> {
   // Boshlang‘ich qiymat
   int selectedNumber = 1;
-  List<int> list = [for (var i = 1; i <= 999; i++) i];
+  List<int> list = [for (var i = 1; i <= 30; i++) i];
 
   @override
   void initState() {

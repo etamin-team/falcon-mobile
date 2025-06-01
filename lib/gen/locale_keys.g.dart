@@ -261,7 +261,8 @@ abstract class  LocaleKeys {
   static var med_add_doctor_temporary_password = 'med_add_doctor.temporary_password';
   static var med_add_doctor_temporary_password_hint = 'med_add_doctor.temporary_password_hint';
   static var med_add_doctor_contract_type = 'med_add_doctor.contract_type';
-  static var med_add_doctor_contract_type_hint = 'med_add_doctor.contract_type_hint';static var med_add_doctor_packs = 'med_add_doctor.packs';
+  static var med_add_doctor_contract_type_hint = 'med_add_doctor.contract_type_hint';
+  static var med_add_doctor_packs = 'med_add_doctor.packs';
   static var med_add_doctor_select_pack = 'med_add_doctor.select_pack';
   static var med_add_doctor_pack_required = 'med_add_doctor.pack_required';
   static var med_add_doctor_data_start = 'med_add_doctor.data_start';
@@ -276,4 +277,24 @@ abstract class  LocaleKeys {
   static var med_add_doctor_error_text = 'med_add_doctor.error_text';
   static var med_add_doctor_error_text_number = 'med_add_doctor.error_text_number';
   static var med_add_doctor_copied = 'med_add_doctor.copied';
+
+  static var med_contract_number = 'med_contract.number';
+
+  static var med_contract_no_results = 'med_contract.no_results';
+
+  static var profile_start_date = 'profile.start_date';
+  static var profile_end_date = 'profile.end_date';
+  static var med_add_doctor_contract_title = 'med_add_doctor.contract_title';
+  static var med_add_doctor_select_doctor = 'med_add_doctor.select_doctor';
+  static var med_add_doctor_error_text_prep = 'med_add_doctor.error_text_prep';
+  static var med_add_doctor_error_text_doctor = 'med_add_doctor.error_text_doctor';
+  static var med_add_doctor_remember = 'med_add_doctor.remember';
+  static var med_add_doctor_sales_out_of_package = 'med_add_doctor.sales_out_of_package';
+  static var med_add_doctor_aim = 'med_add_doctor.aim';
+  static var med_add_doctor_edit_contract = 'med_add_doctor.edit_contract';
+  static var med_add_doctor_add_new_packs = 'med_add_doctor.add_new_packs';
+  static var med_add_doctor_edit_old_packs = 'med_add_doctor.edit_old_packs';
+  static var med_add_doctor_name_of_doctor = 'med_add_doctor.name_of_doctor';
+
+  static var med_add_doctor_offer_contract = 'med_add_doctor.offer_contract';
 }

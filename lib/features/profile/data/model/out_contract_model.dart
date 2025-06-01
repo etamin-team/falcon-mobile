@@ -4,6 +4,8 @@
 
 import 'dart:convert';
 
+import 'package:wm_doctor/features/create_template/data/model/mnn_model.dart';
+
 OutContractModel outContractModelFromJson(String str) => OutContractModel.fromJson(json.decode(str));
 
 String outContractModelToJson(OutContractModel data) => json.encode(data.toJson());
@@ -79,7 +81,7 @@ class Medicine {
   String? nameUzLatin;
   String? nameRussian;
   String? imageUrl;
-  List<String>? inn;
+  List<MnnModel>? inn;
 
 
    int? cip;
@@ -135,7 +137,7 @@ class Medicine {
       nameUzLatin: json['nameUzLatin'],
       nameRussian: json['nameRussian'],
       imageUrl: json['imageUrl'],
-      inn: List<String>.from(json['mnn']),
+      inn: List<MnnModel>.from(json["mnn"].map((x) => MnnModel.fromJson(x))),
       cip: json['cip'],
       quantity: json['quantity'],
       prescription: json['prescription'],

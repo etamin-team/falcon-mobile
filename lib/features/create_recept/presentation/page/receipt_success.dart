@@ -1,10 +1,10 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:wm_doctor/features/home/presentation/page/HomePage.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wm_doctor/gen/locale_keys.g.dart';
 
 import '../../../../core/widgets/export.dart';
-import '../../../main/presentation/page/main_page.dart';
+import '../../../home/presentation/cubit/home_cubit.dart';
 
 class ReceiptSuccessPage extends StatefulWidget{
 
@@ -36,7 +36,8 @@ class _ReceiptSuccessPageState extends State<ReceiptSuccessPage>{
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
-                  Navigator.pop(context);
+                  context.read<HomeCubit>().getTemplate(saved: "", sortBy: "", searchText: "");
+                  Navigator.pop(context,true);
                 },
                 style: ElevatedButton.styleFrom(
                   shadowColor: AppColors.blueColor,

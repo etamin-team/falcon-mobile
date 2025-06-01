@@ -184,13 +184,52 @@ class _ProfileCardState extends State<ProfileCard> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   spacing: Dimens.space10,
                   children: [
-                    Text(
-                      "C  $fromDate  по  $toDate",
-                      style: TextStyle(
-                          fontFamily: 'VelaSans',
-                          fontSize: Dimens.space14,
-                          fontWeight: FontWeight.w400),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              LocaleKeys.profile_start_date.tr(),
+                              style: TextStyle(
+                                  fontFamily: 'VelaSans',
+                                  fontSize: Dimens.space14,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              fromDate,
+                              style: TextStyle(
+                                  fontFamily: 'VelaSans',
+                                  fontSize: Dimens.space14,
+                                  fontWeight: FontWeight.w400),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: Dimens.space10,
+                        ),
+                        Row(
+                          children: [
+                            Text(
+                              LocaleKeys.profile_end_date.tr(),
+                              style: TextStyle(
+                                  fontFamily: 'VelaSans',
+                                  fontSize: Dimens.space14,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              toDate,
+                              style: TextStyle(
+                                  fontFamily: 'VelaSans',
+                                  fontSize: Dimens.space14,
+                                  fontWeight: FontWeight.w400),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
+
                     SvgPicture.asset(Assets.icons.calendar),
                   ],
                 ),

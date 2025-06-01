@@ -83,7 +83,6 @@ class _DoctorsPageDState extends State<DoctorsPageD> {
             selectedWorkPlaceId = 0;
             selectedWorkPlaceName = "Not Found";
           }
-          print("-----------------------------------------------------workplaces");
         });
       } else if (state is WorkplaceErrorr) {
         ScaffoldMessenger.of(context).showSnackBar(

@@ -53,8 +53,6 @@ class AgentHomeRepositoryImpl implements AgentHomeRepository {
       for (var item in request.response) {
         list.add(DoctorsModel.fromJson(item));
       }
-      print("ssssssssssssssssssssssrrrrrrrrrrrrrrrrrrrrrrr-----------------");
-      print(list.length);
       return Right(list);
     }
     return Left(Failure(

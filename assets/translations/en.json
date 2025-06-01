@@ -129,6 +129,7 @@
     "timesInDay": "Times per Day",
     "days": "Days",
     "note": "Notes",
+    "template_created": "Template Created Successfully",
     "save_template": "Save Template"
   },
   "home": {
@@ -170,7 +171,8 @@
     "profile_error": "Something went wrong, please try again.",
     "my_paket": "My Package",
     "execution_period": "Execution Period",
-    "date": "From {fromDate} to {toDate}",
+    "start_date" : "Start Date: ",
+    "end_date" : "End Date: ",
     "target": "Goal:",
     "step": "Step:",
     "passed": "Passed"
@@ -224,7 +226,9 @@
     "title" : "Contracts",
     "filters" : "Filters",
     "search" : "Doctor Name",
-    "all" : "All"
+    "all" : "All",
+    "number" : "Contract ID: ",
+    "no_results" : "No Results"
   },
   "med_profile": {
     "sales_in_pack_for_last_month" : "Sales in package for the last month",
@@ -248,6 +252,8 @@
   },
   "med_add_doctor": {
     "title" : "Add Doctor",
+    "contract_title" : "Add Contract",
+    "edit_contract" : "Edit Contract",
     "back" : "Back",
     "success_title" : "Successfully",
     "success_text" : "Doctor Successfully Registered",
@@ -280,6 +286,16 @@
     "data_finish" : "Date of End",
     "step" : "Steps",
     "register" : "Register Doctor",
-    "copied" : "Copied"
+    "copied" : "Copied",
+    "select_doctor" : "Select Doctor",
+    "error_text_prep" : "Please fill the required fields and select at least five medicine.",
+    "error_text_doctor" : "Please select doctor.",
+    "remember" : "remember",
+    "sales_out_of_package" : "Sales Out Of Contract",
+    "aim" : "Aim",
+    "name_of_doctor" : "Name of Doctor",
+    "edit_old_packs" : "Edit Old Packages",
+    "add_new_packs" : "Add new Packages",
+    "offer_contract" : "Offer Contract"
   }
 }

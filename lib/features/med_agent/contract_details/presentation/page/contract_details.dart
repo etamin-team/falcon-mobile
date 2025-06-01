@@ -1,17 +1,16 @@
-import 'package:flutter/cupertino.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:wm_doctor/core/extensions/widget_extensions.dart';
 import 'package:wm_doctor/features/med_agent/contract_details/presentation/cubit/contract_details_cubit.dart';
 import 'package:wm_doctor/features/med_agent/edit_contract/presentation/cubit/edit_contract_cubit.dart';
 import 'package:wm_doctor/features/med_agent/edit_contract/presentation/page/agent_edit_contract.dart';
+import 'package:wm_doctor/gen/locale_keys.g.dart';
 
 import '../../../../../core/utils/dependencies_injection.dart';
 import '../../../../../core/widgets/export.dart';
 import '../../../../create_template/data/model/medicine_model.dart';
 import '../../../../medicine/data/repository/medicine_repository_impl.dart';
-import '../../../../medicine/presentation/page/medicine_dialog.dart';
 import '../../../../profile/data/model/profile_data_model.dart';
-import '../../../edit_contract/presentation/page/agent_create_contract.dart';
 
 class ContractDetails extends StatefulWidget {
   final String id;
@@ -51,7 +50,9 @@ class _ContractDetailsState extends State<ContractDetails> {
     result.fold(
           (failure) {
         // Handle the failure case here if needed
-        print('Error: ${failure.errorMsg}');
+        if (kDebugMode) {
+          print('Error: ${failure.errorMsg}');
+        }
       },
           (list) {
         setState(() {
@@ -138,11 +139,11 @@ class _ContractDetailsState extends State<ContractDetails> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                "Место работы:",
+                                LocaleKeys.med_add_doctor_select_workplace_hint.tr(),
                                 style: TextStyle(fontSize: Dimens.space14),
                               ),
                               Text(
-                                state.workplaceModel?.name ?? "Место работы",
+                                state.workplaceModel?.name ?? LocaleKeys.med_add_doctor_select_workplace_hint.tr(),
                                 style: TextStyle(fontSize: Dimens.space14),
                               ),
                             ],
@@ -160,7 +161,7 @@ class _ContractDetailsState extends State<ContractDetails> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              "Место работы:",
+                              LocaleKeys.med_add_doctor_select_speciality_hint.tr(),
                               style: TextStyle(fontSize: Dimens.space14),
                             ),
                             Text(
@@ -171,7 +172,7 @@ class _ContractDetailsState extends State<ContractDetails> {
                         ),
                         ),
                         Text(
-                          "Контактные данные врача",
+                          LocaleKeys.med_add_doctor_info_doctor.tr(),
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: Dimens.space18),
@@ -208,7 +209,7 @@ class _ContractDetailsState extends State<ContractDetails> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            "Условие работы:",
+                            LocaleKeys.med_add_doctor_contract_type.tr(),
                             style: TextStyle(
                                 fontSize: Dimens.space14,
                                 color: AppColors.white),
@@ -284,8 +285,8 @@ class _ContractDetailsState extends State<ContractDetails> {
                         spacing: Dimens.space8,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            "Прописано вне пакета",
+                          Text(
+                      LocaleKeys.med_add_doctor_sales_out_of_package.tr(),
                             style: TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold),
                           ),
@@ -348,7 +349,7 @@ class _ContractDetailsState extends State<ContractDetails> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              "Цель:",
+                              LocaleKeys.med_add_doctor_aim.tr(),
                               style: TextStyle(
                                   fontSize: 18, fontWeight: FontWeight.bold),
                             ),
@@ -356,7 +357,7 @@ class _ContractDetailsState extends State<ContractDetails> {
                               width: Dimens.space10,
                             ),
                             Text(
-                              allAmount.toString()+" / "+allQuote.toString(),
+                              "$allAmount / $allQuote",
                               style: TextStyle(
                                   fontSize: 18, fontWeight: FontWeight.bold),
                             ),
@@ -376,13 +377,13 @@ class _ContractDetailsState extends State<ContractDetails> {
                               state
                                   .profileModel
                                   ?.medicineWithQuantityDoctorDTOS[index]
-                                  ?.contractMedicineDoctorAmount
-                                  ?.amount ??
+                                  .contractMedicineDoctorAmount
+                                  .amount ??
                                   0,
                               state
                                   .profileModel
                                   ?.medicineWithQuantityDoctorDTOS[index]
-                                  ?.quote ??
+                                  .quote ??
                                   0),
                         ),
 
@@ -403,7 +404,7 @@ class _ContractDetailsState extends State<ContractDetails> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text("Шаги"),
+                          Text( LocaleKeys.med_add_doctor_step.tr()),
                           Text(allQuote.toString()),
                         ],
                       ),
@@ -416,7 +417,7 @@ class _ContractDetailsState extends State<ContractDetails> {
                   UniversalButton.filled(
                     fontSize: Dimens.space14,
                     cornerRadius: Dimens.space20,
-                    text: "Изменить договор",
+                    text:  LocaleKeys.med_add_doctor_edit_contract.tr(),
                     onPressed: () {
                       Navigator.pop(context);
                       if(state.profileModel!=null){
@@ -480,10 +481,8 @@ class _ContractDetailsState extends State<ContractDetails> {
               children: [
                 Expanded(
                   child: Text(
-                    //TODO
-                    // (selectedPreparations[index].name!.length>27?selectedPreparations[index].name?.substring(0,27):selectedPreparations[index].name) ?? "",
                     overflow: TextOverflow.ellipsis,
-                    title ?? "",
+                    title,
                 style: TextStyle(
                     fontSize: Dimens.space14, fontWeight: FontWeight.bold)
                   ),
@@ -502,7 +501,6 @@ class _ContractDetailsState extends State<ContractDetails> {
 
   void calculateAmount(state) {
 
-    int i=0;
     for (ContractedMedicineWithQuantity context in  state?.profileModel?.medicineWithQuantityDoctorDTOS) {
 
       double ball = 0;
@@ -510,88 +508,61 @@ class _ContractDetailsState extends State<ContractDetails> {
           .profileModel
           ?.contractType) {
         case 'RECIPE':
-          ball = context?.medicine.prescription ?? 0;
+          ball = context.medicine.prescription ?? 0;
           break;
         case 'SU':
-          ball = (context?.medicine.suBall ?? 0).toDouble();
+          ball = (context.medicine.suBall ?? 0).toDouble();
           break;
         case 'SB':
-          ball = (context?.medicine.sbBall ?? 0).toDouble();
+          ball = (context.medicine.sbBall ?? 0).toDouble();
           break;
         case 'GZ':
-          ball = (context?.medicine.gzBall ?? 0).toDouble();
+          ball = (context.medicine.gzBall ?? 0).toDouble();
           break;
         case 'KZ':
-          ball = (context?.medicine.kbBall ?? 0).toDouble();
+          ball = (context.medicine.kbBall ?? 0).toDouble();
           break;
         default:
           ball = 0;
       }
-      print("22222222222222222joooooopppppppp---------------------------");
-
-      print("BALL_$ball");
-      print("AAAAAAAAAAAAAAAA:"+i.toString());
-      print(context.medicine.name);
-      print("context?.contractMedicineDoctorAmount.amount");
-
-      print(context?.contractMedicineDoctorAmount);
-      print("context?.contractMedicineDoctorAmount.amount");
       allAmount +=  context.contractMedicineDoctorAmount.amount * ball;
-      i++;
-      print("BBBBBBBBBBBBBBBBBBBBBBBBBBBB:"+i.toString());
 
     }
   }
 
   void calculateQuote(state) {
-    print("joooooopppppppp---------------------------");
 
-    int i=0;
     for (ContractedMedicineWithQuantity context in  state?.profileModel?.medicineWithQuantityDoctorDTOS) {
-      print("333333333333333joooooopppppppp---------------------------");
 
       double ball = 0;
       switch (state
           .profileModel
           ?.contractType) {
         case 'RECIPE':
-          ball = context?.medicine.prescription ?? 0;
+          ball = context.medicine.prescription ?? 0;
           break;
         case 'SU':
-          ball = (context?.medicine.suBall ?? 0).toDouble();
+          ball = (context.medicine.suBall ?? 0).toDouble();
           break;
         case 'SB':
-          ball = (context?.medicine.sbBall ?? 0).toDouble();
+          ball = (context.medicine.sbBall ?? 0).toDouble();
           break;
         case 'GZ':
-          ball = (context?.medicine.gzBall ?? 0).toDouble();
+          ball = (context.medicine.gzBall ?? 0).toDouble();
           break;
         case 'KZ':
-          ball = (context?.medicine.kbBall ?? 0).toDouble();
+          ball = (context.medicine.kbBall ?? 0).toDouble();
           break;
         default:
           ball = 0;
       }
-      print("22222222222222222joooooopppppppp---------------------------");
-
-      print("BALL_$ball");
-      print("AAAAAAAAAAAAAAAA:"+i.toString());
-      print(context.medicine.name);
-      print("context?.contractMedicineDoctorAmount.amount");
-
-      print(context?.contractMedicineDoctorAmount);
-      print("context?.contractMedicineDoctorAmount.amount");
       allQuote +=  context.quote * ball;
-      i++;
-      print("BBBBBBBBBBBBBBBBBBBBBBBBBBBB:"+i.toString());
 
     }
-    print("ALLQUOTE::: $allQuote");
   }
 
 
   void calculate() {
-    print("asasas++++ ${selectedContractType}");
     int i = 0;
     for (MedicineModel medicine in selectedPreparations) {
       double ball = 0;
@@ -615,12 +586,10 @@ class _ContractDetailsState extends State<ContractDetails> {
           ball = 0;
       }
 
-      print("BALL_$ball");
 
       allQuote += quantity[i] * ball;
       i++;
     }
-    print("ALLQUOTE::: $allQuote");
     setState(() {});
   }
 }

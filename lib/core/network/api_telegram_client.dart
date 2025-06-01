@@ -1,14 +1,21 @@
 import 'package:dio/dio.dart';
 
 class ApiTelegramClient {
-  final Dio dio = Dio(BaseOptions(baseUrl: "http://209.38.109.22:8081"));
+  final Dio dio = Dio(BaseOptions(baseUrl: "http://209.38.109.22:8083"));
 
   Future<bool> sendMessage({
     required String number,
     required String message,
   }) async {
     final String path = "/telegram/send-message";
-    print("---------------------------------aaaaaaaaaaaaaaaaaaaaaaaaa----------------");
+    final Response response = await dio.post(
+      path,
+      queryParameters: {
+        "number": number,
+        "message": message,
+      },
+    );
+    print(response.toString());
     try {
       final Response response = await dio.post(
         path,

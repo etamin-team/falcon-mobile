@@ -21,12 +21,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   @override
-  void initState() {
-    context.read<HomeCubit>().getTemplate(saved: "", sortBy: "", searchText: "");
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
 
     return Scaffold(
@@ -310,10 +304,10 @@ class _HomePageState extends State<HomePage> {
                                                                 ),
                                                                 onPressed: () {
                                                                   Navigator.of(ctx).pop(); // Close the dialog
+
                                                                   // Call deleteTemplate from HomeCubit
                                                                   context.read<HomeCubit>().deleteTemplate(id: template.id!.toInt());
-
-                                                                  CircularProgressIndicator();
+                                                                  context.read<HomeCubit>().getTemplate(saved: "", sortBy: "", searchText: "");
                                                                   // Navigator.pop(context);
                                                                 },
                                                               ),
@@ -409,5 +403,11 @@ class _HomePageState extends State<HomePage> {
         },
       ),
     );
+  }
+
+  @override
+  void initState() {
+    context.read<HomeCubit>().getTemplate(saved: "", sortBy: "", searchText: "");
+    super.initState();
   }
 }
