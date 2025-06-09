@@ -45,20 +45,20 @@ showLanguageChoice({required BuildContext ctx}) {
                 Navigator.pop(context);
               },
             ),
-            RadioListTile(
-              secondary: SvgPicture.asset(
-                Assets.icons.usa,
-                height: 30,
-                width: 30,
-              ),
-              title: Text("English"),
-              value: currentLang == "en",
-              groupValue: true,
-              onChanged: (value) {
-                ctx.setLocale(Locale("en"));
-                Navigator.pop(context);
-              },
-            ),
+            // RadioListTile(
+            //   secondary: SvgPicture.asset(
+            //     Assets.icons.usa,
+            //     height: 30,
+            //     width: 30,
+            //   ),
+            //   title: Text("English"),
+            //   value: currentLang == "en",
+            //   groupValue: true,
+            //   onChanged: (value) {
+            //     ctx.setLocale(Locale("en"));
+            //     Navigator.pop(context);
+            //   },
+            // ),
             SizedBox(
               height: Dimens.space30,
             ),

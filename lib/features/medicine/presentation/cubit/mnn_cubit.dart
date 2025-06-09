@@ -28,6 +28,24 @@ class MnnCubit extends Cubit<MnnState> {
     );
   }
 
+
+  Future<void> getMnnSearch(query, {required int page, required int size}) async {
+    print("--------------------------");
+    print(query);
+    print("--------------------------");
+    if (state is MnnLoading && page != 1) return; // Prevent concurrent loads
+    emit(MnnLoading(allItems));
+    final Either<Failure, List<MnnModel>> result =
+    await repository.getMnnSearch(query,page: page, size: size);
+    result.fold(
+          (failure) => emit(MnnError(failure.errorMsg, allItems)),
+          (newItems) {
+        allItems = page == 1 ? newItems : [...allItems, ...newItems];
+        emit(MnnSuccess(allItems));
+      },
+    );
+  }
+
   Future<void> resetAndGetMnn({required int page, required int size}) async {
     allItems = [];
     await getMnn(page: page, size: size);

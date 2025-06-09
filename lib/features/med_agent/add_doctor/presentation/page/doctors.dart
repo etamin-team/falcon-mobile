@@ -11,6 +11,7 @@ import '../../../../../core/utils/dependencies_injection.dart';
 import '../../../../../core/widgets/export.dart';
 import '../../../../auth/sign_up/data/model/region_model.dart';
 import '../../../../auth/sign_up/domain/entity/regison_entity.dart';
+import '../../../../regions/presentation/cubit/workplace_cubit.dart';
 import '../../../contract/data/model/contract_model.dart';
 import '../../../home/data/model/doctors_model.dart';
 import '../../../home/presentation/cubit/doctor/doctor_cubit.dart';
@@ -62,18 +63,24 @@ class _DoctorsPageDState extends State<DoctorsPageD> {
           if (state.districts.isNotEmpty) {
             selectedDistrictId = state.districts.first.districtId;
             selectedDistrictName = state.districts.first.name;
+            print("hereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
             getWorkPlaces();
           } else {
             selectedDistrictId = 0;
             selectedDistrictName = "Not Found";
           }
-          print("-----------------------------------------------------district");
+
         });
       } else if (state is DistrictsError) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error fetching districts: ${state.failure}')),
         );
-      } else if (state is WorkplaceSuccesss) {
+      }
+    });
+
+    context.read<WorkPlaceCubit>().stream.listen((state) {
+      print("----------------------------------- doctor");
+      if (state is WorkPlaceSuccess) {
         setState(() {
           workPlaceList = state.workplace;
           if (state.workplace.isNotEmpty) {
@@ -84,9 +91,10 @@ class _DoctorsPageDState extends State<DoctorsPageD> {
             selectedWorkPlaceName = "Not Found";
           }
         });
-      } else if (state is WorkplaceErrorr) {
+      } else if (state is WorkPlaceError) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error fetching workplaces: ${state.failure}')),
+          SnackBar(
+              content: Text('Error fetching workplaces: ${state.failure}')),
         );
       }
     });
@@ -100,7 +108,11 @@ class _DoctorsPageDState extends State<DoctorsPageD> {
   }
 
   void getWorkPlaces() async {
-    context.read<RegionsCubit>().getWorkplacesByDistrictId(selectedDistrictId);
+    print("sssssselloooooooo---");
+    context
+        .read<WorkPlaceCubit>()
+        .getWorkplacesByDistrictId(selectedDistrictId);
+
     Future.delayed(Duration(milliseconds: 400), () {
       getUsersByFilter();
     });
@@ -108,11 +120,11 @@ class _DoctorsPageDState extends State<DoctorsPageD> {
 
   void getUsersByFilter() async {
     context.read<DoctorCubit>().getDoctorsWithFilters(
-      selectedDistrictId,
-      selectedWorkPlaceId,
-      selectedDoctorType,
-      hasContract,
-    );
+          selectedDistrictId,
+          selectedWorkPlaceId,
+          selectedDoctorType,
+          hasContract,
+        );
   }
 
   void clearData() {
@@ -138,8 +150,7 @@ class _DoctorsPageDState extends State<DoctorsPageD> {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<DoctorCubit, DoctorState>(
-      listener: (context, state) {
-      },
+      listener: (context, state) {},
       builder: (context, state) {
         if (state is DoctorSuccess) {
           filteredDoctors = state.list.where((region) {
@@ -232,17 +243,22 @@ class _DoctorsPageDState extends State<DoctorsPageD> {
                             ),
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<int>(
-                                borderRadius: BorderRadius.all(Radius.circular(15)),
-                                value: selectedDistrictId == 0 ? null : selectedDistrictId,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(15)),
+                                value: selectedDistrictId == 0
+                                    ? null
+                                    : selectedDistrictId,
                                 onChanged: (int? newValue) {
                                   setState(() {
                                     selectedDistrictId = newValue ?? 0;
                                     selectedDistrictName = (newValue != null
                                         ? districtList
-                                        .firstWhere(
-                                          (district) => district.districtId == newValue,
-                                    )
-                                        .name
+                                            .firstWhere(
+                                              (district) =>
+                                                  district.districtId ==
+                                                  newValue,
+                                            )
+                                            .name
                                         : 'District');
                                     getWorkPlaces();
                                   });
@@ -252,10 +268,11 @@ class _DoctorsPageDState extends State<DoctorsPageD> {
                                   color: Colors.black,
                                   size: 30,
                                 ),
-                                style: TextStyle(fontSize: 18, color: Colors.black),
+                                style: TextStyle(
+                                    fontSize: 18, color: Colors.black),
                                 dropdownColor: Colors.white,
-                                items: districtList
-                                    .map<DropdownMenuItem<int>>((District value) {
+                                items: districtList.map<DropdownMenuItem<int>>(
+                                    (District value) {
                                   return DropdownMenuItem<int>(
                                     value: value.districtId,
                                     child: Text(
@@ -280,17 +297,21 @@ class _DoctorsPageDState extends State<DoctorsPageD> {
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<int>(
                                 hint: Text("WorkPlaces"),
-                                borderRadius: BorderRadius.all(Radius.circular(15)),
-                                value: selectedWorkPlaceId == 0 ? null : selectedWorkPlaceId,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(15)),
+                                value: selectedWorkPlaceId == 0
+                                    ? null
+                                    : selectedWorkPlaceId,
                                 onChanged: (int? newValue) {
                                   setState(() {
                                     selectedWorkPlaceId = newValue ?? 0;
                                     selectedWorkPlaceName = (newValue != null
                                         ? workPlaceList
-                                        .firstWhere(
-                                          (workPlace) => workPlace.id == newValue,
-                                    )
-                                        .name
+                                            .firstWhere(
+                                              (workPlace) =>
+                                                  workPlace.id == newValue,
+                                            )
+                                            .name
                                         : 'WorkPlace')!;
                                     getUsersByFilter();
                                   });
@@ -300,10 +321,11 @@ class _DoctorsPageDState extends State<DoctorsPageD> {
                                   color: Colors.black,
                                   size: 30,
                                 ),
-                                style: TextStyle(fontSize: 18, color: Colors.black),
+                                style: TextStyle(
+                                    fontSize: 18, color: Colors.black),
                                 dropdownColor: Colors.white,
-                                items: workPlaceList
-                                    .map<DropdownMenuItem<int>>((WorkPlaceDto value) {
+                                items: workPlaceList.map<DropdownMenuItem<int>>(
+                                    (WorkPlaceDto value) {
                                   return DropdownMenuItem<int>(
                                     value: value.id,
                                     child: Text(
@@ -335,7 +357,8 @@ class _DoctorsPageDState extends State<DoctorsPageD> {
                                   "Doctor Types",
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                                borderRadius: BorderRadius.all(Radius.circular(15)),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(15)),
                                 value: selectedDoctorType,
                                 onChanged: (String? newValue) {
                                   setState(() {
@@ -348,10 +371,12 @@ class _DoctorsPageDState extends State<DoctorsPageD> {
                                   color: Colors.black,
                                   size: 30,
                                 ),
-                                style: TextStyle(fontSize: 18, color: Colors.black),
+                                style: TextStyle(
+                                    fontSize: 18, color: Colors.black),
                                 dropdownColor: Colors.white,
                                 items: DoctorTypes.specialists
-                                    .map<DropdownMenuItem<String>>((String value) {
+                                    .map<DropdownMenuItem<String>>(
+                                        (String value) {
                                   return DropdownMenuItem<String>(
                                     value: value,
                                     child: Text(
@@ -383,11 +408,13 @@ class _DoctorsPageDState extends State<DoctorsPageD> {
                             spacing: Dimens.space10,
                             children: List.generate(
                               filteredDoctors.length,
-                                  (index) {
+                              (index) {
                                 return GestureDetector(
                                   onTap: () {
-                                    if (filteredDoctors[index].contractAvailable!) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
+                                    if (filteredDoctors[index]
+                                        .contractAvailable!) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
                                         SnackBar(
                                           content: Text(
                                             'Этот доктор уже имеет контракт, пожалуйста, выберите другого',
@@ -395,24 +422,38 @@ class _DoctorsPageDState extends State<DoctorsPageD> {
                                         ),
                                       );
                                     } else {
-                                      widget.id(filteredDoctors[index].userId ?? '');
-                                      widget.firstName(filteredDoctors[index].firstName ?? '');
-                                      widget.lastName(filteredDoctors[index].lastName ?? '');
-                                      widget.level(filteredDoctors[index].fieldName ?? '');
-                                      widget.type(filteredDoctors[index].position ?? '');
-                                      widget.phone(filteredDoctors[index].phoneNumber ?? '');
+                                      widget.id(
+                                          filteredDoctors[index].userId ?? '');
+                                      widget.firstName(
+                                          filteredDoctors[index].firstName ??
+                                              '');
+                                      widget.lastName(
+                                          filteredDoctors[index].lastName ??
+                                              '');
+                                      widget.level(
+                                          filteredDoctors[index].fieldName ??
+                                              '');
+                                      widget.type(
+                                          filteredDoctors[index].position ??
+                                              '');
+                                      widget.phone(
+                                          filteredDoctors[index].phoneNumber ??
+                                              '');
                                       clearData();
                                       Navigator.pop(context);
                                     }
                                   },
                                   child: Container(
-                                    margin: EdgeInsets.symmetric(vertical: Dimens.space4),
+                                    margin: EdgeInsets.symmetric(
+                                        vertical: Dimens.space4),
                                     padding: EdgeInsets.all(Dimens.space14),
                                     decoration: BoxDecoration(
-                                      color: filteredDoctors[index].contractAvailable!
+                                      color: filteredDoctors[index]
+                                              .contractAvailable!
                                           ? Color(0xFF00FF79)
                                           : Color(0xFFFFFFFF),
-                                      borderRadius: BorderRadius.circular(Dimens.space10),
+                                      borderRadius:
+                                          BorderRadius.circular(Dimens.space10),
                                     ),
                                     alignment: AlignmentDirectional.centerStart,
                                     child: Text(

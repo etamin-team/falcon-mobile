@@ -37,7 +37,15 @@ class PrepContainerData {
     List<PreparationModel>? selectedPreparations,
     List<MedicineModel>? medicineList,
   })  : selectedMNNs = selectedMNNs ?? [],
-        preparation = preparation ?? PreparationModel(name: '', amount: '', quantity: 0, timesInDay: 0, days: 0, type: '', medicineId: 0),
+        preparation = preparation ??
+            PreparationModel(
+                name: '',
+                amount: '',
+                quantity: 0,
+                timesInDay: 0,
+                days: 0,
+                type: '',
+                medicineId: 0),
         selectedPreparations = selectedPreparations ?? [],
         medicineList = medicineList ?? [];
 
@@ -111,14 +119,17 @@ class _CreateRecepState extends State<CreateRecep> {
             preparationContainersData.clear();
             preparationContainers.clear();
           });
-          Navigator.push(context, MaterialPageRoute(builder: (context) =>  ReceiptSuccessPage()));
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => ReceiptSuccessPage()));
         } else if (state is CreateRecepError || state is SendTelegramError) {
           toastification.show(
             style: ToastificationStyle.flat,
             context: context,
             alignment: Alignment.topCenter,
-            title: Text(state is CreateRecepError ? state.failure.errorMsg : 'Failed to send Telegram message'),
-            autoCloseDuration:  Duration(seconds: 4),
+            title: Text(state is CreateRecepError
+                ? state.failure.errorMsg
+                : 'Failed to send Telegram message'),
+            autoCloseDuration: Duration(seconds: 4),
             showProgressBar: false,
             primaryColor: Colors.white,
             backgroundColor: Colors.redAccent,
@@ -128,7 +139,7 @@ class _CreateRecepState extends State<CreateRecep> {
       },
       builder: (context, state) {
         if (state is CreateRecepLoading) {
-          return  Scaffold(body: Center(child: CircularProgressIndicator()));
+          return Scaffold(body: Center(child: CircularProgressIndicator()));
         }
         return BlocListener<CreateTemplateCubit, CreateTemplateState>(
           listener: (context, cstate) {
@@ -138,13 +149,17 @@ class _CreateRecepState extends State<CreateRecep> {
                   print("Received medicines: ${cstate.list}");
                 }
                 medicineList = cstate.list;
-                if (lastAddIndex >= 0 && lastAddIndex < preparationContainersData.length) {
-                  preparationContainersData[lastAddIndex] = preparationContainersData[lastAddIndex].copyWith(
+                if (lastAddIndex >= 0 &&
+                    lastAddIndex < preparationContainersData.length) {
+                  preparationContainersData[lastAddIndex] =
+                      preparationContainersData[lastAddIndex].copyWith(
                     medicineList: cstate.list,
                   );
-                  preparationContainers[lastAddIndex] = buildPreparationContainer(lastAddIndex);
+                  preparationContainers[lastAddIndex] =
+                      buildPreparationContainer(lastAddIndex);
                   if (kDebugMode) {
-                    print("Updated medicineList for container $lastAddIndex: ${preparationContainersData[lastAddIndex].medicineList}");
+                    print(
+                        "Updated medicineList for container $lastAddIndex: ${preparationContainersData[lastAddIndex].medicineList}");
                   }
                 }
               });
@@ -154,7 +169,7 @@ class _CreateRecepState extends State<CreateRecep> {
                 context: context,
                 alignment: Alignment.topCenter,
                 title: Text(cstate.failure.errorMsg),
-                autoCloseDuration:  Duration(seconds: 2),
+                autoCloseDuration: Duration(seconds: 2),
                 showProgressBar: false,
                 primaryColor: Colors.white,
                 backgroundColor: Colors.redAccent,
@@ -175,7 +190,7 @@ class _CreateRecepState extends State<CreateRecep> {
         forceMaterialTransparency: true,
         title: Text(
           LocaleKeys.create_recep_title.tr(),
-          style:  TextStyle(
+          style: TextStyle(
             fontFamily: 'VelaSans',
             fontSize: Dimens.space30,
             fontWeight: FontWeight.w800,
@@ -219,7 +234,7 @@ class _CreateRecepState extends State<CreateRecep> {
 
   Widget buildTemplateSelection() {
     return Container(
-      padding:  EdgeInsets.all(Dimens.space20),
+      padding: EdgeInsets.all(Dimens.space20),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(Dimens.space20),
         color: AppColors.white,
@@ -241,25 +256,30 @@ class _CreateRecepState extends State<CreateRecep> {
                     templateName = value.name ?? "";
                     preparationContainersData = List.generate(
                       value.preparations?.length ?? 0,
-                          (index) => PrepContainerData(
+                      (index) => PrepContainerData(
                         selectedMNNs: widget.selectedMNNs,
                         medicineList: medicineList,
                         preparation: PreparationModel(
                           name: value.preparations![index].name ?? "",
                           amount: value.preparations![index].amount.toString(),
-                          medicineId: value.preparations![index].medicineId ?? 0,
+                          medicineId:
+                              value.preparations![index].medicineId ?? 0,
                           days: value.preparations![index].days ?? 0,
-                          timesInDay: value.preparations![index].timesInDay ?? 0,
+                          timesInDay:
+                              value.preparations![index].timesInDay ?? 0,
                           quantity: value.preparations![index].quantity ?? 0,
                           type: value.preparations![index].type ?? "",
                         ),
                         selectedPreparations: [
                           PreparationModel(
                             name: value.preparations![index].name ?? "",
-                            amount: value.preparations![index].amount.toString(),
-                            medicineId: value.preparations![index].medicineId ?? 0,
+                            amount:
+                                value.preparations![index].amount.toString(),
+                            medicineId:
+                                value.preparations![index].medicineId ?? 0,
                             days: value.preparations![index].days ?? 0,
-                            timesInDay: value.preparations![index].timesInDay ?? 0,
+                            timesInDay:
+                                value.preparations![index].timesInDay ?? 0,
                             quantity: value.preparations![index].quantity ?? 0,
                             type: value.preparations![index].type ?? "",
                           ),
@@ -268,7 +288,7 @@ class _CreateRecepState extends State<CreateRecep> {
                     );
                     preparationContainers = List.generate(
                       value.preparations?.length ?? 0,
-                          (index) => buildPreparationContainer(index),
+                      (index) => buildPreparationContainer(index),
                     );
                     diagnosisController.text = value.diagnosis ?? "";
                     commentController.text = value.note ?? "";
@@ -282,7 +302,8 @@ class _CreateRecepState extends State<CreateRecep> {
           );
         },
         child: Container(
-          padding:  EdgeInsets.symmetric(horizontal: Dimens.space14, vertical: Dimens.space16),
+          padding: EdgeInsets.symmetric(
+              horizontal: Dimens.space14, vertical: Dimens.space16),
           decoration: BoxDecoration(
             color: AppColors.backgroundColor,
             borderRadius: BorderRadius.circular(Dimens.space10),
@@ -292,8 +313,10 @@ class _CreateRecepState extends State<CreateRecep> {
             children: [
               Expanded(
                 child: Text(
-                  templateName.isEmpty ? LocaleKeys.create_recep_select_template.tr() : templateName,
-                  style:  TextStyle(
+                  templateName.isEmpty
+                      ? LocaleKeys.create_recep_select_template.tr()
+                      : templateName,
+                  style: TextStyle(
                     fontFamily: 'VelaSans',
                     fontSize: Dimens.space14,
                     fontWeight: FontWeight.w400,
@@ -313,7 +336,7 @@ class _CreateRecepState extends State<CreateRecep> {
 
   Widget buildNameField() {
     return Container(
-      padding:  EdgeInsets.all(Dimens.space20),
+      padding: EdgeInsets.all(Dimens.space20),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(Dimens.space20),
         color: AppColors.white,
@@ -324,7 +347,7 @@ class _CreateRecepState extends State<CreateRecep> {
         children: [
           Text(
             LocaleKeys.create_recep_name.tr(),
-            style:  TextStyle(
+            style: TextStyle(
               fontFamily: 'VelaSans',
               fontSize: Dimens.space18,
               fontWeight: FontWeight.w700,
@@ -348,7 +371,7 @@ class _CreateRecepState extends State<CreateRecep> {
 
   Widget buildBirthDateAndNumberField() {
     return Container(
-      padding:  EdgeInsets.all(Dimens.space20),
+      padding: EdgeInsets.all(Dimens.space20),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(Dimens.space20),
         color: AppColors.white,
@@ -359,7 +382,7 @@ class _CreateRecepState extends State<CreateRecep> {
         children: [
           Text(
             LocaleKeys.create_recep_birthdate_and_number.tr(),
-            style:  TextStyle(
+            style: TextStyle(
               fontFamily: 'VelaSans',
               fontSize: Dimens.space18,
               fontWeight: FontWeight.w700,
@@ -394,7 +417,7 @@ class _CreateRecepState extends State<CreateRecep> {
             ),
           ),
           AppTextField(
-            prefixIcon:  Text(
+            prefixIcon: Text(
               textAlign: TextAlign.center,
               "+998  ",
               style: TextStyle(fontFamily: 'VelaSans', color: Colors.black),
@@ -421,7 +444,7 @@ class _CreateRecepState extends State<CreateRecep> {
 
   Widget buildDiagnosisField() {
     return Container(
-      padding:  EdgeInsets.all(Dimens.space20),
+      padding: EdgeInsets.all(Dimens.space20),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(Dimens.space20),
         color: AppColors.white,
@@ -432,7 +455,7 @@ class _CreateRecepState extends State<CreateRecep> {
         children: [
           Text(
             LocaleKeys.create_recep_diagnose.tr(),
-            style:  TextStyle(
+            style: TextStyle(
               fontFamily: 'VelaSans',
               fontSize: Dimens.space18,
               fontWeight: FontWeight.w700,
@@ -456,7 +479,7 @@ class _CreateRecepState extends State<CreateRecep> {
 
   Widget buildCommentField() {
     return Container(
-      padding:  EdgeInsets.all(Dimens.space20),
+      padding: EdgeInsets.all(Dimens.space20),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(Dimens.space20),
         color: AppColors.white,
@@ -467,7 +490,7 @@ class _CreateRecepState extends State<CreateRecep> {
         children: [
           Text(
             LocaleKeys.create_recep_add_comment.tr(),
-            style:  TextStyle(
+            style: TextStyle(
               fontFamily: 'VelaSans',
               fontSize: Dimens.space18,
               fontWeight: FontWeight.w700,
@@ -493,7 +516,7 @@ class _CreateRecepState extends State<CreateRecep> {
 
   Widget buildPreparationContainer(int index) {
     if (index >= preparationContainersData.length) {
-      return  Text(
+      return Text(
         "Index error",
         style: TextStyle(color: Colors.red),
       );
@@ -503,8 +526,8 @@ class _CreateRecepState extends State<CreateRecep> {
 
     return Container(
       width: double.infinity,
-      margin:  EdgeInsets.only(top: 10),
-      padding:  EdgeInsets.all(Dimens.space20),
+      margin: EdgeInsets.only(top: 10),
+      padding: EdgeInsets.all(Dimens.space20),
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(20),
@@ -517,7 +540,7 @@ class _CreateRecepState extends State<CreateRecep> {
             children: [
               Text(
                 LocaleKeys.create_recep_select.tr(),
-                style:  TextStyle(
+                style: TextStyle(
                   fontFamily: 'VelaSans',
                   fontWeight: FontWeight.w700,
                   fontSize: Dimens.space18,
@@ -545,8 +568,8 @@ class _CreateRecepState extends State<CreateRecep> {
             children: [
               SizedBox(height: 5),
               UniversalButton.filled(
-                  text: LocaleKeys.create_recep_select_mnn.tr(),
-                  onPressed: () => showMNN(
+                text: LocaleKeys.create_recep_select_mnn.tr(),
+                onPressed: () => showMNN(
                     ctx: context,
                     model: (value) {},
                     mnn: [],
@@ -557,139 +580,155 @@ class _CreateRecepState extends State<CreateRecep> {
                         containerData = containerData.copyWith(
                           selectedMNNs: updatedList,
                         );
+                        context.read<CreateTemplateCubit>().getMedicine(inn: widget.selectedMNNs);
                         preparationContainersData[index] = containerData;
-                        preparationContainers[index] = buildPreparationContainer(index);
+                        preparationContainers[index] =
+                            buildPreparationContainer(index);
                       });
                     }),
-                    fontSize: Dimens.space14,
-                    backgroundColor: AppColors.backgroundColor,
-                    textColor: Colors.black,
-                    cornerRadius: Dimens.space10,
-                  ),
-                  if (containerData.selectedMNNs.isNotEmpty)
-              Wrap(
-                spacing: 8.0,
-                runSpacing: 8.0,
-                crossAxisAlignment: WrapCrossAlignment.start,
-                children: containerData.selectedMNNs.map((mnn) => Chip(
-                  label: Text(
-                    mnn.name ?? "null",
-                    style: TextStyle(color: Colors.black),
-                  ),
-                  deleteIcon: Icon(Icons.remove_circle),
-                  deleteIconColor: AppColors.redAccent,
-                  backgroundColor: AppColors.backgroundColor,
-                  side: BorderSide.none,
-                  onDeleted: () {
-                    setState(() {
-                      containerData = containerData.copyWith(
-                        selectedMNNs: containerData.selectedMNNs.where((item) => item != mnn).toList(),
-                        medicineList: [],
-                      );
-                      preparationContainersData[index] = containerData;
-                      preparationContainers[index] = buildPreparationContainer(index);
-                    });
-                  },
-                )).toList(),
+                fontSize: Dimens.space14,
+                backgroundColor: AppColors.backgroundColor,
+                textColor: Colors.black,
+                cornerRadius: Dimens.space10,
               ),
-              Container(
-                decoration: BoxDecoration(
-                  color: AppColors.backgroundColor,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                padding: EdgeInsets.symmetric(horizontal: Dimens.space20, vertical: Dimens.space16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        containerData.selectedPreparations.isNotEmpty
-                            ? containerData.selectedPreparations.first.name
-                            : LocaleKeys.create_recep_select_medicine.tr(),
-                        style: TextStyle(
-                          fontFamily: 'VelaSans',
-                          fontSize: Dimens.space14,
-                          color: Colors.black,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        if (medicineList.isEmpty) {
-                          toastification.show(
-                            style: ToastificationStyle.flat,
-                            context: context,
-                            alignment: Alignment.topCenter,
-                            title: const Text("No medicines available to select"),
-                            autoCloseDuration: const Duration(seconds: 2),
-                            showProgressBar: false,
-                            primaryColor: Colors.white,
-                            backgroundColor: Colors.redAccent,
-                            foregroundColor: Colors.white,
-                          );
-                          return;
-                        }
-                        try {
-                          showMedicine(
-                            ctx: context,
-                            model: (value) {
+              if (containerData.selectedMNNs.isNotEmpty)
+                Wrap(
+                  spacing: 8.0,
+                  runSpacing: 8.0,
+                  crossAxisAlignment: WrapCrossAlignment.start,
+                  children: containerData.selectedMNNs
+                      .map((mnn) => Chip(
+                            label: Text(
+                              mnn.name ?? "null",
+                              style: TextStyle(color: Colors.black),
+                            ),
+                            deleteIcon: Icon(Icons.remove_circle),
+                            deleteIconColor: AppColors.redAccent,
+                            backgroundColor: AppColors.backgroundColor,
+                            side: BorderSide.none,
+                            onDeleted: () {
                               setState(() {
                                 containerData = containerData.copyWith(
-                                  preparation: PreparationModel(
-                                    name: value.name ?? "Unknown",
-                                    amount: "${value.prescription ?? ''} ${value.volume ?? ''}".trim(),
-                                    quantity: 1,
-                                    timesInDay: 1,
-                                    days: 1,
-                                    inn: value.inn,
-                                    type: value.type ?? "Unknown",
-                                    medicineId: value.id ?? 0,
-                                  ),
-                                  selectedPreparations: [
-                                    PreparationModel(
-                                      name: value.name ?? "Unknown",
-                                      amount: "${value.prescription ?? ''} ${value.volume ?? ''}".trim(),
-                                      quantity: 1,
-                                      timesInDay: 1,
-                                      days: 1,
-                                      inn: value.inn,
-                                      type: value.type ?? "Unknown",
-                                      medicineId: value.id ?? 0,
-                                    ),
-                                  ],
+                                  selectedMNNs: containerData.selectedMNNs
+                                      .where((item) => item != mnn)
+                                      .toList(),
+                                  medicineList: [],
                                 );
-                                preparationContainersData[index] = containerData;
-                                preparationContainers[index] = buildPreparationContainer(index);
+                                preparationContainersData[index] =
+                                    containerData;
+                                preparationContainers[index] =
+                                    buildPreparationContainer(index);
                               });
-                              Navigator.pop(context);
                             },
-                            medicine: medicineList,
+                          ))
+                      .toList(),
+                ),
+              GestureDetector(
+                onTap: () {
+                  if (medicineList.isEmpty) {
+                    toastification.show(
+                      style: ToastificationStyle.flat,
+                      context: context,
+                      alignment: Alignment.topCenter,
+                      title: const Text("No medicines available to select"),
+                      autoCloseDuration: const Duration(seconds: 2),
+                      showProgressBar: false,
+                      primaryColor: Colors.white,
+                      backgroundColor: Colors.redAccent,
+                      foregroundColor: Colors.white,
+                    );
+                    return;
+                  }
+                  try {
+                    showMedicine(
+                      ctx: context,
+                      model: (value) {
+                        setState(() {
+                          containerData = containerData.copyWith(
+                            preparation: PreparationModel(
+                              name: value.name ?? "Unknown",
+                              amount:
+                                  "${value.prescription ?? ''} ${value.volume ?? ''}"
+                                      .trim(),
+                              quantity: 1,
+                              timesInDay: 1,
+                              days: 1,
+                              inn: value.inn,
+                              type: value.type ?? "Unknown",
+                              medicineId: value.id ?? 0,
+                            ),
+                            selectedPreparations: [
+                              PreparationModel(
+                                name: value.name ?? "Unknown",
+                                amount:
+                                    "${value.prescription ?? ''} ${value.volume ?? ''}"
+                                        .trim(),
+                                quantity: 1,
+                                timesInDay: 1,
+                                days: 1,
+                                inn: value.inn,
+                                type: value.type ?? "Unknown",
+                                medicineId: value.id ?? 0,
+                              ),
+                            ],
                           );
-                        } catch (e) {
-                          toastification.show(
-                            style: ToastificationStyle.flat,
-                            context: context,
-                            alignment: Alignment.topCenter,
-                            title: const Text("Error displaying medicines"),
-                            autoCloseDuration: const Duration(seconds: 2),
-                            showProgressBar: false,
-                            primaryColor: Colors.white,
-                            backgroundColor: Colors.redAccent,
-                            foregroundColor: Colors.white,
-                          );
-                        }
+                          preparationContainersData[index] = containerData;
+                          preparationContainers[index] =
+                              buildPreparationContainer(index);
+                        });
+                        Navigator.pop(context);
                       },
-                      child: SvgPicture.asset(
-                        containerData.selectedPreparations.isEmpty
-                            ? "assets/icons/plus.svg"
-                            : "assets/icons/minus.svg",
-                        height: 24,
-                        width: 24,
+                      medicine: medicineList,
+                    );
+                  } catch (e) {
+                    toastification.show(
+                      style: ToastificationStyle.flat,
+                      context: context,
+                      alignment: Alignment.topCenter,
+                      title: const Text("Error displaying medicines"),
+                      autoCloseDuration: const Duration(seconds: 2),
+                      showProgressBar: false,
+                      primaryColor: Colors.white,
+                      backgroundColor: Colors.redAccent,
+                      foregroundColor: Colors.white,
+                    );
+                  }
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.backgroundColor,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  padding: EdgeInsets.symmetric(
+                      horizontal: Dimens.space20, vertical: Dimens.space16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          containerData.selectedPreparations.isNotEmpty
+                              ? containerData.selectedPreparations.first.name
+                              : LocaleKeys.create_recep_select_medicine.tr(),
+                          style: TextStyle(
+                            fontFamily: 'VelaSans',
+                            fontSize: Dimens.space14,
+                            color: Colors.black,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
                       ),
-                    ),
-                  ],
+                      GestureDetector(
+                        child: SvgPicture.asset(
+                          containerData.selectedPreparations.isEmpty
+                              ? "assets/icons/plus.svg"
+                              : "assets/icons/minus.svg",
+                          height: 24,
+                          width: 24,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               ...containerData.selectedPreparations.map((med) {
@@ -700,14 +739,16 @@ class _CreateRecepState extends State<CreateRecep> {
                         Expanded(
                           child: GestureDetector(
                             child: Container(
-                              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 16),
                               decoration: BoxDecoration(
                                 color: AppColors.backgroundColor,
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
                                 med.type,
-                                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w600, fontSize: 12),
                               ),
                             ),
                           ),
@@ -721,29 +762,36 @@ class _CreateRecepState extends State<CreateRecep> {
                                 amount: double.tryParse(med.amount) ?? 1.0,
                                 onChange: (value) {
                                   setState(() {
-                                    final updatedMed = med.copyWith(amount: value.toString());
+                                    final updatedMed =
+                                        med.copyWith(amount: value.toString());
                                     containerData = containerData.copyWith(
                                       preparation: updatedMed,
                                       selectedPreparations: [updatedMed],
                                     );
-                                    preparationContainersData[index] = containerData;
-                                    preparationContainers[index] = buildPreparationContainer(index);
+                                    preparationContainersData[index] =
+                                        containerData;
+                                    preparationContainers[index] =
+                                        buildPreparationContainer(index);
                                   });
                                 },
                               );
                             },
                             child: Container(
-                              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 16),
                               decoration: BoxDecoration(
                                 color: AppColors.backgroundColor,
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     med.amount,
-                                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 12),
                                   ),
                                 ],
                               ),
@@ -759,13 +807,16 @@ class _CreateRecepState extends State<CreateRecep> {
                             selectedNumber: med.quantity,
                             onChanged: (int value) {
                               setState(() {
-                                final updatedMed = med.copyWith(quantity: value);
+                                final updatedMed =
+                                    med.copyWith(quantity: value);
                                 containerData = containerData.copyWith(
                                   preparation: updatedMed,
                                   selectedPreparations: [updatedMed],
                                 );
-                                preparationContainersData[index] = containerData;
-                                preparationContainers[index] = buildPreparationContainer(index);
+                                preparationContainersData[index] =
+                                    containerData;
+                                preparationContainers[index] =
+                                    buildPreparationContainer(index);
                               });
                             },
                           ),
@@ -775,13 +826,16 @@ class _CreateRecepState extends State<CreateRecep> {
                             selectedNumber: med.timesInDay,
                             onChanged: (int value) {
                               setState(() {
-                                final updatedMed = med.copyWith(timesInDay: value);
+                                final updatedMed =
+                                    med.copyWith(timesInDay: value);
                                 containerData = containerData.copyWith(
                                   preparation: updatedMed,
                                   selectedPreparations: [updatedMed],
                                 );
-                                preparationContainersData[index] = containerData;
-                                preparationContainers[index] = buildPreparationContainer(index);
+                                preparationContainersData[index] =
+                                    containerData;
+                                preparationContainers[index] =
+                                    buildPreparationContainer(index);
                               });
                             },
                           ),
@@ -796,8 +850,10 @@ class _CreateRecepState extends State<CreateRecep> {
                                   preparation: updatedMed,
                                   selectedPreparations: [updatedMed],
                                 );
-                                preparationContainersData[index] = containerData;
-                                preparationContainers[index] = buildPreparationContainer(index);
+                                preparationContainersData[index] =
+                                    containerData;
+                                preparationContainers[index] =
+                                    buildPreparationContainer(index);
                               });
                             },
                           ),
@@ -812,7 +868,9 @@ class _CreateRecepState extends State<CreateRecep> {
                           child: Center(
                             child: Text(
                               LocaleKeys.create_recep_quantity.tr(),
-                              style: GoogleFonts.ubuntu(fontWeight: FontWeight.w500, fontSize: Dimens.space12),
+                              style: GoogleFonts.ubuntu(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: Dimens.space12),
                             ),
                           ),
                         ),
@@ -820,7 +878,9 @@ class _CreateRecepState extends State<CreateRecep> {
                           child: Center(
                             child: Text(
                               LocaleKeys.create_recep_times.tr(),
-                              style: GoogleFonts.ubuntu(fontWeight: FontWeight.w500, fontSize: Dimens.space12),
+                              style: GoogleFonts.ubuntu(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: Dimens.space12),
                             ),
                           ),
                         ),
@@ -828,7 +888,9 @@ class _CreateRecepState extends State<CreateRecep> {
                           child: Center(
                             child: Text(
                               LocaleKeys.create_recep_days.tr(),
-                              style: GoogleFonts.ubuntu(fontWeight: FontWeight.w500, fontSize: Dimens.space12),
+                              style: GoogleFonts.ubuntu(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: Dimens.space12),
                             ),
                           ),
                         ),
@@ -847,16 +909,25 @@ class _CreateRecepState extends State<CreateRecep> {
   void addPreparationContainer() {
     setState(() {
       final newData = PrepContainerData(
-        preparation: PreparationModel(name: "", amount: "", quantity: 0, timesInDay: 0, days: 0, type: "", medicineId: 0),
+        preparation: PreparationModel(
+            name: "",
+            amount: "",
+            quantity: 0,
+            timesInDay: 0,
+            days: 0,
+            type: "",
+            medicineId: 0),
         medicineList: medicineList,
       );
       preparationContainersData.add(newData);
-      preparationContainers.add(buildPreparationContainer(preparationContainersData.length - 1));
+      preparationContainers
+          .add(buildPreparationContainer(preparationContainersData.length - 1));
     });
   }
 
   void createRecep() async {
-    if (formKey.currentState!.validate() && preparationContainersData.isNotEmpty) {
+    if (formKey.currentState!.validate() &&
+        preparationContainersData.isNotEmpty) {
       final token = await SecureStorage().read(key: "accessToken") ?? "";
       final decodedToken = JwtDecoder.decode(token);
       final docID = decodedToken["sub"];
@@ -864,15 +935,15 @@ class _CreateRecepState extends State<CreateRecep> {
       final validPreparations = preparationContainersData
           .where((e) => e.preparation.name.isNotEmpty)
           .map((e) => Preparation(
-        name: e.preparation.name,
-        amount: e.preparation.amount,
-        quantity: e.preparation.quantity,
-        timesInDay: e.preparation.timesInDay,
-        days: e.preparation.days,
-        type: e.preparation.type,
-        medicineId: e.preparation.medicineId,
-        medicine: MedicineModel(id: e.preparation.medicineId),
-      ))
+                name: e.preparation.name,
+                amount: e.preparation.amount,
+                quantity: e.preparation.quantity,
+                timesInDay: e.preparation.timesInDay,
+                days: e.preparation.days,
+                type: e.preparation.type,
+                medicineId: e.preparation.medicineId,
+                medicine: MedicineModel(id: e.preparation.medicineId),
+              ))
           .toList();
 
       if (validPreparations.isEmpty) {
@@ -881,7 +952,7 @@ class _CreateRecepState extends State<CreateRecep> {
           context: context,
           alignment: Alignment.topCenter,
           title: Text(LocaleKeys.create_recep_add_medicine.tr()),
-          autoCloseDuration:  Duration(seconds: 2),
+          autoCloseDuration: Duration(seconds: 2),
           showProgressBar: false,
           primaryColor: Colors.white,
           backgroundColor: Colors.redAccent,
@@ -891,28 +962,27 @@ class _CreateRecepState extends State<CreateRecep> {
       }
 
       context.read<CreateRecepCubit>().saveRecep(
-        model: RecepModel(
-          doctorId: docID,
-          firstName: nameController.text.trim(),
-          lastName: "",
-          dateOfBirth: selectedDate ?? DateTime.now(),
-          phoneNumber: numberController.text.trim().replaceAll(" ", ""),
-          phoneNumberPrefix: "+998",
-          dateCreation: DateTime.now(),
-          diagnosis: diagnosisController.text.trim(),
-          comment: commentController.text.trim(),
-          telegramId: 0,
-          districtId: 100,
-          preparations: validPreparations,
-        ),
-      );
+            model: RecepModel(
+              doctorId: docID,
+              firstName: nameController.text.trim(),
+              lastName: "",
+              dateOfBirth: selectedDate ?? DateTime.now(),
+              phoneNumber: numberController.text.trim().replaceAll(" ", ""),
+              phoneNumberPrefix: "+998",
+              dateCreation: DateTime.now(),
+              diagnosis: diagnosisController.text.trim(),
+              comment: commentController.text.trim(),
+              telegramId: 0,
+              districtId: 100,
+              preparations: validPreparations,
+            ),
+          );
 
       final message = buildTelegramMessage();
       context.read<CreateRecepCubit>().sendTelegramData(
-        number: "998${numberController.text.trim().replaceAll(" ", "")}",
-        message: message,
-      );
-
+            number: "998${numberController.text.trim().replaceAll(" ", "")}",
+            message: message,
+          );
     } else {
       showValidationError();
     }
@@ -926,17 +996,20 @@ class _CreateRecepState extends State<CreateRecep> {
 
     var receiptDetails = '';
     for (var container in preparationContainersData) {
-      if (container.selectedMNNs.isNotEmpty && container.selectedPreparations.isNotEmpty) {
+      if (container.selectedMNNs.isNotEmpty &&
+          container.selectedPreparations.isNotEmpty) {
         for (var i = 0; i < container.selectedPreparations.length; i++) {
           final prep = container.selectedPreparations[i];
-          final mnnName = container.selectedMNNs.length > i ? container.selectedMNNs[i].name : '';
+          final mnnName = container.selectedMNNs.length > i
+              ? container.selectedMNNs[i].name
+              : '';
           receiptDetails +=
-          '✅ [$mnnName] ${prep.name} ${prep.amount} ${prep.quantity} ${prep.type} * ${prep.timesInDay} раз в день (${prep.days} дней)\n';
+              '✅ [$mnnName] ${prep.name} ${prep.amount} ${prep.quantity} ${prep.type} * ${prep.timesInDay} раз в день (${prep.days} дней)\n';
         }
       } else if (container.selectedPreparations.isNotEmpty) {
         for (var prep in container.selectedPreparations) {
           receiptDetails +=
-          '✅ ${prep.name} ${prep.amount} ${prep.quantity} ${prep.type} * ${prep.timesInDay} раз в день (${prep.days} дней)\n';
+              '✅ ${prep.name} ${prep.amount} ${prep.quantity} ${prep.type} * ${prep.timesInDay} раз в день (${prep.days} дней)\n';
         }
       } else if (container.selectedMNNs.isNotEmpty) {
         for (var mnn in container.selectedMNNs) {
@@ -945,7 +1018,9 @@ class _CreateRecepState extends State<CreateRecep> {
       }
     }
 
-    message += receiptDetails.isNotEmpty ? receiptDetails : 'Hech qanday dori yoki MNN tanlanmagan\n';
+    message += receiptDetails.isNotEmpty
+        ? receiptDetails
+        : 'Hech qanday dori yoki MNN tanlanmagan\n';
     message += '\nПримечание: ${commentController.text.trim()}';
     return message;
   }
@@ -968,7 +1043,7 @@ class _CreateRecepState extends State<CreateRecep> {
         context: context,
         alignment: Alignment.topCenter,
         title: Text(errorMessage),
-        autoCloseDuration:  Duration(seconds: 4),
+        autoCloseDuration: Duration(seconds: 4),
         showProgressBar: false,
         primaryColor: Colors.white,
         backgroundColor: Colors.redAccent,
@@ -997,7 +1072,10 @@ class _CreateRecepState extends State<CreateRecep> {
               SizedBox(height: 30),
               Text(
                 LocaleKeys.sign_up_select_date.tr(),
-                style:  TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black),
               ),
               Expanded(
                 child: CupertinoDatePicker(
@@ -1014,12 +1092,14 @@ class _CreateRecepState extends State<CreateRecep> {
               CupertinoButton(
                 child: Text(
                   LocaleKeys.sign_up_save.tr(),
-                  style:  TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                      color: Colors.black, fontWeight: FontWeight.w600),
                 ),
                 onPressed: () {
                   setState(() {
                     selectedDate = dateTime;
-                    birthDateController.text = DateFormat('dd/MM/yyyy').format(selectedDate!);
+                    birthDateController.text =
+                        DateFormat('dd/MM/yyyy').format(selectedDate!);
                   });
                   Navigator.pop(context);
                 },
@@ -1054,10 +1134,11 @@ class _CreateRecepState extends State<CreateRecep> {
             children: [
               Text(
                 name,
-                style:  TextStyle(fontSize: Dimens.space18, fontWeight: FontWeight.w500),
+                style: TextStyle(
+                    fontSize: Dimens.space18, fontWeight: FontWeight.w500),
               ),
               TextFormField(
-                keyboardType:  TextInputType.numberWithOptions(decimal: true),
+                keyboardType: TextInputType.numberWithOptions(decimal: true),
                 validator: (value) {
                   if (value?.isEmpty ?? true) {
                     return "kamida 1 ta bo'lishi kerak";
@@ -1070,7 +1151,7 @@ class _CreateRecepState extends State<CreateRecep> {
                 },
                 maxLength: 5,
                 controller: textController,
-                decoration:  InputDecoration(hintText: "1"),
+                decoration: InputDecoration(hintText: "1"),
               ),
               UniversalButton.filled(
                 text: "Сохранить",
@@ -1084,7 +1165,11 @@ class _CreateRecepState extends State<CreateRecep> {
               ),
               SizedBox(height: Dimens.space50),
             ],
-          ).paddingOnly(left: Dimens.space30, right: Dimens.space30, top: Dimens.space20, bottom: MediaQuery.of(context).viewInsets.bottom),
+          ).paddingOnly(
+              left: Dimens.space30,
+              right: Dimens.space30,
+              top: Dimens.space20,
+              bottom: MediaQuery.of(context).viewInsets.bottom),
         );
       },
     );

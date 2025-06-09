@@ -5,4 +5,5 @@ import '../../../../core/error/failure.dart';
 
 abstract class MnnRepository {
   Future<Either<Failure, List<MnnModel>>> getMnn({required int size, required int page});
+  Future<Either<Failure, List<MnnModel>>> getMnnSearch(query,{required int size, required int page});
 }

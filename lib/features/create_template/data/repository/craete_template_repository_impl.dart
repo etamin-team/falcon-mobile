@@ -13,7 +13,7 @@ class CreateTemplateRepositoryImpl implements CreateTemplateRepository {
   @override
   Future<Either<Failure, List<MedicineModel>>> getMedicine({required List<String>? inn}) async {
     final request = await sl<ApiClient>().getMethod(
-      pathUrl: "/doctor/find-medicines-by-mnn?${ inn?.map((e) => "mnnIds=${Uri.encodeComponent(e)}").join("&")}&exact=false",
+      pathUrl: "/doctor/find-medicines-by-mnn?${ inn?.map((e) => "mnnIds=${Uri.encodeComponent(e)}").join("&")}&exact=true",
       isHeader: true,
     );
 
@@ -33,6 +33,20 @@ class CreateTemplateRepositoryImpl implements CreateTemplateRepository {
   Future<Either<Failure, List<MnnModel>>> getMnn({int page = 1, int size = 10}) async {
     final request = await sl<ApiClient>()
         .getMethod(pathUrl: "/db/mnn/list-page?page=$page&size=$size", isHeader: true);
+    if (request.isSuccess) {
+      List<MnnModel> list = [];
+      for (var item in request.response) {
+        list.add(MnnModel.fromJson(item));
+      }
+      return Right(list);
+    }
+    return Left(Failure(
+        errorMsg: request.response.toString(),
+        statusCode: request.code ?? 500));
+  }
+  Future<Either<Failure, List<MnnModel>>> getMnnSearch(query,{int page = 1, int size = 10}) async {
+    final request = await sl<ApiClient>()
+        .getMethod(pathUrl: "/db/mnn/list-page-search?query=$query&$page=$page&size=$size", isHeader: true);
     if (request.isSuccess) {
       List<MnnModel> list = [];
       for (var item in request.response) {

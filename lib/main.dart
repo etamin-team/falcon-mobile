@@ -29,6 +29,7 @@ import 'core/services/secure_storage.dart';
 import 'core/utils/dependencies_injection.dart';
 import 'features/med_agent/home/presentation/cubit/doctor/last_doctor_cubit.dart';
 import 'features/medicine/presentation/cubit/mnn_cubit.dart';
+import 'features/regions/presentation/cubit/workplace_cubit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -139,6 +140,9 @@ class _MyAppState extends State<MyApp> {
         ),
         BlocProvider(
           create: (context) => sl<WorkplaceCubit>(),
+        ),
+        BlocProvider(
+          create: (context) => sl<WorkPlaceCubit>(),
         ),
         BlocProvider(
           create: (context) => sl<MedicineCubit>(),

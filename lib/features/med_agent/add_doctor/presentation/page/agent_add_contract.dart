@@ -53,7 +53,8 @@ class _AgentAddContractState extends State<AgentAddContract> {
   List<MedicineModel> preparations = [];
   List<MedicineModel> selectedPreparations = [];
   List<int> quantity = [];
-  LanguageModel location = LanguageModel(uz: "", ru: "", en: "");
+  LanguageModel location = LanguageModel(uz: "", ru: "", );
+  // LanguageModel location = LanguageModel(uz: "", ru: "", en: "");
   int locationId = 0;
   int workplaceId = 0;
   String doctorID = "";
@@ -87,12 +88,12 @@ class _AgentAddContractState extends State<AgentAddContract> {
   void loadMedicines() async {
     final result = await medicineRepositoryImpl.getMedicine();
     result.fold(
-      (failure) {
+          (failure) {
         if (kDebugMode) {
           print('Error: ${failure.errorMsg}');
         }
       },
-      (list) {
+          (list) {
         setState(() {
           preparations = list;
         });
@@ -185,7 +186,7 @@ class _AgentAddContractState extends State<AgentAddContract> {
                               },
                               lastName: (String value) {
                                 nameController.text =
-                                    "${nameController.text} $value";
+                                "${nameController.text} $value";
                                 if (formKey.currentState!.validate()) {}
                               },
                               id: (String value) {
@@ -204,7 +205,7 @@ class _AgentAddContractState extends State<AgentAddContract> {
                             },
                             controller: nameController,
                             hintText:
-                                LocaleKeys.med_add_doctor_select_doctor.tr(),
+                            LocaleKeys.med_add_doctor_select_doctor.tr(),
                             suffixIcon: Icon(
                               CupertinoIcons.chevron_down,
                               color: Colors.black,
@@ -241,7 +242,7 @@ class _AgentAddContractState extends State<AgentAddContract> {
                           textColor: Colors.black,
                           controller: doctorTypeController,
                           hintText:
-                              LocaleKeys.med_add_doctor_select_speciality.tr(),
+                          LocaleKeys.med_add_doctor_select_speciality.tr(),
                           hintColor: Colors.black87,
                           isEnabled: false,
                         ),
@@ -249,7 +250,7 @@ class _AgentAddContractState extends State<AgentAddContract> {
                           textColor: Colors.black,
                           controller: doctorLevelController,
                           hintText:
-                              LocaleKeys.med_add_doctor_select_position.tr(),
+                          LocaleKeys.med_add_doctor_select_position.tr(),
                           hintColor: Colors.black87,
                           isEnabled: false,
                         ),
@@ -323,32 +324,32 @@ class _AgentAddContractState extends State<AgentAddContract> {
                                     fontSize: 16, color: Colors.grey[600]),
                               ),
                               borderRadius:
-                                  BorderRadius.all(Radius.circular(15)),
+                              BorderRadius.all(Radius.circular(15)),
                               value: selectedContractTypeFull,
                               onChanged: (String? newValue) {
                                 calculate();
                                 setState(() {
                                   int selectedIndex =
-                                      contractTypesFullList.indexOf(newValue!);
+                                  contractTypesFullList.indexOf(newValue!);
                                   selectedContractTypeFull = newValue;
                                   selectedContractType =
-                                      contractTypesList[selectedIndex];
+                                  contractTypesList[selectedIndex];
                                 });
                               },
                               icon: Icon(Icons.arrow_drop_down,
                                   color: Colors.black, size: 30),
                               style:
-                                  TextStyle(fontSize: 18, color: Colors.black),
+                              TextStyle(fontSize: 18, color: Colors.black),
                               dropdownColor: Color.fromRGBO(247, 248, 252, 1),
                               items: contractTypesFullList
                                   .map<DropdownMenuItem<String>>(
                                       (String value) {
-                                return DropdownMenuItem<String>(
-                                  value: value,
-                                  child: Text(value,
-                                      style: TextStyle(fontSize: 16)),
-                                );
-                              }).toList(),
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Text(value,
+                                          style: TextStyle(fontSize: 16)),
+                                    );
+                                  }).toList(),
                             ),
                           ),
                         ),
@@ -430,7 +431,7 @@ class _AgentAddContractState extends State<AgentAddContract> {
                             },
                             controller: recipeController,
                             hintText:
-                                LocaleKeys.med_add_doctor_select_pack.tr(),
+                            LocaleKeys.med_add_doctor_select_pack.tr(),
                             suffixIcon: Icon(
                               CupertinoIcons.add_circled_solid,
                               color: Colors.blueAccent,
@@ -441,19 +442,19 @@ class _AgentAddContractState extends State<AgentAddContract> {
                         ),
                         ...List.generate(
                           selectedPreparations.length,
-                          (index) {
+                              (index) {
                             return Container(
                               padding: EdgeInsets.symmetric(
                                   horizontal: Dimens.space20,
                                   vertical: Dimens.space16),
                               decoration: BoxDecoration(
                                   borderRadius:
-                                      BorderRadius.circular(Dimens.space10),
+                                  BorderRadius.circular(Dimens.space10),
                                   color: AppColors.backgroundColor),
                               child: Row(
                                 spacing: Dimens.space10,
                                 mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                MainAxisAlignment.spaceBetween,
                                 children: [
                                   GestureDetector(
                                       onTap: () {
@@ -481,7 +482,7 @@ class _AgentAddContractState extends State<AgentAddContract> {
                                     onTap: () {
                                       showInputAmount(
                                           name: selectedPreparations[index]
-                                                  .name ??
+                                              .name ??
                                               "",
                                           amount: quantity[index],
                                           onChange: (int value) {
@@ -564,7 +565,7 @@ class _AgentAddContractState extends State<AgentAddContract> {
                           GestureDetector(
                             onTap: () {
                               DateTime min =
-                                  DateTime.now().add(Duration(days: 1));
+                              DateTime.now().add(Duration(days: 1));
                               if (fromDateController.text.length == 10) {
                                 DateFormat format = DateFormat("yyyy-MM-dd");
                                 min = format
@@ -642,19 +643,19 @@ class _AgentAddContractState extends State<AgentAddContract> {
                                       doctor: DoctorModel(
                                           firstName: names[0],
                                           lastName:
-                                              names.length > 1 ? names[1] : "",
+                                          names.length > 1 ? names[1] : "",
                                           middleName:
-                                              names.length > 2 ? names[2] : "",
+                                          names.length > 2 ? names[2] : "",
                                           email: emailController.text.trim(),
                                           role: "DOCTOR",
                                           password:
-                                              passwordController.text.trim(),
+                                          passwordController.text.trim(),
                                           phoneNumber: numberController.text
                                               .trim()
                                               .replaceAll(" ", ""),
                                           phonePrefix: "998",
                                           number:
-                                              "998${numberController.text.trim().replaceAll(" ", "")}",
+                                          "998${numberController.text.trim().replaceAll(" ", "")}",
                                           workPlaceId: workplaceId,
                                           birthDate: "2000-01-01",
                                           gender: "MALE",
@@ -664,21 +665,21 @@ class _AgentAddContractState extends State<AgentAddContract> {
                                       contract: AddContractModel(
                                         doctorId: doctorID,
                                         startDate:
-                                            fromDateController.text.toString(),
+                                        fromDateController.text.toString(),
                                         endDate:
-                                            toDateController.text.toString(),
+                                        toDateController.text.toString(),
                                         agentId: "",
                                         contractType: selectedContractType,
                                         agentContractId: agentContractId,
                                         medicineWithQuantityDoctorDTOS:
-                                            List.generate(
+                                        List.generate(
                                           selectedPreparations.length,
-                                          (index) {
+                                              (index) {
                                             return MedicineWithQuantityDoctorDTOS(
                                                 medicineId:
-                                                    selectedPreparations[index]
-                                                            .id ??
-                                                        0,
+                                                selectedPreparations[index]
+                                                    .id ??
+                                                    0,
                                                 quote: quantity[index]);
                                           },
                                         ),
@@ -804,8 +805,8 @@ class _AgentAddContractState extends State<AgentAddContract> {
 
   void showInputAmount(
       {required String name,
-      required int amount,
-      required ValueChanged<int> onChange}) async {
+        required int amount,
+        required ValueChanged<int> onChange}) async {
     final quantForm = GlobalKey<FormState>();
     amountController.text = amount.toString();
     showModalBottomSheet(
@@ -868,11 +869,11 @@ class _AgentAddContractState extends State<AgentAddContract> {
 
   Future<void> showDatePickerBottomSheet(
       {required BuildContext ctx,
-      required String text,
-      required ValueChanged<String> onChange,
-      required DateTime min,
-      required DateTime max,
-      required bool from}) async {
+        required String text,
+        required ValueChanged<String> onChange,
+        required DateTime min,
+        required DateTime max,
+        required bool from}) async {
     DateTime dateTime = DateTime.now().add(Duration(hours: 1));
     if (!from) {
       dateTime = min.add(Duration(hours: 5));
@@ -908,7 +909,7 @@ class _AgentAddContractState extends State<AgentAddContract> {
                   maximumDate: from ? max : DateTime(2050),
                   minimumDate: from
                       ? DateTime(DateTime.now().year, DateTime.now().month,
-                          DateTime.now().day)
+                      DateTime.now().day)
                       : min,
                   onDateTimeChanged: (DateTime newDate) {
                     dateTime = newDate;
@@ -1015,7 +1016,8 @@ class _AgentAddContractState extends State<AgentAddContract> {
     // Clear lists
 
     // Reset custom objects and strings to their initial values
-    location = LanguageModel(uz: "", ru: "", en: "");
+    location = LanguageModel(uz: "", ru: "");
+    // location = LanguageModel(uz: "", ru: "", en: "");
     doctorID = "";
     locationDTO = "";
     workplaceDTO = "";

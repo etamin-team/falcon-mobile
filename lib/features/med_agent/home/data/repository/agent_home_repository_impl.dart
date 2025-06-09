@@ -19,8 +19,7 @@ class AgentHomeRepositoryImpl implements AgentHomeRepository {
         pathUrl: "/med-agent/goal/agent-id/$uuid", isHeader: true);
     if (request.isSuccess) {
       return Right(AgentGoalModel.fromJson(request.response));
-    }
-    return Left(Failure(
+    }return Left(Failure(
         errorMsg: request.response.toString(),
         statusCode: request.code ?? 500));
   }

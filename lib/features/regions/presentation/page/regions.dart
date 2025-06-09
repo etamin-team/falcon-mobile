@@ -27,6 +27,13 @@ class RegionsPage extends StatefulWidget {
 
 class _RegionsPageState extends State<RegionsPage> {
   final searchController = TextEditingController();
+
+  @override
+  void initState() {
+    print("init State--------------------");
+    context.read<RegionsCubit>().getRegions();
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<RegionsCubit, RegionsState>(
@@ -34,9 +41,10 @@ class _RegionsPageState extends State<RegionsPage> {
         // TODO: implement listener
       },
       builder: (context, state) {
-        if (state is RegionsSuccess ) {
+        print(state);
+        print("state---------");
+         if (state is RegionsSuccess) {
           final filteredRegions = state.regions.where((region) {
-
             final regionName = region.name.toLowerCase();
             final districts = region.districts
                 .where((district) => district.name
@@ -118,7 +126,7 @@ class _RegionsPageState extends State<RegionsPage> {
                           children: [
                             SvgPicture.asset(Assets.icons.list),
                             Text(
-                            "HELLO",
+                            LocaleKeys.med_add_doctor_select_region_hint.tr(),
                               style: TextStyle(
                                 fontFamily: 'VelaSans',
                                   fontWeight: FontWeight.w700,
@@ -161,9 +169,10 @@ class _RegionsPageState extends State<RegionsPage> {
                                                 ru: filteredRegions[index]
                                                     .nameRussian
                                                     .toString(),
-                                                en: filteredRegions[index]
-                                                    .name
-                                                    .toString()))),
+                                                // en: filteredRegions[index]
+                                                //     .name
+                                                //     .toString()
+                                            ))),
                                         children: filteredRegions[index]
                                             .districts
                                             .map<Widget>((district) {
@@ -171,8 +180,8 @@ class _RegionsPageState extends State<RegionsPage> {
                                             onTap: () {
                                               widget.onChange(LanguageModel(
                                                   uz: district.nameUzLatin,
-                                                  ru: district.nameRussian,
-                                                  en: district.name));
+                                                  ru: district.nameRussian));
+                                                  // en: district.name));
                                               widget.districtId(
                                                   district.districtId);
                                               Navigator.pop(context);
@@ -182,7 +191,8 @@ class _RegionsPageState extends State<RegionsPage> {
                                                 model: LanguageModel(
                                                     uz: district.nameUzLatin,
                                                     ru: district.nameRussian,
-                                                    en: district.name))),
+                                                    // en: district.name
+                                                    ))),
                                             dense: true,
                                             visualDensity:
                                                 VisualDensity.compact,
@@ -203,13 +213,25 @@ class _RegionsPageState extends State<RegionsPage> {
               ],
             ).paddingSymmetric(horizontal: Dimens.space20),
           );
+        } else if (state is RegionsError){
+           print("ddddddddddoaaaaaa---------------------------------------ssssssssssssssss22222222@@@@@@@@@@aasssaaa");
+           return Scaffold(
+             backgroundColor: AppColors.backgroundColor,
+             body: Center(
+               child: CircularProgressIndicator(),
+             ),
+           );
+         }
+         else {
+           print("helllllloooooooooooooooooooooooooooooooaaaaaa---------------------------------------aasssaaa");
+
+           return Scaffold(
+            backgroundColor: AppColors.backgroundColor,
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
         }
-        return Scaffold(
-          backgroundColor: AppColors.backgroundColor,
-          body: Center(
-            child: CircularProgressIndicator(),
-          ),
-        );
       },
     );
   }

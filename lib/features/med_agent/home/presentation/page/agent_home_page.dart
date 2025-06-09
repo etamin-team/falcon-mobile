@@ -129,39 +129,6 @@ class _AgentHomePageState extends State<AgentHomePage> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => AgentContract()));
-                          },
-                          child: Container(
-                            padding: EdgeInsets.all(Dimens.space20),
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(Dimens.space20)),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              spacing: Dimens.space6,
-                              children: [
-                                SvgPicture.asset(Assets.icons.pills),
-                                Text(
-                                  LocaleKeys.med_home_edit_contract.tr(),
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: Dimens.space16),
-                                )
-                              ],
-                            ),
-                          ),
-                        )),
-                  ],
-                ),
-                SizedBox(height: 10,),
-                Row(
-                  children: [
-                    Expanded(
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
                                     builder: (context) => BlocProvider(
                                       create: (context) => sl<AddDoctorCubit>(),
                                       child: AgentAddContract(),
@@ -187,6 +154,40 @@ class _AgentHomePageState extends State<AgentHomePage> {
                             ),
                           ),
                         )),
+                  ],
+                ),
+                SizedBox(height: 10,),
+                Row(
+                  children: [
+                    Expanded(
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => AgentContract()));
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(Dimens.space20),
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(Dimens.space20)),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              spacing: Dimens.space6,
+                              children: [
+                                SvgPicture.asset(Assets.icons.pills),
+                                Text(
+                                  LocaleKeys.med_home_edit_contract.tr(),
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: Dimens.space16),
+                                )
+                              ],
+                            ),
+                          ),
+                        )),
+
                   ],
                 ),
                 SizedBox(height: Dimens.space10),

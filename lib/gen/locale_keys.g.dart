@@ -16,6 +16,7 @@ abstract class  LocaleKeys {
   static const texts_filters = 'texts.filters';
   static const texts_region = 'texts.region';
   static const texts_all = 'texts.all';
+  static const texts_add_mnn = 'texts.add_mnn';
   static const texts_by_alphabet = 'texts.by_alphabet';
   static const texts_by_priority = 'texts.by_priority';
   static const texts_by_chronology = 'texts.by_chronology';

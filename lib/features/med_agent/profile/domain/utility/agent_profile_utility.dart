@@ -73,7 +73,7 @@ mixin AgentProfileUtility on State<AgentProfile> {
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(builder: (context) => SignPage()),
-                      (route) => false,
+                      (route) => true,
                 );
               },
             ),

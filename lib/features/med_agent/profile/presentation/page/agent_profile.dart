@@ -1,13 +1,10 @@
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:toastification/toastification.dart';
-import 'package:wm_doctor/core/model/language_model.dart';
 import 'package:wm_doctor/core/widgets/export.dart';
 import 'package:wm_doctor/features/med_agent/profile/domain/utility/agent_profile_utility.dart';
 import 'package:wm_doctor/features/med_agent/profile/presentation/cubit/agent_profile_data/agent_profile_data_cubit.dart';
 import 'package:wm_doctor/gen/locale_keys.g.dart';
-
 import '../../../../../core/widgets/custom_progress_bar.dart';
 import '../../../../auth/sign_up/presentation/widgets/language.dart';
 import '../../../../profile/presentation/cubit/profile_cubit.dart';
@@ -363,6 +360,7 @@ class _AgentProfileState extends State<AgentProfile> with AgentProfileUtility {
                                       style: TextStyle(
                                           fontSize: Dimens.space12,
                                           fontWeight: FontWeight.bold),
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                     Text(
                                       LocaleKeys.med_profile_for_current_month.tr(),
@@ -370,6 +368,7 @@ class _AgentProfileState extends State<AgentProfile> with AgentProfileUtility {
                                           fontSize: Dimens.space12,
                                           fontWeight: FontWeight.w400,
                                           color: Colors.grey),
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                     Spacer(),
                                     Text(
@@ -377,6 +376,7 @@ class _AgentProfileState extends State<AgentProfile> with AgentProfileUtility {
                                       style: TextStyle(
                                           fontSize: Dimens.space12,
                                           fontWeight: FontWeight.bold),
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ],
                                 ),
@@ -647,7 +647,7 @@ class _AgentProfileState extends State<AgentProfile> with AgentProfileUtility {
                                         foregroundColor: Colors.white,
                                       );
                                       setState(() {
-                                        placeName = value.uz;
+                                        placeName = value.toString();
                                       });
                                     },
                                     districtId: (value) {

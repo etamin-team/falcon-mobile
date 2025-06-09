@@ -47,17 +47,5 @@ final class RegionsError extends RegionsState {
   List<Object> get props => [failure];
 }
 
-final class WorkplaceSuccesss extends RegionsState {
-  final List<WorkPlaceDto> workplace;
-  const WorkplaceSuccesss({required this.workplace});
-  @override
-  List<Object> get props => [];
-}
-final class WorkplaceErrorr extends RegionsState {
-  final Failure failure;
 
-  const WorkplaceErrorr({required this.failure});
 
-  @override
-  List<Object> get props => [failure];
-}

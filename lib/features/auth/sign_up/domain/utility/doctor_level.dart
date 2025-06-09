@@ -14,9 +14,10 @@ void showDoctorPositionList({
     doctorPositions = DoctorTypes.doctorDegreesUz;
   } else if (currentLang == 'ru') {
     doctorPositions = DoctorTypes.doctorDegreesRu;
-  } else if (currentLang == 'en') {
-    doctorPositions = DoctorTypes.doctorDegreesEn;
   }
+  // }} else if (currentLang == 'en') {
+  //   doctorPositions = DoctorTypes.doctorDegreesEn;
+  // }
 
   showModalBottomSheet(
     showDragHandle: true,
@@ -41,7 +42,8 @@ void showDoctorPositionList({
                     onchange(LanguageModel(
                         uz: DoctorTypes.doctorDegreesUz[index],
                         ru: DoctorTypes.doctorDegreesRu[index],
-                        en: DoctorTypes.doctorDegreesEn[index]));
+                        // en: DoctorTypes.doctorDegreesEn[index]
+                    ));
                     Navigator.pop(context);
                   },
                   title: Text(doctorPositions[index]),

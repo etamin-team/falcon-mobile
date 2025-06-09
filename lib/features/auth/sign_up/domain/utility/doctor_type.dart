@@ -13,11 +13,11 @@ void showDoctorTypeList({
   List<String> doctorTypes = [];
   String currentLang = ctx.locale.languageCode;
   if (currentLang == "uz") {
-    doctorTypes = DoctorTypes.uzbek;
+    doctorTypes = DoctorTypes.uzbekSelect;
   } else if (currentLang == 'ru') {
-    doctorTypes = DoctorTypes.russian;
-  } else if (currentLang == 'en') {
-    doctorTypes = DoctorTypes.english;
+    doctorTypes = DoctorTypes.russianSelect;
+    // } else if (currentLang == 'en') {
+    //   doctorTypes = DoctorTypes.english;
   }
 
   showModalBottomSheet(
@@ -28,21 +28,29 @@ void showDoctorTypeList({
     builder: (context) {
       return Container(
         constraints: BoxConstraints(
-          minWidth: MediaQuery.sizeOf(context).width,
-          maxHeight: MediaQuery.sizeOf(context).height * 0.8,
-          minHeight: MediaQuery.sizeOf(context).height * 0.2,
+          minWidth: MediaQuery
+              .sizeOf(context)
+              .width,
+          maxHeight: MediaQuery
+              .sizeOf(context)
+              .height * 0.8,
+          minHeight: MediaQuery
+              .sizeOf(context)
+              .height * 0.2,
         ),
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: List.generate(
               doctorTypes.length,
-              (index) {
+                  (index) {
                 return ListTile(
                   onTap: () {
-                    onchange(LanguageModel(uz: DoctorTypes.uzbek[index], ru: DoctorTypes.russian[index], en: DoctorTypes.english[index]));
+                    onchange(LanguageModel(uz: DoctorTypes.uzbekSelect[index],
+                        ru: DoctorTypes.russianSelect[index]));
+                    // onchange(LanguageModel(uz: DoctorTypes.uzbek[index], ru: DoctorTypes.russian[index], en: DoctorTypes.english[index]));
 
-                    realType(DoctorTypes.specialists[index]);
+                    realType(DoctorTypes.specialistsSelect[index]);
                     Navigator.pop(context);
                   },
                   title: Text(doctorTypes[index]),

@@ -35,6 +35,7 @@ import 'package:wm_doctor/features/profile/presentation/cubit/profile_data/profi
 import 'package:wm_doctor/features/profile/presentation/cubit/statistics/statistics_cubit.dart';
 import 'package:wm_doctor/features/regions/data/repository/regions_repository_impl.dart';
 import 'package:wm_doctor/features/regions/presentation/cubit/regions_cubit.dart';
+import 'package:wm_doctor/features/regions/presentation/cubit/workplace_cubit.dart';
 import 'package:wm_doctor/features/reset_password/data/repository/reset_password_repository_impl.dart';
 import 'package:wm_doctor/features/reset_password/presentation/cubit/reset_password_cubit.dart';
 import 'package:wm_doctor/features/workplace/data/repository/workplace_repository_impl.dart';
@@ -141,6 +142,7 @@ void _blocs() {
   sl.registerFactory(() => ProfileCubit(sl<ProfileRepositoryImpl>()));
   sl.registerFactory(() => CreateRecepCubit(sl<CreateRecepRepositoryImpl>()));
   sl.registerFactory(() => MnnCubit(sl<MnnRepositoryImpl>()));
+  sl.registerFactory(() => WorkPlaceCubit(sl<RegionsRepositoryImpl>()));
   sl.registerFactory(() => WorkplaceCubit(sl<WorkplaceRepositoryImpl>()));
   sl.registerFactory(() => MedicineCubit(sl<MedicineRepositoryImpl>()));
   sl.registerFactory(() => ProfileDataCubit(sl<ProfileRepositoryImpl>()));

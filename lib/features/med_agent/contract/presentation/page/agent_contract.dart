@@ -14,6 +14,8 @@ import 'package:wm_doctor/features/regions/presentation/cubit/regions_cubit.dart
 import 'package:wm_doctor/gen/locale_keys.g.dart';
 
 import '../../../../auth/sign_up/domain/entity/regison_entity.dart';
+import '../../../../regions/presentation/cubit/workplace_cubit.dart';
+import '../../../../workplace/presentation/cubit/workplace_cubit.dart';
 
 class AgentContract extends StatefulWidget {
   const AgentContract({super.key});
@@ -46,8 +48,12 @@ class _AgentContractState extends State<AgentContract> {
 
     context.read<RegionsCubit>().stream.listen((state) {
       setState(() {
+        print(state);
         if (state is RegionsSuccess) {
           _districtList = state.regions.first.districts;
+          print("here is workplace:-------------------");
+          print(_selectedDistrictId);
+          print(state.regions.first);
           if (state.regions.first.districts.isNotEmpty) {
             _selectedDistrictId =
                 state.regions.first.districts.first.districtId;
@@ -56,26 +62,35 @@ class _AgentContractState extends State<AgentContract> {
           } else {
             _selectedDistrictId = 0;
             _selectedDistrictName = LocaleKeys.med_add_doctor_select_region_hint.tr();
+            _showErrorSnackBar(state as String);
           }
-        } else if (state is WorkplaceSuccesss) {
+      }
+      }
+      );
+    });
+    context.read<WorkPlaceCubit>().stream.listen((state) {
+      setState(() {
+        print(state);
+        if (state is WorkPlaceSuccess) {
           _workPlaceList = state.workplace;
-          if (state.workplace.isNotEmpty) {
-            _selectedWorkPlaceId = state.workplace.first.id!;
+          print("here is workplace:-------------------");
+          print(state.workplace.first.name);
+          if (state.workplace.first.name != null) {
             _selectedWorkPlaceName = state.workplace.first.name!;
+            _selectedWorkPlaceId = state.workplace.first.id!;
           } else {
             _selectedWorkPlaceId = 0;
-            _selectedWorkPlaceName = LocaleKeys.med_add_doctor_select_workplace_hint.tr();
+            _selectedDistrictName = LocaleKeys.med_add_doctor_select_workplace_hint.tr();
+            _showErrorSnackBar(state as String);
           }
-        } else if (state is WorkplaceErrorr) {
-          _showErrorSnackBar(state.failure as String);
         }
-      });
+      }
+      );
     });
   }
 
   @override
   void dispose() {
-    _searchController.removeListener(_onFilterChanged);
     _searchController.dispose();
     _debounce?.cancel();
     super.dispose();
@@ -87,7 +102,9 @@ class _AgentContractState extends State<AgentContract> {
   }
 
   void _fetchWorkPlaces() {
-    context.read<RegionsCubit>().getWorkplacesByDistrictId(_selectedDistrictId);
+    print("hellllooooooo-------------");
+    context.read<WorkPlaceCubit>().getWorkplacesByDistrictId(_selectedDistrictId);
+
     Future.delayed(Duration(milliseconds: 500), _fetchContractsByFilter);
   }
 

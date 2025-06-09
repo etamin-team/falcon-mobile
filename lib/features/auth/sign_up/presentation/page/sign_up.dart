@@ -103,7 +103,6 @@ class _SignUpPageState extends State<SignUpPage> {
                       validator: (value) {
                         if (value.toString().length < 12) {
                           return       LocaleKeys.sign_up_validate_number.tr();
-                          return "Пожалуйста, введите правильный номер телефона!";
                         }
                         return null;
                       },

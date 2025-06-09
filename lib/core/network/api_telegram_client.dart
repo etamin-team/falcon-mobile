@@ -1,7 +1,8 @@
 import 'package:dio/dio.dart';
 
 class ApiTelegramClient {
-  final Dio dio = Dio(BaseOptions(baseUrl: "http://209.38.109.22:8083"));
+  // final Dio dio = Dio(BaseOptions(baseUrl: "http://209.38.109.22:8083"));
+  final Dio dio = Dio(BaseOptions(baseUrl: "http://209.38.109.22:8081"));
 
   Future<bool> sendMessage({
     required String number,

@@ -59,7 +59,8 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
   List<MedicineModel> preparations = [];
   List<MedicineModel> selectedPreparations = [];
   List<int> quantity = [];
-  LanguageModel location = LanguageModel(uz: "", ru: "", en: "");
+  LanguageModel location = LanguageModel(uz: "", ru: "");
+  // LanguageModel location = LanguageModel(uz: "", ru: "", en: "");
   int locationId = 0;
   int workplaceId = 0;
   String doctorID = "";
@@ -68,7 +69,9 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
   String locationDTO = "";
   String workplaceDTO = "";
   String special = "";
+  String specialEnum = "";
   String level = "";
+  bool numberexist = false;
   final formKey = GlobalKey<FormState>();
   List<String> contractTypesList = ["KZ", "SU", "SB", "GZ", "RECIPE"];
   List<String> contractTypesFullList = [
@@ -167,9 +170,11 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
             }
             return BlocListener<SignUpCubit, SignUpState>(
               listener: (context, signUpState) {
+                print("SUCCESS-----------------------3");
                 if (signUpState is SignUpCheckNumberSuccess) {
+                  print("SUCCESS---------------------2");
                   if (!signUpState.isExist) {
-                    // Proceed with doctor registration
+                    print("SUCCESS--------------------1");
                     final names = nameController.text.split(" ");
                     context.read<AddDoctorCubit>().addDoctor(
                       doctor: DoctorModel(
@@ -179,15 +184,13 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                         email: emailController.text.trim(),
                         role: "DOCTOR",
                         password: passwordController.text.trim(),
-                        phoneNumber: numberController.text.trim().replaceAll(
-                            " ", ""),
+                        phoneNumber: numberController.text.trim().replaceAll(" ", ""),
                         phonePrefix: "998",
-                        number: "998${numberController.text.trim().replaceAll(
-                            " ", "")}",
+                        number: "998${numberController.text.trim().replaceAll(" ", "")}",
                         workPlaceId: workplaceId,
                         birthDate: "2000-01-01",
                         gender: "MALE",
-                        fieldName: special.toUpperCase(),
+                        fieldName: specialEnum.toUpperCase(),
                         position: level,
                         districtId: locationId,
                       ),
@@ -200,11 +203,10 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                         agentContractId: agentContractId,
                         medicineWithQuantityDoctorDTOS: List.generate(
                           selectedPreparations.length,
-                              (index) =>
-                              MedicineWithQuantityDoctorDTOS(
-                                medicineId: selectedPreparations[index].id ?? 0,
-                                quote: quantity[index],
-                              ),
+                              (index) => MedicineWithQuantityDoctorDTOS(
+                            medicineId: selectedPreparations[index].id ?? 0,
+                            quote: quantity[index],
+                          ),
                         ),
                       ),
                       isCreateDoctor: true,
@@ -215,13 +217,16 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                       context: context,
                       builder: (context) {
                         return AlertDialog(
-                          title: Text(LocaleKeys.med_add_doctor_success_title.tr(),
-                              style: TextStyle(color: Colors.green)),
+                          title: Text(
+                            LocaleKeys.med_add_doctor_success_title.tr(),
+                            style: TextStyle(color: Colors.green),
+                          ),
                           content: Text(LocaleKeys.med_add_doctor_success_text.tr()),
                           actions: [
                             TextButton(
                               onPressed: () {
-                                Navigator.pop(context);},
+                                Navigator.pop(context);
+                              },
                               child: Text(LocaleKeys.med_add_doctor_ok.tr()),
                             ),
                           ],
@@ -229,13 +234,16 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                       },
                     );
                     resetForm();
-                  }else{
+                  } else {
                     showDialog(
                       context: context,
                       builder: (context) {
                         return AlertDialog(
-                          title: Text(LocaleKeys.med_add_doctor_error_title.tr(), style: TextStyle(color: Colors.redAccent)),
-                          content: Text(LocaleKeys.med_add_doctor_error_text.tr()),
+                          title: Text(
+                            LocaleKeys.med_add_doctor_error_title.tr(),
+                            style: TextStyle(color: Colors.redAccent),
+                          ),
+                          content: Text("This phone number is already registered."),
                           actions: [
                             TextButton(
                               onPressed: () {
@@ -284,20 +292,20 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                                 showRegions(
                                   ctx: context,
                                   onChange: (value) {
+                                    if (formKey.currentState!.validate()) {}
                                     addressController.text = dataTranslate(
                                       ctx: context,
                                       model: LanguageModel(
                                         uz: value.uz,
                                         ru: value.ru,
-                                        en: value.en,
+                                        // en: value.en,
                                       ),
                                     );
-                                    setState(() {
-                                    }); // Update UI if needed
+                                    setState(() {});
                                   },
                                   districtId: (value) {
                                     locationId = value;
-                                    print('Selected district ID: $value'); // Debug
+                                    print('Selected district ID: $value');
                                   },
                                 );
                               },
@@ -355,17 +363,25 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                                 showDoctorTypeList(
                                   ctx: context,
                                   onchange: (value) {
-                                    doctorTypeController.text = dataTranslate(ctx: context, model: LanguageModel(
-                                        uz: value.uz,
-                                        ru: value.ru,
-                                        en: value.en));
-                                    special = dataTranslate(ctx: context, model: LanguageModel(
-                                        uz: value.uz,
-                                        ru: value.ru,
-                                        en: value.en));;
+                                    doctorTypeController.text = dataTranslate(
+                                        ctx: context,
+                                        model: LanguageModel(
+                                          uz: value.uz,
+                                          ru: value.ru,
+                                          // en: value.en,
+                                        ));
+                                    special = dataTranslate(
+                                        ctx: context,
+                                        model: LanguageModel(
+                                          uz: value.uz,
+                                          ru: value.ru,
+                                          // en: value.en,
+                                        ));
                                     if (formKey.currentState!.validate()) {}
                                   },
-                                  realType: (value) {},
+                                  realType: (value) {
+                                    specialEnum = value;
+                                  },
                                 );
                               },
                               child: AppTextField(
@@ -391,14 +407,20 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                                 showDoctorPositionList(
                                   ctx: context,
                                   onchange: (value) {
-                                    doctorLevelController.text = dataTranslate(ctx: context, model: LanguageModel(
-                                        uz: value.uz,
-                                        ru: value.ru,
-                                        en: value.en));
-                                    level = dataTranslate(ctx: context, model: LanguageModel(
-                                        uz: value.uz,
-                                        ru: value.ru,
-                                        en: value.en));;
+                                    doctorLevelController.text = dataTranslate(
+                                        ctx: context,
+                                        model: LanguageModel(
+                                          uz: value.uz,
+                                          ru: value.ru,
+                                          // en: value.en,
+                                        ));
+                                    level = dataTranslate(
+                                        ctx: context,
+                                        model: LanguageModel(
+                                          uz: value.uz,
+                                          ru: value.ru,
+                                          // en: value.en,
+                                        ));
                                     if (formKey.currentState!.validate()) {}
                                   },
                                 );
@@ -450,6 +472,9 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                                 if (value.toString().isEmpty) {
                                   return LocaleKeys.med_add_doctor_enter_number.tr();
                                 }
+                                if (numberexist) {
+                                  return "This phone number is already registered.";
+                                }
                                 return null;
                               },
                               prefixIcon: Text("+998 "),
@@ -459,6 +484,13 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                               ],
                               controller: numberController,
                               hintText: "90 123 45 67",
+                              onChanged: (value) {
+                                if (numberexist) {
+                                  setState(() {
+                                    numberexist = false;
+                                  });
+                                }
+                              },
                             ),
                             SizedBox(height: Dimens.space10),
                             Text(
@@ -726,6 +758,12 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                                 );
                               },
                               child: AppTextField(
+                                validator: (value) {
+                                  if (value.toString().isEmpty) {
+                                    return LocaleKeys.med_add_doctor_error_text.tr();
+                                  }
+                                  return null;
+                                },
                                 isEnabled: false,
                                 title: LocaleKeys.med_add_doctor_data_start.tr(),
                                 titleStyle: TextStyle(
@@ -764,6 +802,12 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                                 );
                               },
                               child: AppTextField(
+                                validator: (value) {
+                                  if (value.toString().isEmpty) {
+                                    return LocaleKeys.med_add_doctor_error_text.tr();
+                                  }
+                                  return null;
+                                },
                                 isEnabled: false,
                                 title: LocaleKeys.med_add_doctor_data_finish.tr(),
                                 titleStyle: TextStyle(
@@ -838,26 +882,22 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                                 );
                                 return;
                               }
-                              if (numberController.text.length == 12) {
-                                context.read<SignUpCubit>().checkNumber(
-                                  number: "998${numberController.text.replaceAll(" ", "").replaceAll("+", "")}",
-                                );
-                              } else {
+                              if (selectedPreparations.length < 5) {
                                 showDialog(
                                   context: context,
                                   builder: (context) {
                                     return AlertDialog(
                                       title: Text(
-                                        "Ошибка",
+                                        LocaleKeys.med_add_doctor_error_title.tr(),
                                         style: TextStyle(color: Colors.redAccent),
                                       ),
-                                      content: Text("Введите номер телефона из 12 символов"),
+                                      content: Text(LocaleKeys.med_add_doctor_error_text_prep.tr()),
                                       actions: [
                                         TextButton(
                                           onPressed: () {
                                             Navigator.pop(context);
                                           },
-                                          child: Text("Ок"),
+                                          child: Text(LocaleKeys.med_add_doctor_ok.tr()),
                                         ),
                                       ],
                                     );
@@ -865,7 +905,43 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                                 );
                                 return;
                               }
-                              // Additional validations moved to BlocListener
+                              final names = nameController.text.trim().split(" ");
+                              context.read<AddDoctorCubit>().addDoctor(
+                                doctor: DoctorModel(
+                                  firstName: names.isNotEmpty ? names[0] : "",
+                                  lastName: names.length > 1 ? names[1] : "",
+                                  middleName: names.length > 2 ? names[2] : "",
+                                  email: emailController.text.trim(),
+                                  role: "DOCTOR",
+                                  password: passwordController.text.trim(),
+                                  phoneNumber: numberController.text.trim().replaceAll(" ", ""),
+                                  phonePrefix: "998",
+                                  number: "998${numberController.text.trim().replaceAll(" ", "")}",
+                                  workPlaceId: workplaceId,
+                                  birthDate: "2000-01-01",
+                                  gender: "MALE",
+                                  fieldName: specialEnum.isNotEmpty ? specialEnum.toUpperCase() : "",
+                                  position: level.isNotEmpty ? level : "",
+                                  districtId: locationId,
+                                ),
+                                contract: AddContractModel(
+                                  doctorId: "",
+                                  startDate: fromDateController.text.isNotEmpty ? fromDateController.text : "",
+                                  endDate: toDateController.text.isNotEmpty ? toDateController.text : "",
+                                  agentId: "",
+                                  contractType: selectedContractType,
+                                  agentContractId: agentContractId,
+                                  medicineWithQuantityDoctorDTOS: List.generate(
+                                    selectedPreparations.length,
+                                        (index) => MedicineWithQuantityDoctorDTOS(
+                                      medicineId: selectedPreparations[index].id ?? 0,
+                                      quote: quantity[index],
+                                    ),
+                                  ),
+                                ),
+                                isCreateDoctor: true,
+                                doctorId: '',
+                              );
                             },
                           );
                         },
@@ -916,7 +992,7 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                   }
                   int number = int.tryParse(value.toString()) ?? 0;
                   if (number < 1) {
-                    return "0 bo'lmasligi kerak";
+                    return "0 bolmasligi kerak";
                   }
                   return null;
                 },
@@ -1063,29 +1139,31 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
 
   void resetForm() {
     nameController.clear();
-    // addressController.clear();
-    // workplaceController.clear();
+    addressController.clear();
+    workplaceController.clear();
     doctorTypeController.clear();
     doctorLevelController.clear();
     emailController.clear();
     numberController.clear();
-    // passwordController.clear();
+    passwordController.clear();
     fromDateController.clear();
     toDateController.clear();
-    // recipeController.clear();
-    // amountController.clear();
-    // allQuote = 0;
+    recipeController.clear();
+    amountController.clear();
+    allQuote = 0;
     agentId = 0;
-    // locationId = 0;
-    // workplaceId = 0;
-    // agentContractId = 1;
-    // selectedPreparations = [];
-    // quantity = [];
+    locationId = 0;
+    workplaceId = 0;
+    agentContractId = 1;
+    selectedPreparations = [];
+    quantity = [];
+    location = LanguageModel(uz: "", ru: "");
     // location = LanguageModel(uz: "", ru: "", en: "");
     doctorID = "";
-    // locationDTO = "";
-    // workplaceDTO = "";
+    locationDTO = "";
+    workplaceDTO = "";
     special = "";
+    specialEnum = "";
     level = "";
     isCreateDoctor = true;
     setState(() {});

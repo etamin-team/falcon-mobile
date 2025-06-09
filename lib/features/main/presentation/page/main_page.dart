@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,20 +22,15 @@ import '../../../create_template/data/model/mnn_model.dart';
 import '../../../med_agent/home/presentation/page/agent_home_page.dart';
 
 class MainPage extends StatefulWidget {
-  final bool fromCheck;
+    final bool fromCheck;
 
   const MainPage({super.key, this.fromCheck = false});
 
-  @override
-  State<MainPage> createState() => _MainPageState();
+   @override
+     State<MainPage> createState() => _MainPageState();
 }
 
 class _MainPageState extends State<MainPage> {
-  // _selectedIndex MainPageSuccess ichiga ko'chirildi
-  // sabab HomePage'dagi "Shablon yaratish" tugmasi bosilganida
-  // vaqtincha shablon yaratilmasligi uchun
-  // Agar shablon yaratilsa izohni olib tashlanishi mumkin
-  // int _selectedIndex = 0;
   bool isDialogOpen = false;
   bool isDataDownload = false;
 
@@ -46,11 +40,10 @@ class _MainPageState extends State<MainPage> {
   void initState() {
     super.initState();
     _subscription = connectionChecker.onStatusChange.listen(
-      (status) {
+          (status) {
         if (status == InternetConnectionStatus.connected) {
           debugPrint("internet ulandi ✅=============================");
           if (isDialogOpen) {
-            // Navigator.of(navigatorKey.currentContext!, rootNavigator: true).pop();
             isDialogOpen = false;
           }
           if (!isDataDownload) {
@@ -64,13 +57,16 @@ class _MainPageState extends State<MainPage> {
         } else {
           debugPrint("❌ internet uzildi =============================");
           internet = false;
-          // showInternetDialog(context);
           isDialogOpen = true;
         }
       },
     );
+  }
 
-    // StreamSubscription orqali real vaqtda internetni kuzatish
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
   }
 
   @override
@@ -89,10 +85,10 @@ class _MainPageState extends State<MainPage> {
               context,
               MaterialPageRoute(
                   builder: (context) => SignUpSuccessPage(
-                        title: LocaleKeys.sign_in_sign_in_title.tr(),
-                        text: LocaleKeys.sign_in_sign_in_text.tr(),
-                      )),
-              (route) => false,
+                    title: LocaleKeys.sign_in_sign_in_title.tr(),
+                    text: LocaleKeys.sign_in_sign_in_text.tr(),
+                  )),
+                  (route) => false,
             );
           }
         }
@@ -103,15 +99,10 @@ class _MainPageState extends State<MainPage> {
             Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (context) => SignPage()),
-              (route) => false,
+                  (route) => false,
             );
           }
         }
-
-        ///401 uchun yozish kerak auto log out ni
-        // if(state is MainPageError){
-        //   if(state.failure)
-        // }
       },
       builder: (context, state) {
         if (state is MainPageSuccess) {
@@ -119,7 +110,6 @@ class _MainPageState extends State<MainPage> {
             return Scaffold(
               body: IndexedStack(
                 index: state.selectedIndex,
-                // index: _selectedIndex,
                 children: [
                   AgentHomePage(),
                   AgentContract(),
@@ -131,21 +121,16 @@ class _MainPageState extends State<MainPage> {
                 currentIndex: state.selectedIndex,
                 onTap: (value) {
                   context.read<MainPageCubit>().changeSelectedIndex(value);
-                  // setState(() {
-                  //   _selectedIndex = value;
-                  // });
                 },
                 type: BottomNavigationBarType.fixed,
                 selectedItemColor: Colors.black,
-                // Tanlangan label rangi
                 unselectedItemColor: Colors.grey,
-                // Tanlanmagan label rangi
                 selectedLabelStyle: TextStyle(
-                  fontSize: 14, // Tanlangan yorliq o'lchami
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
                 ),
                 unselectedLabelStyle: TextStyle(
-                  fontSize: 12, // Tanlanmagan yorliq o'lchami
+                  fontSize: 12,
                 ),
                 items: [
                   _buildBottomNavigationBarItem(
@@ -169,11 +154,10 @@ class _MainPageState extends State<MainPage> {
                 ],
               ),
             );
-          }else if (state.role == "DOCTOR" && state.status == "ENABLED") {
+          } else if (state.role == "DOCTOR" && state.status == "ENABLED") {
             return Scaffold(
               body: IndexedStack(
                 index: state.selectedIndex,
-                // index: _selectedIndex,
                 children: [
                   HomePage(),
                   CreateRecep(List<MnnModel>.empty()),
@@ -183,24 +167,18 @@ class _MainPageState extends State<MainPage> {
               bottomNavigationBar: BottomNavigationBar(
                 backgroundColor: Colors.white,
                 currentIndex: state.selectedIndex,
-                // currentIndex: _selectedIndex,
                 onTap: (value) {
                   context.read<MainPageCubit>().changeSelectedIndex(value);
-                  // setState(() {
-                  //   _selectedIndex = value;
-                  // });
                 },
                 type: BottomNavigationBarType.fixed,
                 selectedItemColor: Colors.black,
-                // Tanlangan label rangi
                 unselectedItemColor: Colors.grey,
-                // Tanlanmagan label rangi
                 selectedLabelStyle: TextStyle(
-                  fontSize: 14, // Tanlangan yorliq o'lchami
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
                 ),
                 unselectedLabelStyle: TextStyle(
-                  fontSize: 12, // Tanlanmagan yorliq o'lchami
+                  fontSize: 12,
                 ),
                 items: [
                   _buildBottomNavigationBarItem(
@@ -224,8 +202,47 @@ class _MainPageState extends State<MainPage> {
                 ],
               ),
             );
+          } else {
+            // Handle invalid role or status
+            return Scaffold(
+              body: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  spacing: Dimens.space20,
+                  children: [
+                    Text(
+                      "Cannot login: Invalid role (${state.role}) or status (${state.status})",
+                      style: TextStyle(
+                        fontSize: Dimens.space16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    Text(
+                      "Role: ${state.role}",
+                      style: TextStyle(
+                        fontSize: Dimens.space14,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    UniversalButton.filled(
+                      height: 50,
+                      width: 200,
+                      text: "Logout",
+                      onPressed: () async {
+                        await FlutterSecureStorage().deleteAll();
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(builder: (context) => SignPage()),
+                              (route) => false,
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            );
           }
-          return Scaffold();
         }
         if (state is MainPageError) {
           return Scaffold(
@@ -237,7 +254,9 @@ class _MainPageState extends State<MainPage> {
                   Text(
                     "Something went wrong",
                     style: TextStyle(
-                        fontSize: Dimens.space14, fontWeight: FontWeight.w500),
+                      fontSize: Dimens.space14,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                   UniversalButton.outline(
                     height: 50,
@@ -246,7 +265,7 @@ class _MainPageState extends State<MainPage> {
                     onPressed: () {
                       context.read<MainPageCubit>().checkToken();
                     },
-                  )
+                  ),
                 ],
               ),
             ),
@@ -267,12 +286,11 @@ class _MainPageState extends State<MainPage> {
     required int index,
     required bool isSelected,
   }) {
-    // final isSelected = _selectedIndex == index;
     return BottomNavigationBarItem(
       icon: SvgPicture.asset(
         icon,
         color: isSelected ? Colors.black : Colors.grey,
-        height: isSelected ? 30 : 24, // Tanlangan element kattaligi
+        height: isSelected ? 30 : 24,
         width: isSelected ? 30 : 24,
       ),
       label: label,

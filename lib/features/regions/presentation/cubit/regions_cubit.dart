@@ -54,14 +54,6 @@ class RegionsCubit extends Cubit<RegionsState> {
           (r) => emit(DistrictsSuccess(districts: r)),
     );
   }
-  void getWorkplacesByDistrictId(id) async {
-    emit(RegionsLoading());
-    final request = await regionsRepositoryImpl.getWorkplacesByDistrictId(id);
-    request.fold(
-          (l) => emit(WorkplaceErrorr(failure: l)),
-          (r) => emit(WorkplaceSuccesss(workplace: r)),
-    );
-  }
   void clear() {
     emit(RegionClear());
   }

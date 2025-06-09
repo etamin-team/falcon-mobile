@@ -5,7 +5,7 @@ import 'package:wm_doctor/features/workplace/presentation/page/workplace.dart';
 showWorkplaceDialog(
     {required BuildContext ctx,
     required ValueChanged<String> name,
-    required ValueChanged<int> id}) {
+    required ValueChanged<int> id,}) {
   showModalBottomSheet(
     context: ctx,
     enableDrag: true,

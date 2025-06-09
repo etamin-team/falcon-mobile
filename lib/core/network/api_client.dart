@@ -6,8 +6,8 @@ import 'status_model.dart';
 import '../services/secure_storage.dart';
 
 class ApiClient {
-  // final baseUrl = "http://209.38.109.22:8080/api/v1";
-  final baseUrl = "http://209.38.109.22:8085/api/v1";
+  final baseUrl = "http://209.38.109.22:8080/api/v1";
+  // final baseUrl = "http://209.38.109.22:8085/api/v1";
   // final baseUrl = "http://192.168.23.162:8080/api/v1";
 
   Dio dio = Dio();  
@@ -386,7 +386,6 @@ class ApiClient {
           response: "Connection Error", isSuccess: false, code: 700);
     }
     if (e.response!.statusCode! == 404) {
-      print('aaaghfhgfahgafhgafhgaf0-------------------------------hagfha');
       return StatusModel(response: null, isSuccess: true, code: 404);
     }
     try {

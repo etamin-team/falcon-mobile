@@ -12,7 +12,7 @@ class RegionsRepositoryImpl implements RegionsRepository {
   Future<Either<Failure, List<RegionModel>>> getRegions() async {
     final request = await sl<ApiClient>()
         .getMethod(pathUrl: "/auth/regions", isHeader: false);
-
+    print("hellllllllllll--------------------");
     if (request.isSuccess) {
       List<RegionModel> list = [];
 
@@ -21,26 +21,28 @@ class RegionsRepositoryImpl implements RegionsRepository {
       }
       return Right(list);
     }
-    return Left(Failure(errorMsg: request.response.toString(), statusCode: request.code??500));
+    return Left(Failure(
+        errorMsg: request.response.toString(),
+        statusCode: request.code ?? 500));
   }
+
   Future<Either<Failure, List<RegionModel>>> getRegionById(regionId) async {
     final request = await sl<ApiClient>()
         .getMethod(pathUrl: "/auth/region?regionId=$regionId", isHeader: true);
-
+    print("------ssssss--------------------------------------------------");
     if (request.isSuccess) {
+      print("------nnnnnnn--------------------------------------------------");
+
       List<RegionModel> list = [];
-      if (request.response is List) {
-        // Handle list response
-        for (var item in request.response) {
-          list.add(RegionModel.fromJson(item));
-        }
-      } else if (request.response is Map<String, dynamic>) {
-        // Handle single object response
-        list.add(RegionModel.fromJson(request.response));
-      }
+      
+      list.add(RegionModel.fromJson(request.response));
+      print(RegionModel.fromJson(request.response).name);
       return Right(list);
+    }else{
+      return Left(Failure(
+          errorMsg: request.response.toString(),
+          statusCode: request.code ?? 500));
     }
-    return Left(Failure(errorMsg: request.response.toString(), statusCode: request.code ?? 500));
   }
 
   Future<Either<Failure, List<District>>> getDistrictsByRegionID(id) async {
@@ -55,10 +57,13 @@ class RegionsRepositoryImpl implements RegionsRepository {
       }
       return Right(list);
     }
-    return Left(Failure(errorMsg: request.response.toString(), statusCode: request.code??500));
+    return Left(Failure(
+        errorMsg: request.response.toString(),
+        statusCode: request.code ?? 500));
   }
 
-  Future<Either<Failure, List<WorkPlaceDto>>> getWorkplacesByDistrictId(id) async {
+  Future<Either<Failure, List<WorkPlaceDto>>> getWorkplacesByDistrictId(
+      id) async {
     final request = await sl<ApiClient>()
         .getMethod(pathUrl: "/db/workplaces?districtId=$id", isHeader: true);
 
@@ -70,7 +75,8 @@ class RegionsRepositoryImpl implements RegionsRepository {
       }
       return Right(list);
     }
-    return Left(Failure(errorMsg: request.response.toString(), statusCode: request.code??500));
+    return Left(Failure(
+        errorMsg: request.response.toString(),
+        statusCode: request.code ?? 500));
   }
 }
-

@@ -202,8 +202,50 @@ class RegionEntity {
 }
 
 class DoctorTypes {
+  static List<String> englishSelect = [
+    "Neurologist",
+    "Surgeon",
+    "Pediatrician",
+    "Ophthalmologist",
+    "Dermatologist",
+    "Endocrinologist",
+    "Gastroenterologist",
+    "Traumatologist",
+  ];
+  static List<String> uzbekSelect = [
+    "Nevropatolog",
+    "Jarroh",
+    "Pediatr",
+    "Oftalmolog",
+    "Dermatolog",
+    "Endokrinolog",
+    "Gastroenterolog",
+    "Travmatolog",
+  ];
+
+  static List<String> russianSelect = [
+    "Невролог",
+    "Хирург",
+    "Педиатр",
+    "Офтальмолог",
+    "Дерматолог",
+    "Эндокринолог",
+    "Гастроэнтеролог",
+    "Травматолог",
+  ];
+  static List<String> specialistsSelect = [
+    "NEUROLOGIST",
+    "SURGEON",
+    "PEDIATRICIAN",
+    "OPHTHALMOLOGIST",
+    "DERMATOLOGIST",
+    "ENDOCRINOLOGIST",
+    "GASTROENTEROLOGIST",
+    "TRAUMATOLOGIST",
+  ];
+
   static List<String> english = [
-    "All"
+    "All",
     "Neurologist",
     "Surgeon",
     "Pediatrician",
@@ -214,7 +256,7 @@ class DoctorTypes {
     "Traumatologist",
   ];
   static List<String> uzbek = [
-    "Barchasi"
+    "Barchasi",
     "Nevropatolog",
     "Jarroh",
     "Pediatr",
@@ -235,6 +277,7 @@ class DoctorTypes {
     "Гастроэнтеролог",
     "Травматолог",
   ];
+
   static List<String> specialists = [
     "ALL",
     "NEUROLOGIST",
@@ -363,11 +406,13 @@ LanguageModel checkMedicineType({required String name}) {
     if (listUz[a].toUpperCase() == name.toUpperCase() ||
         listRu[a].toUpperCase() == name.toUpperCase() ||
         listEn[a].toUpperCase() == name.toUpperCase()) {
-      return LanguageModel(uz: listUz[a], ru: listRu[a], en: listEn[a]);
+      return LanguageModel(uz: listUz[a], ru: listRu[a]);
+      // return LanguageModel(uz: listUz[a], ru: listRu[a], en: listEn[a]);
     }
   }
 
-  return LanguageModel(uz: name, ru: name, en: name);
+  return LanguageModel(uz: name, ru: name);
+  // return LanguageModel(uz: name, ru: name, en: name);
 }
 
 LanguageModel findDoctorType({required String name}) {
@@ -379,9 +424,11 @@ LanguageModel findDoctorType({required String name}) {
     if (listUz[a].toUpperCase() == name.toUpperCase() ||
         listRu[a].toUpperCase() == name.toUpperCase() ||
         listEn[a].toUpperCase() == name.toUpperCase()) {
-      return LanguageModel(uz: listUz[a], ru: listRu[a], en: listEn[a]);
+      return LanguageModel(uz: listUz[a], ru: listRu[a]);
+      // return LanguageModel(uz: listUz[a], ru: listRu[a], en: listEn[a]);
     }
   }
 
-  return LanguageModel(uz: name, ru: name, en: name);
+  return LanguageModel(uz: name, ru: name);
+  // return LanguageModel(uz: name, ru: name, en: name);
 }
