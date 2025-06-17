@@ -18,6 +18,9 @@ class CreateTemplateCubit extends Cubit<CreateTemplateState> {
 
   void getMedicine({required List<MnnModel> inn}) async {
     List<String>? newInn = inn.map((e) => e.id.toString()).toList();
+    print("----------------------------------------------------");
+    print(newInn);
+    
     emit(CreateTemplateGetMedicineLoading());
     final request = await createTemplateRepositoryImpl.getMedicine(inn: newInn);
     request.fold(
