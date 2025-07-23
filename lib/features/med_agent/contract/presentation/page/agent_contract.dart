@@ -51,7 +51,7 @@ class _AgentContractState extends State<AgentContract> {
         print(state);
         if (state is RegionsSuccess) {
           _districtList = state.regions.first.districts;
-          print("here is workplace:-------------------");
+          print("Here is Region:-------------------");
           print(_selectedDistrictId);
           print(state.regions.first);
           if (state.regions.first.districts.isNotEmpty) {
@@ -107,7 +107,7 @@ class _AgentContractState extends State<AgentContract> {
 
     Future.delayed(Duration(milliseconds: 500), _fetchContractsByFilter);
   }
-
+  ///TODO ID ERROR
   void _fetchContractsByFilter() {
     final nameParts = _prepareNameParts(_searchController.text);
     context.read<ContractCubit>().getContractsWithFilter(
@@ -119,6 +119,8 @@ class _AgentContractState extends State<AgentContract> {
           lastName: nameParts.length > 1 ? nameParts[nameParts.length - 1] : "",
           middleName: nameParts.length > 2 ? nameParts[1] : "",
         );
+    print(_selectedWorkPlaceName);
+    print(_selectedWorkPlaceId);
   }
 
   List<String> _prepareNameParts(String nameQuery) {
@@ -258,6 +260,7 @@ class _AgentContractState extends State<AgentContract> {
         color: AppColors.backgroundColor,
         borderRadius: BorderRadius.circular(12),
       ),
+      ///TODO DROPDOWN ID ERRROR
       child: DropdownButtonHideUnderline(
         child: DropdownButton<int>(
           borderRadius: BorderRadius.circular(15),

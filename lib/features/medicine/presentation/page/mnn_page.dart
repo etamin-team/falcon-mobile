@@ -28,6 +28,27 @@ class MNNPage extends StatefulWidget {
   static List<MnnModel> getSelectedItems() => [];
 }
 
+class _SliverAppTextFieldDelegate extends SliverPersistentHeaderDelegate {
+  final Widget child;
+
+  _SliverAppTextFieldDelegate({required this.child});
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return child;
+  }
+
+  @override
+  double get maxExtent => 90.0; // Adjusted height
+
+  @override
+  double get minExtent => 90.0;
+
+  @override
+  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) {
+    return false;
+  }
+}
 class _MNNPageState extends State<MNNPage> {
   final TextEditingController searchController = TextEditingController();
   late List<MnnModel> selectedItems;
@@ -145,13 +166,27 @@ class _MNNPageState extends State<MNNPage> {
       body: CustomScrollView(
         controller: _scrollController,
         slivers: [
-          SliverToBoxAdapter(
-            child: AppTextField(
-              padding: const EdgeInsets.only(bottom: 15, top: 10),
-              controller: searchController,
-              hintText: LocaleKeys.texts_search.tr(),
-              backgroundColor: AppColors.white,
-            ).paddingSymmetric(horizontal: Dimens.space20),
+          SliverPersistentHeader(
+            pinned: true,
+            delegate: _SliverAppTextFieldDelegate(
+              child: Container(
+                constraints: BoxConstraints(maxHeight: 90.0),
+                decoration: BoxDecoration(
+                  color: Colors.transparent, // Background for shadow visibility
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.2),
+                    ),
+                  ],
+                ),
+                child: AppTextField(
+                  padding: const EdgeInsets.only(bottom: 15, top: 10),
+                  controller: searchController,
+                  hintText: LocaleKeys.texts_search.tr(),
+                  backgroundColor: AppColors.white,
+                ).paddingSymmetric(horizontal: Dimens.space20),
+              ),
+            ),
           ),
           BlocConsumer<MnnCubit, MnnState>(
             listener: (context, state) {

@@ -50,13 +50,12 @@ class _SignUpDataState extends State<SignUpData> {
   final birthDateController = TextEditingController();
   bool isMen = true;
   bool isObscureText = true;
-  LanguageModel city = LanguageModel(uz: "", ru: "");
-  // LanguageModel city = LanguageModel(uz: "", ru: "", en: "");
-
-  LanguageModel doctorTypeName = LanguageModel(uz: "", ru: "");
-  // LanguageModel doctorTypeName = LanguageModel(uz: "", ru: "", en: "");
-  LanguageModel doctorPosition = LanguageModel(uz: "", ru: "");
-  // LanguageModel doctorPosition = LanguageModel(uz: "", ru: "", en: "");
+  // LanguageModel city = LanguageModel(uz: "", ru: "");
+  LanguageModel city = LanguageModel(uz: "", ru: "", en: "");
+  // LanguageModel doctorTypeName = LanguageModel(uz: "", ru: "");
+  LanguageModel doctorTypeName = LanguageModel(uz: "", ru: "", en: "");
+  // LanguageModel doctorPosition = LanguageModel(uz: "", ru: "");
+  LanguageModel doctorPosition = LanguageModel(uz: "", ru: "", en: "");
   String workplace = "";
 
   int districtId = 0;
@@ -539,8 +538,8 @@ class _SignUpDataState extends State<SignUpData> {
                                           "gender": isMen ? "MALE" : "FEMALE",
                                           "workPlaceId": workplaceId,
                                           "fieldName":
-                                              doctorTypeName.ru.toUpperCase(),
                                               // doctorTypeName.en.toUpperCase(),
+                                              doctorTypeName.en.toUpperCase(),
                                           "position": doctorPosition.uz,
                                           "districtId": districtId
                                         },

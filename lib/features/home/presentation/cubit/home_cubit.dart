@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 import 'package:wm_doctor/core/error/failure.dart';
 import 'package:wm_doctor/features/home/data/model/template_model.dart';
@@ -11,58 +12,63 @@ class HomeCubit extends Cubit<HomeState> {
 
   HomeCubit(this.homeRepositoryImpl) : super(HomeInitial());
 
-  void getTemplate(
-      {required String saved, required String sortBy, required String searchText}) async {
+  Future<void> getTemplate({
+    required String saved,
+    required String sortBy,
+    required String searchText,
+  }) async {
     try {
       emit(HomeGetTemplateLoading());
-      print("✅ HomeCubit: API so‘rov yuborilmoqda...");
+      // Add minimum delay for UX (optional, adjust as needed)
+      await Future.delayed(const Duration(milliseconds: 300));
 
       final request = await homeRepositoryImpl.getTemplate(
-          saved: saved, sortBy: sortBy, searchText: searchText);
+        saved: saved,
+        sortBy: sortBy,
+        searchText: searchText,
+      );
 
       request.fold(
-            (l) {
-          print("❌ API Xato: ${l.message}");
-          emit(HomeGetTemplateError(failure: l));
+            (failure) {
+          emit(HomeGetTemplateError(failure: failure));
         },
-            (r) {
-          print("✅ API Javob: ${r.length} ta template olindi.");
-          emit(HomeGetTemplateSuccess(list: r));
+            (templates) {
+          emit(HomeGetTemplateSuccess(list: templates));
         },
       );
     } catch (e) {
-      print("❌ HomeCubit Exception: $e");
       emit(HomeGetTemplateError(
-          failure: Failure(errorMsg: e.toString(), statusCode: 500,)));
+        failure: Failure(errorMsg: e.toString(), statusCode: 500),
+      ));
     }
   }
 
-  void deleteTemplate(
-      {required int id}) async {
+  Future<void> deleteTemplate({required int id}) async {
     try {
       emit(HomeGetTemplateLoading());
-      print("✅ HomeCubit: API so‘rov yuborilmoqda...");
+      // Add minimum delay for UX (optional, adjust as needed)
+      await Future.delayed(const Duration(milliseconds: 300));
 
       final request = await homeRepositoryImpl.deleteTemplate(id: id);
 
       request.fold(
-            (l) {
-          print("❌ API Xato: ${l.message}");
-          emit(HomeGetTemplateError(failure: l));
+            (failure) {
+          emit(HomeGetTemplateError(failure: failure));
         },
-            (r) {
-          print("✅ API Javob: ${r.length} ta template olindi.");
-          emit(HomeGetTemplateSuccess(list: r));
+            (_) {
+          // No need to emit HomeGetTemplateSuccess here; let getTemplate handle the refresh
+          // Optionally emit a specific state for successful deletion if needed
         },
       );
     } catch (e) {
-      print("❌ HomeCubit Exception: $e");
       emit(HomeGetTemplateError(
-          failure: Failure(errorMsg: e.toString(), statusCode: 500,)));
+        failure: Failure(errorMsg: e.toString(), statusCode: 500),
+      ));
     }
   }
 }
 
-extension on Failure {
-  get message => null;
+// Extension to fix Failure message getter
+extension FailureExtension on Failure {
+  String get message => errorMsg; // Return errorMsg instead of null
 }

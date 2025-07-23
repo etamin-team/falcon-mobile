@@ -10,8 +10,8 @@ String dataTranslate({required BuildContext ctx,required LanguageModel model}) {
   }else if(currentLang=="ru"){
     return model.ru;
   }
-  // }else if(currentLang=="en"){
-  //   return model.en;
-  // }
+  else if(currentLang=="en"){
+    return model.en;
+  }
   return model.uz;
 }

@@ -28,10 +28,10 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> with ProfileUtility {
-  // LanguageModel placeName = LanguageModel(uz: "", ru: "", en: "");
-  LanguageModel placeName = LanguageModel(uz: "", ru: "");
-  // LanguageModel doctorType = LanguageModel(uz: "", ru: "", en: "");
-  LanguageModel doctorType = LanguageModel(uz: "", ru: "");
+  LanguageModel placeName = LanguageModel(uz: "", ru: "", en: "");
+  // LanguageModel placeName = LanguageModel(uz: "", ru: "");
+  LanguageModel doctorType = LanguageModel(uz: "", ru: "", en: "");
+  // LanguageModel doctorType = LanguageModel(uz: "", ru: "");
   bool showData = false;
 
   @override
@@ -46,10 +46,10 @@ class _ProfilePageState extends State<ProfilePage> with ProfileUtility {
   Future<void> _onRefresh() async {
     // Reset placeName and doctorType to ensure fresh data
     setState(() {
-      placeName = LanguageModel(uz: "", ru: "");
-      // placeName = LanguageModel(uz: "", ru: "", en: "");
-      doctorType = LanguageModel(uz: "", ru: "",);
-      // doctorType = LanguageModel(uz: "", ru: "", en: "");
+      // placeName = LanguageModel(uz: "", ru: "");
+      placeName = LanguageModel(uz: "", ru: "", en: "");
+      // doctorType = LanguageModel(uz: "", ru: "",);
+      doctorType = LanguageModel(uz: "", ru: "", en: "");
     });
 
     // Call the data-fetching methods
@@ -79,7 +79,7 @@ class _ProfilePageState extends State<ProfilePage> with ProfileUtility {
             placeName = LanguageModel(
                 uz: state.districtModel?.nameUzLatin ?? "",
                 ru: state.districtModel?.nameRussian ?? "",
-                // en: state.districtModel?.name ?? ""
+                en: state.districtModel?.name ?? ""
             );
           }
           if (doctorType.uz == "") {
@@ -612,7 +612,7 @@ class _ProfilePageState extends State<ProfilePage> with ProfileUtility {
                                             model: LanguageModel(
                                                 uz: "O'zbekcha",
                                                 ru: "Русский",
-                                                // en: "English"
+                                                en: "English"
                                             )),
                                         style: TextStyle(
                                             fontFamily: "VelaSans",

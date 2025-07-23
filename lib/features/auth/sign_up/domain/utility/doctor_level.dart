@@ -42,7 +42,7 @@ void showDoctorPositionList({
                     onchange(LanguageModel(
                         uz: DoctorTypes.doctorDegreesUz[index],
                         ru: DoctorTypes.doctorDegreesRu[index],
-                        // en: DoctorTypes.doctorDegreesEn[index]
+                        en: DoctorTypes.doctorDegreesEn[index]
                     ));
                     Navigator.pop(context);
                   },

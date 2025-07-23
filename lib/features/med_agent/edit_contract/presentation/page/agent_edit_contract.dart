@@ -45,10 +45,10 @@ class AgentEditContract extends StatefulWidget {
 }
 
 class _AgentEditContractState extends State<AgentEditContract> {
-  LanguageModel location = LanguageModel(uz: "", ru: "");
-  // LanguageModel location = LanguageModel(uz: "", ru: "", en: "");
-  LanguageModel special = LanguageModel(uz: "", ru: "");
-  // LanguageModel special = LanguageModel(uz: "", ru: "", en: "");
+  // LanguageModel location = LanguageModel(uz: "", ru: "");
+  LanguageModel location = LanguageModel(uz: "", ru: "", en: "");
+  // LanguageModel special = LanguageModel(uz: "", ru: "");
+  LanguageModel special = LanguageModel(uz: "", ru: "", en: "");
   int locationId = 0;
   int workplaceId = 0;
   String selectedContractType = "KZ";
@@ -71,14 +71,14 @@ class _AgentEditContractState extends State<AgentEditContract> {
     location = LanguageModel(
         uz: widget.districtModel?.nameUzLatin ?? "",
         ru: widget.districtModel?.nameRussian ?? "",
-        // en: widget.districtModel?.name ?? ""
+        en: widget.districtModel?.name ?? ""
     );
     workplace = widget.workplaceModel?.name ?? "";
     selectedContractType = "KZ";
     special = LanguageModel(
         uz: widget.model.fieldName ?? "",
         ru: widget.model.fieldName ?? "",
-        // en: widget.model.fieldName ?? ""
+        en: widget.model.fieldName ?? ""
     );
     if (widget.profileModel != null) {
       medicine = List.generate(
@@ -263,7 +263,7 @@ class _AgentEditContractState extends State<AgentEditContract> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              LocaleKeys.med_add_doctor_select_speciality.tr() + ": ",
+                              LocaleKeys.med_add_doctor_select_speciality_hint.tr() + ": ",
                               style: TextStyle(
                                   fontSize: Dimens.space14,
                                   fontWeight: FontWeight.bold),
@@ -271,7 +271,7 @@ class _AgentEditContractState extends State<AgentEditContract> {
                             ),
                             Text(
                               "${widget.model.fieldName?.toString() ?? 'Noma\'lum'}",
-                              overflow: TextOverflow.fade,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ],
                         ),

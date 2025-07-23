@@ -62,4 +62,16 @@ class PreparationModel {
     "id": medicineId,
     "mnn": inn,
   };
+
+  PreparationModel toPreparationModel() {
+    return PreparationModel(
+      quantity: quantity,
+      timesInDay: timesInDay,
+      days: days,
+      name: name,
+      amount: amount,
+      type: type,
+      medicineId: medicineId,
+    );
+  }
 }

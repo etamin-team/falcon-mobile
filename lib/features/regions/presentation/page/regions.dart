@@ -169,9 +169,9 @@ class _RegionsPageState extends State<RegionsPage> {
                                                 ru: filteredRegions[index]
                                                     .nameRussian
                                                     .toString(),
-                                                // en: filteredRegions[index]
-                                                //     .name
-                                                //     .toString()
+                                                en: filteredRegions[index]
+                                                    .name
+                                                    .toString()
                                             ))),
                                         children: filteredRegions[index]
                                             .districts
@@ -180,8 +180,8 @@ class _RegionsPageState extends State<RegionsPage> {
                                             onTap: () {
                                               widget.onChange(LanguageModel(
                                                   uz: district.nameUzLatin,
-                                                  ru: district.nameRussian));
-                                                  // en: district.name));
+                                                  ru: district.nameRussian,
+                                                  en: district.name));
                                               widget.districtId(
                                                   district.districtId);
                                               Navigator.pop(context);
@@ -191,7 +191,7 @@ class _RegionsPageState extends State<RegionsPage> {
                                                 model: LanguageModel(
                                                     uz: district.nameUzLatin,
                                                     ru: district.nameRussian,
-                                                    // en: district.name
+                                                    en: district.name
                                                     ))),
                                             dense: true,
                                             visualDensity:

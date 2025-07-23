@@ -28,7 +28,6 @@ class ContractRepositoryImpl implements ContractRepository {
         statusCode: request.code ?? 500));
   }
   Future<Either<Failure, List<ContractModel>>> getContractWithFilter({
-
     required String districtId,
     required int workPlaceId,
     required String firstName,

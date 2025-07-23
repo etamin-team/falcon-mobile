@@ -406,13 +406,13 @@ LanguageModel checkMedicineType({required String name}) {
     if (listUz[a].toUpperCase() == name.toUpperCase() ||
         listRu[a].toUpperCase() == name.toUpperCase() ||
         listEn[a].toUpperCase() == name.toUpperCase()) {
-      return LanguageModel(uz: listUz[a], ru: listRu[a]);
-      // return LanguageModel(uz: listUz[a], ru: listRu[a], en: listEn[a]);
+      // return LanguageModel(uz: listUz[a], ru: listRu[a]);
+      return LanguageModel(uz: listUz[a], ru: listRu[a], en: listEn[a]);
     }
   }
 
-  return LanguageModel(uz: name, ru: name);
-  // return LanguageModel(uz: name, ru: name, en: name);
+  // return LanguageModel(uz: name, ru: name);
+  return LanguageModel(uz: name, ru: name, en: name);
 }
 
 LanguageModel findDoctorType({required String name}) {
@@ -424,11 +424,11 @@ LanguageModel findDoctorType({required String name}) {
     if (listUz[a].toUpperCase() == name.toUpperCase() ||
         listRu[a].toUpperCase() == name.toUpperCase() ||
         listEn[a].toUpperCase() == name.toUpperCase()) {
-      return LanguageModel(uz: listUz[a], ru: listRu[a]);
-      // return LanguageModel(uz: listUz[a], ru: listRu[a], en: listEn[a]);
+      // return LanguageModel(uz: listUz[a], ru: listRu[a]);
+      return LanguageModel(uz: listUz[a], ru: listRu[a], en: listEn[a]);
     }
   }
 
-  return LanguageModel(uz: name, ru: name);
-  // return LanguageModel(uz: name, ru: name, en: name);
+  // return LanguageModel(uz: name, ru: name);
+  return LanguageModel(uz: name, ru: name, en: name);
 }

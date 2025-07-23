@@ -24,10 +24,11 @@ import 'package:wm_doctor/features/medicine/presentation/cubit/medicine_cubit.da
 import 'package:wm_doctor/features/medicine/presentation/page/medicine_dialog.dart';
 import 'package:wm_doctor/features/profile/presentation/cubit/profile_cubit.dart';
 import 'package:wm_doctor/features/regions/presentation/cubit/regions_cubit.dart';
-import 'package:wm_doctor/features/regions/presentation/page/regions_dialog.dart';
-import 'package:wm_doctor/features/workplace/presentation/page/workplace_dialog.dart';
 import '../../../../../gen/locale_keys.g.dart';
+import '../../../../auth/sign_up/data/model/region_model.dart';
 import '../../../../auth/sign_up/data/repository/sign_up_repository_impl.dart';
+import '../../../../regions/presentation/cubit/workplace_cubit.dart';
+import '../../../contract/data/model/contract_model.dart' hide MedicineWithQuantityDoctorDTOS;
 import '../../../contract/presentation/cubit/contract_cubit.dart';
 import '../../data/repository/add_doctor_repository_impl.dart';
 
@@ -55,12 +56,16 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
 
   late final MedicineRepositoryImpl medicineRepositoryImpl;
 
+  var _selectedDistrictId = 0;
+  var _selectedWorkPlaceId = 0;
+  String _selectedDistrictName = "";
+  String _selectedWorkPlaceName = "";
   int agentId = 0;
   List<MedicineModel> preparations = [];
   List<MedicineModel> selectedPreparations = [];
   List<int> quantity = [];
-  LanguageModel location = LanguageModel(uz: "", ru: "");
-  // LanguageModel location = LanguageModel(uz: "", ru: "", en: "");
+  // LanguageModel location = LanguageModel(uz: "", ru: "");
+  LanguageModel location = LanguageModel(uz: "", ru: "", en: "");
   int locationId = 0;
   int workplaceId = 0;
   String doctorID = "";
@@ -83,16 +88,69 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
   ];
   String selectedContractType = "KZ";
   String selectedContractTypeFull = "Каб.вакцинации";
+  List<District> _districtList = [];
+  List<WorkPlaceDto> _workPlaceList = [];
 
   @override
   void initState() {
     super.initState();
+    _initializeData();
     medicineRepositoryImpl = sl<MedicineRepositoryImpl>();
     loadMedicines();
     context.read<RegionsCubit>().getRegions();
     context.read<MedicineCubit>().getMedicine();
   }
+  void _initializeData() {
+    context.read<ContractCubit>().getContracts();
+    context.read<RegionsCubit>().getRegions();
 
+    context.read<RegionsCubit>().stream.listen((state) {
+      setState(() {
+        print(state);
+        if (state is RegionsSuccess) {
+          _districtList = state.regions.first.districts;
+          print("Here is Region:-------------------");
+          print(_selectedDistrictId);
+          print(state.regions.first);
+          if (state.regions.first.districts.isNotEmpty) {
+            _selectedDistrictId =
+                state.regions.first.districts.first.districtId;
+            _selectedDistrictName = state.regions.first.districts.first.name;
+            _fetchWorkPlaces();
+          } else {
+            _selectedDistrictId = 0;
+            _selectedDistrictName = LocaleKeys.med_add_doctor_select_region_hint.tr();
+            _showErrorSnackBar(state as String);
+          }
+        }
+      }
+      );
+    });
+    context.read<WorkPlaceCubit>().stream.listen((state) {
+      setState(() {
+        print(state);
+        if (state is WorkPlaceSuccess) {
+          _workPlaceList = state.workplace;
+          print("here is workplace:-------------------");
+          print(state.workplace.first.name);
+          if (state.workplace.first.name != null) {
+            _selectedWorkPlaceName = state.workplace.first.name!;
+            _selectedWorkPlaceId = state.workplace.first.id!;
+          } else {
+            _selectedWorkPlaceId = 0;
+            _selectedDistrictName = LocaleKeys.med_add_doctor_select_workplace_hint.tr();
+            _showErrorSnackBar(state as String);
+          }
+        }
+      }
+      );
+    });
+  }
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
   void loadMedicines() async {
     final result = await medicineRepositoryImpl.getMedicine();
     result.fold(
@@ -106,6 +164,83 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
           preparations = list;
         });
       },
+    );
+  }
+
+  Widget _buildDistrictDropdown() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10),
+      decoration: BoxDecoration(
+        color: AppColors.backgroundColor,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<int>(
+          borderRadius: BorderRadius.circular(15),
+          value: _selectedDistrictId == 0 ? null : _selectedDistrictId,
+          hint: Text(_selectedDistrictName),
+          onChanged: (int? newValue) {
+            if (newValue != null) {
+              setState(() {
+                _selectedDistrictId = newValue;
+                _selectedDistrictName = _districtList
+                    .firstWhere((district) => district.districtId == newValue)
+                    .name;
+                _fetchWorkPlaces();
+              });
+            }
+          },
+          icon: Icon(Icons.keyboard_arrow_down, color: Colors.black, size: 30),
+          style: TextStyle(fontSize: 18, color: Colors.black),
+          dropdownColor: Colors.white,
+          items: _districtList
+              .map((district) => DropdownMenuItem<int>(
+            value: district.districtId,
+            child: Text(district.name,
+                style: TextStyle(fontSize: 16),
+                overflow: TextOverflow.ellipsis),
+          ))
+              .toList(),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWorkplaceDropdown() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10),
+      decoration: BoxDecoration(
+        color: AppColors.backgroundColor,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<int>(
+          borderRadius: BorderRadius.circular(15),
+          value: _selectedWorkPlaceId == 0 ? null : _selectedWorkPlaceId,
+          hint: Text(_selectedWorkPlaceName),
+          onChanged: (int? newValue) {
+            if (newValue != null) {
+              setState(() {
+                _selectedWorkPlaceId = newValue;
+                _selectedWorkPlaceName = _workPlaceList
+                    .firstWhere((workPlace) => workPlace.id == newValue)
+                    .name!;
+              });
+            }
+          },
+          icon: Icon(Icons.keyboard_arrow_down, color: Colors.black, size: 30),
+          style: TextStyle(fontSize: 18, color: Colors.black),
+          dropdownColor: Colors.white,
+          items: _workPlaceList
+              .map((workPlace) => DropdownMenuItem<int>(
+            value: workPlace.id,
+            child: Text(workPlace.name!,
+                style: TextStyle(fontSize: 16),
+                overflow: TextOverflow.ellipsis),
+          ))
+              .toList(),
+        ),
+      ),
     );
   }
 
@@ -187,12 +322,12 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                         phoneNumber: numberController.text.trim().replaceAll(" ", ""),
                         phonePrefix: "998",
                         number: "998${numberController.text.trim().replaceAll(" ", "")}",
-                        workPlaceId: workplaceId,
+                        workPlaceId: _selectedWorkPlaceId,
                         birthDate: "2000-01-01",
                         gender: "MALE",
                         fieldName: specialEnum.toUpperCase(),
                         position: level,
-                        districtId: locationId,
+                        districtId: _selectedDistrictId,
                       ),
                       contract: AddContractModel(
                         doctorId: "",
@@ -287,76 +422,13 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                               controller: nameController,
                               hintText: LocaleKeys.med_add_doctor_hint_name.tr(),
                             ),
-                            GestureDetector(
-                              onTap: () {
-                                showRegions(
-                                  ctx: context,
-                                  onChange: (value) {
-                                    if (formKey.currentState!.validate()) {}
-                                    addressController.text = dataTranslate(
-                                      ctx: context,
-                                      model: LanguageModel(
-                                        uz: value.uz,
-                                        ru: value.ru,
-                                        // en: value.en,
-                                      ),
-                                    );
-                                    setState(() {});
-                                  },
-                                  districtId: (value) {
-                                    locationId = value;
-                                    print('Selected district ID: $value');
-                                  },
-                                );
-                              },
-                              child: AppTextField(
-                                textColor: Colors.black,
-                                validator: (value) {
-                                  if (value.toString().isEmpty) {
-                                    return LocaleKeys.med_add_doctor_select_region.tr();
-                                  }
-                                  return null;
-                                },
-                                controller: addressController,
-                                hintText: LocaleKeys.med_add_doctor_select_region_hint.tr(),
-                                suffixIcon: Icon(
-                                  CupertinoIcons.chevron_down,
-                                  color: Colors.black,
-                                ),
-                                hintColor: Colors.black87,
-                                isEnabled: false,
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                showWorkplaceDialog(
-                                  ctx: context,
-                                  name: (String value) {
-                                    workplaceController.text = value;
-                                    if (formKey.currentState!.validate()) {}
-                                  },
-                                  id: (int value) {
-                                    workplaceId = value;
-                                  },
-                                );
-                              },
-                              child: AppTextField(
-                                textColor: Colors.black,
-                                validator: (value) {
-                                  if (value.toString().isEmpty) {
-                                    return LocaleKeys.med_add_doctor_select_workplace.tr();
-                                  }
-                                  return null;
-                                },
-                                controller: workplaceController,
-                                hintText: LocaleKeys.med_add_doctor_select_workplace_hint.tr(),
-                                suffixIcon: Icon(
-                                  CupertinoIcons.chevron_down,
-                                  color: Colors.black,
-                                ),
-                                hintColor: Colors.black87,
-                                isEnabled: false,
-                              ),
+                            ///changing
+                            Row(
+                              children: [
+                                Expanded(child: _buildDistrictDropdown()),
+                                SizedBox(width: Dimens.space10),
+                                Expanded(child: _buildWorkplaceDropdown()),
+                              ],
                             ),
                             GestureDetector(
                               onTap: () {
@@ -368,14 +440,14 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                                         model: LanguageModel(
                                           uz: value.uz,
                                           ru: value.ru,
-                                          // en: value.en,
+                                          en: value.en,
                                         ));
                                     special = dataTranslate(
                                         ctx: context,
                                         model: LanguageModel(
                                           uz: value.uz,
                                           ru: value.ru,
-                                          // en: value.en,
+                                          en: value.en,
                                         ));
                                     if (formKey.currentState!.validate()) {}
                                   },
@@ -412,14 +484,14 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                                         model: LanguageModel(
                                           uz: value.uz,
                                           ru: value.ru,
-                                          // en: value.en,
+                                          en: value.en,
                                         ));
                                     level = dataTranslate(
                                         ctx: context,
                                         model: LanguageModel(
                                           uz: value.uz,
                                           ru: value.ru,
-                                          // en: value.en,
+                                          en: value.en,
                                         ));
                                     if (formKey.currentState!.validate()) {}
                                   },
@@ -917,12 +989,12 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
                                   phoneNumber: numberController.text.trim().replaceAll(" ", ""),
                                   phonePrefix: "998",
                                   number: "998${numberController.text.trim().replaceAll(" ", "")}",
-                                  workPlaceId: workplaceId,
+                                  workPlaceId: _selectedWorkPlaceId,
                                   birthDate: "2000-01-01",
                                   gender: "MALE",
                                   fieldName: specialEnum.isNotEmpty ? specialEnum.toUpperCase() : "",
                                   position: level.isNotEmpty ? level : "",
-                                  districtId: locationId,
+                                  districtId: _selectedDistrictId,
                                 ),
                                 contract: AddContractModel(
                                   doctorId: "",
@@ -1136,7 +1208,10 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
     }
     setState(() {});
   }
-
+  void _fetchWorkPlaces() {
+    print("hellllooooooo-------------");
+    context.read<WorkPlaceCubit>().getWorkplacesByDistrictId(_selectedDistrictId);
+  }
   void resetForm() {
     nameController.clear();
     addressController.clear();
@@ -1157,8 +1232,8 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
     agentContractId = 1;
     selectedPreparations = [];
     quantity = [];
-    location = LanguageModel(uz: "", ru: "");
-    // location = LanguageModel(uz: "", ru: "", en: "");
+    // location = LanguageModel(uz: "", ru: "");
+    location = LanguageModel(uz: "", ru: "", en: "");
     doctorID = "";
     locationDTO = "";
     workplaceDTO = "";
@@ -1168,4 +1243,6 @@ class _AgentAddDoctorState extends State<AgentAddDoctor> {
     isCreateDoctor = true;
     setState(() {});
   }
+
+
 }

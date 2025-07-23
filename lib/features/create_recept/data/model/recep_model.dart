@@ -96,6 +96,8 @@ class RecepModel {
     "districtId": districtId,
     "preparations": List<dynamic>.from(preparations.map((x) => x.toJson())),
   };
+
+
 }
 
 class PreparationRecep {

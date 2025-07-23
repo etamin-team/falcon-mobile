@@ -4,12 +4,11 @@ import 'package:wm_doctor/core/extensions/widget_extensions.dart';
 import 'package:wm_doctor/core/widgets/export.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:wm_doctor/features/create_template/presentation/page/create_template.dart';
-import 'package:wm_doctor/features/preparad/presentation/page/preparad.dart';
+import 'package:wm_doctor/features/home/data/model/template_model.dart';
 import 'package:wm_doctor/features/profile/presentation/cubit/profile_cubit.dart';
-
-import '../../../../gen/locale_keys.g.dart';
-import '../../../template/presentation/page/templates.dart';
-import '../../data/model/template_model.dart';
+import 'package:wm_doctor/features/template/presentation/page/templates.dart';
+import 'package:wm_doctor/gen/locale_keys.g.dart';
+import '../../../preparad/presentation/page/preparad.dart';
 import '../cubit/home_cubit.dart';
 
 class HomePage extends StatefulWidget {
@@ -21,8 +20,14 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
+    // Fetch templates on page load
+    context.read<HomeCubit>().getTemplate(saved: "", sortBy: "", searchText: "");
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
@@ -35,31 +40,32 @@ class _HomePageState extends State<HomePage> {
                   Text(
                     LocaleKeys.home_greeting.tr(),
                     style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                        fontSize: Dimens.space22,
-                        color: Colors.black),
+                      fontFamily: 'VelaSans',
+                      fontWeight: FontWeight.w800,
+                      fontSize: Dimens.space22,
+                      color: Colors.black,
+                    ),
                   ),
                   Text(
-                    state.model.firstName??"",
+                    state.model.firstName ?? "",
                     style: TextStyle(
-                        fontWeight: FontWeight.w900,
-                        fontSize: Dimens.space22,
-                        color: AppColors.blueColor),
+                      fontFamily: 'VelaSans',
+                      fontWeight: FontWeight.w900,
+                      fontSize: Dimens.space22,
+                      color: AppColors.blueColor,
+                    ),
                   ),
                 ],
               );
             }
-            return Row(
-              children: [
-                Text(
-                  LocaleKeys.home_greeting.tr(),
-                  style: TextStyle(
-                    fontFamily: 'VelaSans',
-                      fontWeight: FontWeight.w800,
-                      fontSize: Dimens.space24,
-                      color: Colors.black),
-                ),
-              ],
+            return Text(
+              LocaleKeys.home_greeting.tr(),
+              style: TextStyle(
+                fontFamily: 'VelaSans',
+                fontWeight: FontWeight.w800,
+                fontSize: Dimens.space24,
+                color: Colors.black,
+              ),
             );
           },
         ),
@@ -67,31 +73,37 @@ class _HomePageState extends State<HomePage> {
       body: BlocConsumer<HomeCubit, HomeState>(
         listener: (context, state) {
           if (state is HomeGetTemplateError) {
+            // Optionally show a snackbar or toast for error feedback
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(LocaleKeys.home_home_error.tr())),
+            );
           }
         },
         builder: (context, state) {
           if (state is HomeGetTemplateSuccess) {
             return RefreshIndicator(
               onRefresh: () async {
-                context
-                    .read<HomeCubit>()
-                    .getTemplate(saved: "", sortBy: "", searchText: "");
+                // Await the template fetch to ensure refresh indicator stops
+                await context.read<HomeCubit>().getTemplate(saved: "", sortBy: "", searchText: "");
               },
+              color: AppColors.blueColor,
+              backgroundColor: AppColors.white,
               child: Column(
                 children: [
                   GestureDetector(
                     onTap: () {
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => PreparadPage()));
+                        context,
+                        MaterialPageRoute(builder: (context) => PreparadPage()),
+                      );
                     },
                     child: Container(
                       width: double.infinity,
                       padding: EdgeInsets.all(Dimens.space20),
                       decoration: BoxDecoration(
-                          color: AppColors.white,
-                          borderRadius: BorderRadius.circular(Dimens.space20)),
+                        color: AppColors.white,
+                        borderRadius: BorderRadius.circular(Dimens.space20),
+                      ),
                       child: Column(
                         spacing: Dimens.space10,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -101,23 +113,23 @@ class _HomePageState extends State<HomePage> {
                             LocaleKeys.home_preparation.tr(),
                             style: TextStyle(
                               fontFamily: 'VelaSans',
-                                fontWeight: FontWeight.w700,
-                                fontSize: Dimens.space14),
-                          )
+                              fontWeight: FontWeight.w700,
+                              fontSize: Dimens.space14,
+                            ),
+                          ),
                         ],
                       ),
                     ),
                   ),
-                  SizedBox(
-                    height: Dimens.space20,
-                  ),
+                  SizedBox(height: Dimens.space20),
                   Expanded(
                     child: Container(
                       width: double.infinity,
                       padding: EdgeInsets.all(Dimens.space20),
                       decoration: BoxDecoration(
-                          color: AppColors.white,
-                          borderRadius: BorderRadius.circular(Dimens.space20)),
+                        color: AppColors.white,
+                        borderRadius: BorderRadius.circular(Dimens.space20),
+                      ),
                       child: Scrollbar(
                         child: Column(
                           spacing: Dimens.space10,
@@ -131,41 +143,60 @@ class _HomePageState extends State<HomePage> {
                                   LocaleKeys.home_template.tr(),
                                   style: TextStyle(
                                     fontFamily: 'VelaSans',
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: Dimens.space18),
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: Dimens.space18,
+                                  ),
                                 ),
                                 Spacer(),
                                 GestureDetector(
                                   onTap: () {
-                                    Navigator.push(context, MaterialPageRoute(builder: (context)=>TemplatePage(onChange: (TemplateModel value) {  },)));
-                                    // Navigator.push(context, MaterialPageRoute(builder: (context)=>CreateRecep(List<MnnModel>)));
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => TemplatePage(
+                                          onChange: (TemplateModel value) {},
+                                        ),
+                                      ),
+                                    );
                                   },
                                   child: Text(
                                     LocaleKeys.home_all.tr(),
                                     style: TextStyle(
                                       fontFamily: 'VelaSans',
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: Dimens.space16,
-                                        color: AppColors.blueColor),
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: Dimens.space16,
+                                      color: AppColors.blueColor,
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
                             Expanded(
                               child: state.list.isEmpty
-                                  ? Center(child: Text(LocaleKeys.home_template_not_available.tr()))
+                                  ? Center(
+                                child: Text(
+                                  LocaleKeys.home_template_not_available
+                                      .tr(),
+                                ),
+                              )
                                   : Stack(
                                 children: [
                                   SingleChildScrollView(
+                                    physics:
+                                    const AlwaysScrollableScrollPhysics(),
                                     child: Column(
                                       spacing: Dimens.space10,
                                       children: List.generate(
                                         state.list.length,
                                             (index) {
                                           final template = state.list[index];
-                                          final hasPreparations = template.preparations != null && template.preparations!.isNotEmpty;
+                                          final hasPreparations =
+                                              template.preparations != null &&
+                                                  template
+                                                      .preparations!.isNotEmpty;
                                           return GestureDetector(
                                             onTap: () {
+                                              // Uncomment and implement navigation to template details if needed
                                               // Navigator.push(
                                               //   context,
                                               //   MaterialPageRoute(
@@ -176,88 +207,151 @@ class _HomePageState extends State<HomePage> {
                                               // );
                                             },
                                             child: Container(
-                                              padding: EdgeInsets.all(Dimens.space16),
+                                              padding: EdgeInsets.all(
+                                                  Dimens.space16),
                                               decoration: BoxDecoration(
-                                                color: AppColors.backgroundColor,
-                                                borderRadius: BorderRadius.circular(15),
+                                                color:
+                                                AppColors.backgroundColor,
+                                                borderRadius:
+                                                BorderRadius.circular(15),
                                               ),
                                               child: Row(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                                 children: [
                                                   Expanded(
                                                     child: Column(
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      crossAxisAlignment:
+                                                      CrossAxisAlignment
+                                                          .start,
                                                       children: [
                                                         Text(
                                                           template.name ?? "",
                                                           style: TextStyle(
-                                                            fontFamily: 'VelaSans',
-                                                            fontSize: Dimens.space14,
-                                                            fontWeight: FontWeight.w800,
-                                                            color: AppColors.redAccent,
+                                                            fontFamily:
+                                                            'VelaSans',
+                                                            fontSize:
+                                                            Dimens.space14,
+                                                            fontWeight:
+                                                            FontWeight.w800,
+                                                            color: AppColors
+                                                                .redAccent,
                                                           ),
                                                         ),
                                                         Row(
-                                                          spacing: Dimens.space5,
+                                                          spacing:
+                                                          Dimens.space5,
                                                           children: [
                                                             Text(
-                                                              LocaleKeys.home_dose.tr(),
+                                                              LocaleKeys
+                                                                  .home_dose
+                                                                  .tr(),
                                                               style: TextStyle(
-                                                                fontFamily: 'VelaSans',
-                                                                fontSize: Dimens.space12,
-                                                                fontWeight: FontWeight.w600,
+                                                                fontFamily:
+                                                                'VelaSans',
+                                                                fontSize:
+                                                                Dimens
+                                                                    .space12,
+                                                                fontWeight:
+                                                                FontWeight
+                                                                    .w600,
                                                               ),
                                                             ),
                                                             Text(
-                                                              hasPreparations ? template.preparations![0].amount ?? "" : "N/A",
+                                                              hasPreparations
+                                                                  ? template
+                                                                  .preparations![
+                                                              0]
+                                                                  .amount ??
+                                                                  ""
+                                                                  : "N/A",
                                                               style: TextStyle(
-                                                                fontFamily: 'VelaSans',
-                                                                fontSize: Dimens.space12,
-                                                                fontWeight: FontWeight.w400,
+                                                                fontFamily:
+                                                                'VelaSans',
+                                                                fontSize:
+                                                                Dimens
+                                                                    .space12,
+                                                                fontWeight:
+                                                                FontWeight
+                                                                    .w400,
                                                               ),
                                                             ),
                                                           ],
                                                         ),
                                                         Row(
-                                                          spacing: Dimens.space5,
+                                                          spacing:
+                                                          Dimens.space5,
                                                           children: [
                                                             Text(
-                                                              LocaleKeys.home_type.tr(),
+                                                              LocaleKeys
+                                                                  .home_type
+                                                                  .tr(),
                                                               style: TextStyle(
-                                                                fontFamily: 'VelaSans',
-                                                                fontSize: Dimens.space12,
-                                                                fontWeight: FontWeight.w600,
+                                                                fontFamily:
+                                                                'VelaSans',
+                                                                fontSize:
+                                                                Dimens
+                                                                    .space12,
+                                                                fontWeight:
+                                                                FontWeight
+                                                                    .w600,
                                                               ),
                                                             ),
                                                             Text(
-                                                              hasPreparations ? template.preparations![0].type ?? "" : "N/A",
+                                                              hasPreparations
+                                                                  ? template
+                                                                  .preparations![
+                                                              0]
+                                                                  .type ??
+                                                                  ""
+                                                                  : "N/A",
                                                               style: TextStyle(
-                                                                fontFamily: 'VelaSans',
-                                                                fontSize: Dimens.space12,
-                                                                fontWeight: FontWeight.w400,
+                                                                fontFamily:
+                                                                'VelaSans',
+                                                                fontSize:
+                                                                Dimens
+                                                                    .space12,
+                                                                fontWeight:
+                                                                FontWeight
+                                                                    .w400,
                                                               ),
                                                             ),
                                                           ],
                                                         ),
                                                         Row(
-                                                          spacing: Dimens.space5,
+                                                          spacing:
+                                                          Dimens.space5,
                                                           children: [
                                                             Text(
-                                                              LocaleKeys.home_note.tr(),
+                                                              LocaleKeys
+                                                                  .home_note
+                                                                  .tr(),
                                                               style: TextStyle(
-                                                                fontFamily: 'VelaSans',
-                                                                fontSize: Dimens.space12,
-                                                                fontWeight: FontWeight.w600,
+                                                                fontFamily:
+                                                                'VelaSans',
+                                                                fontSize:
+                                                                Dimens
+                                                                    .space12,
+                                                                fontWeight:
+                                                                FontWeight
+                                                                    .w600,
                                                               ),
                                                             ),
                                                             Expanded(
                                                               child: Text(
-                                                                overflow: TextOverflow.ellipsis,
-                                                                template.diagnosis ?? "",
+                                                                template
+                                                                    .diagnosis ??
+                                                                    "",
+                                                                overflow: TextOverflow
+                                                                    .ellipsis,
                                                                 style: TextStyle(
-                                                                  fontFamily: 'VelaSans',
-                                                                  fontSize: Dimens.space12,
-                                                                  fontWeight: FontWeight.w400,
+                                                                  fontFamily:
+                                                                  'VelaSans',
+                                                                  fontSize: Dimens
+                                                                      .space12,
+                                                                  fontWeight:
+                                                                  FontWeight
+                                                                      .w400,
                                                                 ),
                                                               ),
                                                             ),
@@ -270,45 +364,80 @@ class _HomePageState extends State<HomePage> {
                                                     onPressed: () {
                                                       showCupertinoDialog(
                                                         context: context,
-                                                        builder: (BuildContext ctx) {
+                                                        builder:
+                                                            (BuildContext ctx) {
                                                           return CupertinoAlertDialog(
                                                             title: Text(
-                                                              LocaleKeys.home_delete_attention.tr(),
+                                                              LocaleKeys
+                                                                  .home_delete_attention
+                                                                  .tr(),
                                                               style: TextStyle(
-                                                                fontWeight: FontWeight.bold,
-                                                                fontSize: Dimens.space18,
+                                                                fontWeight:
+                                                                FontWeight
+                                                                    .bold,
+                                                                fontSize:
+                                                                Dimens
+                                                                    .space18,
                                                               ),
                                                             ),
                                                             content: Text(
-                                                                LocaleKeys.home_delete_attention_text.tr(),
-                                                              style: TextStyle(fontSize: Dimens.space16),
+                                                              LocaleKeys
+                                                                  .home_delete_attention_text
+                                                                  .tr(),
+                                                              style: TextStyle(
+                                                                  fontSize: Dimens
+                                                                      .space16),
                                                             ),
                                                             actions: [
                                                               CupertinoDialogAction(
                                                                 child: Text(
-                                                                  LocaleKeys.home_cancel.tr(),
-                                                                  style: TextStyle(fontSize: Dimens.space14),
+                                                                  LocaleKeys
+                                                                      .home_cancel
+                                                                      .tr(),
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                      Dimens.space14),
                                                                 ),
                                                                 onPressed: () {
-                                                                  Navigator.of(ctx).pop(); // Close the dialog
+                                                                  Navigator.of(ctx)
+                                                                      .pop();
                                                                 },
                                                               ),
                                                               CupertinoDialogAction(
-                                                                isDefaultAction: true,
+                                                                isDefaultAction:
+                                                                true,
                                                                 child: Text(
-                                                                  LocaleKeys.home_delete.tr(),
+                                                                  LocaleKeys
+                                                                      .home_delete
+                                                                      .tr(),
                                                                   style: TextStyle(
-                                                                    fontSize: Dimens.space14,
-                                                                    color: Colors.red,
+                                                                    fontSize:
+                                                                    Dimens
+                                                                        .space14,
+                                                                    color:
+                                                                    Colors.red,
                                                                   ),
                                                                 ),
                                                                 onPressed: () {
-                                                                  Navigator.of(ctx).pop(); // Close the dialog
-
-                                                                  // Call deleteTemplate from HomeCubit
-                                                                  context.read<HomeCubit>().deleteTemplate(id: template.id!.toInt());
-                                                                  context.read<HomeCubit>().getTemplate(saved: "", sortBy: "", searchText: "");
-                                                                  // Navigator.pop(context);
+                                                                  Navigator.of(ctx)
+                                                                      .pop();
+                                                                  context
+                                                                      .read<
+                                                                      HomeCubit>()
+                                                                      .deleteTemplate(
+                                                                      id: template
+                                                                          .id!
+                                                                          .toInt());
+                                                                  context
+                                                                      .read<
+                                                                      HomeCubit>()
+                                                                      .getTemplate(
+                                                                      saved:
+                                                                      "",
+                                                                      sortBy:
+                                                                      "",
+                                                                      searchText:
+                                                                      "");
                                                                 },
                                                               ),
                                                             ],
@@ -317,9 +446,9 @@ class _HomePageState extends State<HomePage> {
                                                       );
                                                     },
                                                     icon: Icon(
-                                                      Icons.delete, // Changed to a delete icon for clarity
-                                                      color: AppColors.redAccent, // Match color with your theme
-                                                      size: Dimens.space16, // Adjust size as needed
+                                                      Icons.delete,
+                                                      color: AppColors.redAccent,
+                                                      size: Dimens.space16,
                                                     ),
                                                   ),
                                                 ],
@@ -343,7 +472,10 @@ class _HomePageState extends State<HomePage> {
                                           gradient: LinearGradient(
                                             begin: Alignment.topCenter,
                                             end: Alignment.bottomCenter,
-                                            colors: [Colors.white.withAlpha(10), Colors.white], // Note: Empty colors list, consider fixing this
+                                            colors: [
+                                              Colors.white.withAlpha(10),
+                                              Colors.white,
+                                            ],
                                           ),
                                         ),
                                       ),
@@ -365,14 +497,15 @@ class _HomePageState extends State<HomePage> {
                       cornerRadius: Dimens.space16,
                       text: LocaleKeys.home_create_template.tr(),
                       onPressed: () {
-                        // context.read<MainPageCubit>().changeSelectedIndex(1);
                         Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => CreateTemplate()));
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CreateTemplate(),
+                          ),
+                        );
                       },
-                    ),
-                  ).paddingAll(value: Dimens.space10),
+                    ).paddingAll(value: Dimens.space10),
+                  ),
                 ],
               ).paddingSymmetric(horizontal: Dimens.space20),
             );
@@ -380,9 +513,17 @@ class _HomePageState extends State<HomePage> {
           if (state is HomeGetTemplateError) {
             return Center(
               child: Column(
-                spacing: Dimens.space20,
                 mainAxisSize: MainAxisSize.min,
+                spacing: Dimens.space20,
                 children: [
+                  Text(
+                    LocaleKeys.home_home_error.tr(),
+                    style: TextStyle(
+                      fontFamily: 'VelaSans',
+                      fontSize: Dimens.space16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                   UniversalButton.outline(
                     height: 50,
                     width: 200,
@@ -392,22 +533,18 @@ class _HomePageState extends State<HomePage> {
                           .read<HomeCubit>()
                           .getTemplate(saved: "", sortBy: "", searchText: "");
                     },
-                  )
+                  ),
                 ],
               ),
             );
           }
           return Center(
-            child: CircularProgressIndicator(),
+            child: CircularProgressIndicator(
+              color: AppColors.blueColor,
+            ),
           );
         },
       ),
     );
-  }
-
-  @override
-  void initState() {
-    context.read<HomeCubit>().getTemplate(saved: "", sortBy: "", searchText: "");
-    super.initState();
   }
 }

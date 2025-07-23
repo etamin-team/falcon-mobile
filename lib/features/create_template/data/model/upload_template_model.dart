@@ -6,6 +6,8 @@ import 'dart:convert';
 
 import 'package:wm_doctor/features/create_template/data/model/medicine_model.dart';
 
+import '../../../home/data/model/PreparationModel.dart';
+
 UploadTemplateModel uploadTemplateModelFromJson(String str) =>
     UploadTemplateModel.fromJson(json.decode(str));
 
@@ -131,4 +133,5 @@ class Preparation {
     "medicineId": medicineId,
     "medicine": medicine.toJson(),
   };
+
 }

@@ -53,8 +53,8 @@ class _AgentAddContractState extends State<AgentAddContract> {
   List<MedicineModel> preparations = [];
   List<MedicineModel> selectedPreparations = [];
   List<int> quantity = [];
-  LanguageModel location = LanguageModel(uz: "", ru: "", );
-  // LanguageModel location = LanguageModel(uz: "", ru: "", en: "");
+  // LanguageModel location = LanguageModel(uz: "", ru: "", );
+  LanguageModel location = LanguageModel(uz: "", ru: "", en: "");
   int locationId = 0;
   int workplaceId = 0;
   String doctorID = "";
@@ -1016,8 +1016,8 @@ class _AgentAddContractState extends State<AgentAddContract> {
     // Clear lists
 
     // Reset custom objects and strings to their initial values
-    location = LanguageModel(uz: "", ru: "");
-    // location = LanguageModel(uz: "", ru: "", en: "");
+    // location = LanguageModel(uz: "", ru: "");
+    location = LanguageModel(uz: "", ru: "", en: "");
     doctorID = "";
     locationDTO = "";
     workplaceDTO = "";

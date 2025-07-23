@@ -46,9 +46,9 @@ void showDoctorTypeList({
                   (index) {
                 return ListTile(
                   onTap: () {
-                    onchange(LanguageModel(uz: DoctorTypes.uzbekSelect[index],
-                        ru: DoctorTypes.russianSelect[index]));
-                    // onchange(LanguageModel(uz: DoctorTypes.uzbek[index], ru: DoctorTypes.russian[index], en: DoctorTypes.english[index]));
+                    // onchange(LanguageModel(uz: DoctorTypes.uzbekSelect[index],
+                    //     ru: DoctorTypes.russianSelect[index]));
+                    onchange(LanguageModel(uz: DoctorTypes.uzbek[index], ru: DoctorTypes.russian[index], en: DoctorTypes.english[index]));
 
                     realType(DoctorTypes.specialistsSelect[index]);
                     Navigator.pop(context);

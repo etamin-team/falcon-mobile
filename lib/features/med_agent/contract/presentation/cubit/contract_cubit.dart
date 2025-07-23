@@ -20,7 +20,6 @@ class ContractCubit extends Cubit<ContractState> {
     );
   }
   void getContractsWithFilter({
-
     required String districtId,
     required int workPlaceId,
     required String firstName,
@@ -30,7 +29,6 @@ class ContractCubit extends Cubit<ContractState> {
   }) async {
     emit(ContractLoading());
     final request = await contractRepositoryImpl.getContractWithFilter(
-
       districtId: districtId,
       workPlaceId: workPlaceId,
       firstName: firstName,

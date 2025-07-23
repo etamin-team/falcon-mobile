@@ -139,6 +139,28 @@ class _ContractDetailsState extends State<ContractDetails> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
+                                LocaleKeys.med_add_doctor_select_region_hint.tr(),
+                                style: TextStyle(fontSize: Dimens.space14),
+                              ),
+                              Text(
+                                state.districtModel?.name.tr() ?? LocaleKeys.med_add_doctor_select_region_hint.tr(),
+                                style: TextStyle(fontSize: Dimens.space14),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                              color: AppColors.backgroundColor,
+                              borderRadius:
+                                  BorderRadius.circular(Dimens.space10)),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: Dimens.space20,
+                              vertical: Dimens.space16),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
                                 LocaleKeys.med_add_doctor_select_workplace_hint.tr(),
                                 style: TextStyle(fontSize: Dimens.space14),
                               ),

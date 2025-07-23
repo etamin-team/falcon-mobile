@@ -11,8 +11,6 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import '../../../../../core/services/secure_storage.dart';
 import '../../../../../core/utils/text_mask.dart';
 import '../../../../../core/widgets/export.dart';
-import '../../../../main/presentation/cubit/main_page_cubit.dart';
-import '../../../../main/presentation/page/main_page.dart';
 import '../../../sign_up/presentation/page/sign_up_success.dart';
 import '../../../sign_up/presentation/widgets/language.dart';
 
@@ -154,7 +152,7 @@ class _SignInPageState extends State<SignInPage> {
                             return null;
                           },
                           withDecoration: true,
-                          prefixIcon: Text("+998 "),
+                          prefix: Text("+998 "),
                           hintColor: Colors.black,
                           onChanged: (value) {
                             // setState(() {

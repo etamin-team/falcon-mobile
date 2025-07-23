@@ -7,6 +7,7 @@ plugins {
 
 android {
     namespace = "com.world.medicine.wm_doctor"
+//    namespace = "com.mobile.app.app_mobile"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -24,7 +25,7 @@ android {
         applicationId "com.mobile.app"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        minSdk = 21//android5
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName

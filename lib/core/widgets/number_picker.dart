@@ -27,8 +27,9 @@ class _CupertinoNumberPickerState extends State<CupertinoNumberPicker> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      margin: EdgeInsets.symmetric(horizontal: Dimens.space30),
       height: 80,
-      width: 100,
+      width: 10,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
