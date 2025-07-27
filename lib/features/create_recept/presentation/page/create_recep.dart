@@ -1092,7 +1092,7 @@ class _CreateRecepState extends State<CreateRecep> {
         style: ToastificationStyle.flat,
         context: context,
         alignment: Alignment.topCenter,
-        title: const Text("Authentication token not found"),
+        title: const Text("Authentication token not  found"),
         autoCloseDuration: const Duration(seconds: 2),
         showProgressBar: false,
         primaryColor: Colors.white,
