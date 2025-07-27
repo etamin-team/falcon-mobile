@@ -1,57 +1,108 @@
-# 🦅 Falcon – Online Receipt
+# 📱 Falcon Mobile
 
-**A smart online prescription management system for doctors.**
+**Falcon Mobile** — это кроссплатформенное мобильное приложение, разработанное командой Etamin Team. Приложение предоставляет пользователям быстрый и удобный способ управления заказами, отслеживания данных в реальном времени и других ключевых функций.
 
-## 📌 About the Project
+---
 
-Falcon is an **online prescription management system** designed for doctors. It allows medical professionals to **create, save, and manage prescriptions** for their patients efficiently.
+## 🚀 Используемые технологии
 
-## 🚀 Technologies Used
+* **Flutter** – разработка кроссплатформенных мобильных приложений
+* **Dart** – основной язык программирования
+* **BLoC / Cubit** – управление состояниями приложения
+* **REST API** – взаимодействие с серверной частью
+* **Firebase** – если используется: авторизация, уведомления, аналитика
+* **Google Maps API** – интеграция карты
+* **Secure Storage / Local DB** – локальное хранение данных (Hive, SQLite и др.)
 
-The project is built using the following technologies:
+---
 
-- **Flutter** – UI development  
-- **Dio** – API requests  
-- **Bloc (Cubit)** – State management  
-- **Secure Storage** – Securely storing authentication tokens  
-- **Toastification** – User notifications  
+## 📁 Структура проекта
 
-## 📥 Installation
+```
+falcon-mobile/
+├── lib/
+│   ├── main.dart
+│   ├── src/
+│   │   ├── features/
+│   │   ├── models/
+│   │   ├── services/
+│   │   ├── widgets/
+│   │   └── utils/
+├── assets/
+│   ├── images/
+│   └── icons/
+├── pubspec.yaml
+└── README.md
+```
 
-To set up and run the project locally, follow these steps:
+---
 
-1️⃣ **Clone the repository:**  
-   ```sh
-   git clone https://github.com/S1MPL3coder/falcon-mobile.git
-   cd falcon-mobile
-   ```  
+## ⚙️ Установка и запуск
 
-2️⃣ **Install dependencies:**  
-   ```sh
-   flutter pub get
-   ```  
+### 🛠 Требования:
 
-3️⃣ **Run the application:**  
-   ```sh
-   flutter run
-   ```  
+* Flutter SDK (>=3.x)
+* Android Studio или VS Code
+* Эмулятор или физическое устройство
 
-## 🔑 Key Features
+### 🚀 Шаги по установке:
 
-✅ Doctors can **create prescriptions** for patients  
-✅ Save prescriptions as **templates for future use**  
-✅ Manage **medications, dosages, and instructions**  
-✅ **Secure authentication** using JWT tokens  
-✅ **User-friendly notifications** using toast messages  
+```bash
+# 1. Клонировать репозиторий
+git clone https://github.com/etamin-team/falcon-mobile.git
 
-## 🔌 API Configuration
+# 2. Перейти в папку проекта
+cd falcon-mobile
 
-If using a backend, configure API endpoints in `lib/core/network/api_client.dart`.
+# 3. Установить зависимости
+flutter pub get
 
-## 🛠 Developer
+# 4. Запустить приложение
+flutter run
+```
 
-👨‍💻 **Developer:** [S1MPL3coder](https://github.com/S1MPL3coder)  
+> ⚠️ Если используется Firebase, убедитесь, что `google-services.json` и `GoogleService-Info.plist` добавлены.
 
-## 📜 License
+---
 
-This project is licensed under the **MIT License** – see the [LICENSE](LICENSE) file for details.
+## 📅 Тестирование
+
+```bash
+flutter test
+```
+
+Юнит- и виджет-тесты находятся в папке `test/`.
+
+---
+
+## 📸 Скриншоты
+
+| Главная                               | Профиль                               | Карта                                 |
+| ------------------------------------- | ------------------------------------- | ------------------------------------- |
+| ![screen1](assets/images/screen1.png) | ![screen2](assets/images/screen2.png) | ![screen3](assets/images/screen3.png) |
+
+---
+
+## 📜 Лицензия
+
+Проект лицензирован под лицензией MIT. Подробнее в файле [`LICENSE`](LICENSE).
+
+---
+
+## 👨‍💼 Авторы
+
+* [Etamin Team](https://github.com/etamin-team)
+
+📅 Приглашаем к сотрудничеству! Создайте `fork`, реализуйте новую функциональность и отправьте Pull Request.
+
+---
+
+## 📬 Контакты
+
+* Telegram: [@etaminteam](https://t.me/etaminteam)
+* Email: [info@etamin.uz](mailto:info@etamin.uz)
+* Сайт: [etamin.uz](https://etamin.uz)
+
+---
+
+**Falcon Mobile** — это безопасный, производительный и современный инструмент для мобильного взаимодействия с данными и сервисами.
