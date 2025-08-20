@@ -1,4 +1,6 @@
-part of 'workplace_cubit.dart';
+import 'package:equatable/equatable.dart';
+import 'package:wm_doctor/core/error/failure.dart';
+import 'package:wm_doctor/features/auth/sign_up/data/model/workplace_model.dart';
 
 sealed class WorkplaceState extends Equatable {
   const WorkplaceState();
@@ -20,7 +22,7 @@ final class WorkplaceSuccess extends WorkplaceState {
   const WorkplaceSuccess({required this.workplace});
 
   @override
-  List<Object> get props => [];
+  List<Object> get props => [workplace];
 }
 
 final class WorkplaceError extends WorkplaceState {
@@ -29,5 +31,5 @@ final class WorkplaceError extends WorkplaceState {
   const WorkplaceError({required this.failure});
 
   @override
-  List<Object> get props => [];
+  List<Object> get props => [failure];
 }

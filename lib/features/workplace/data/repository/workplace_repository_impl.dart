@@ -8,9 +8,9 @@ import '../../../../core/utils/dependencies_injection.dart';
 
 class WorkplaceRepositoryImpl implements WorkplaceRepository {
   @override
-  Future<Either<Failure, List<WorkplaceModel>>> getWorkplace() async {
+  Future<Either<Failure, List<WorkplaceModel>>> getWorkplace(int regionId, int districtId) async {
     final request = await sl<ApiClient>()
-        .getMethod(pathUrl: "/auth/workplaces", isHeader: false);
+        .getMethod(pathUrl: "/auth/workplaces?regionId=$regionId&districtId=100", isHeader: false);
 
     if (request.isSuccess) {
       List<WorkplaceModel> list = [];

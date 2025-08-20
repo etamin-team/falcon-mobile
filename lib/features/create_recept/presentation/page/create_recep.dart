@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
@@ -69,7 +68,7 @@ class PrepContainerData {
 class CreateRecep extends StatefulWidget {
   final List<MnnModel> selectedMNNs;
 
-  const CreateRecep(this.selectedMNNs, {super.key});
+  CreateRecep(this.selectedMNNs, {super.key});
 
   @override
   State<CreateRecep> createState() => _CreateRecepState();
@@ -117,120 +116,177 @@ class _CreateRecepState extends State<CreateRecep> {
   void _addNewContainer() {
     setState(() {
       final newData = PrepContainerData(
-        selectedMNNs: widget.selectedMNNs,
-        medicineList: medicineList,
+        selectedMNNs: List.from(widget.selectedMNNs),
+        medicineList: List.from(medicineList),
       );
       preparationContainersData.add(newData);
       nameControllers.add(TextEditingController());
       debounceTimers.add(null);
       final index = preparationContainersData.length - 1;
-      preparationContainers.add(buildPreparationContainer(index));
+      preparationContainers.add(_buildPreparationContainer(index));
       lastAddIndex = index;
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return BlocConsumer<CreateRecepCubit, CreateRecepState>(
-      listener: (context, state) {
-        if (state is SendTelegramSuccess) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => ReceiptSuccessPage()),
-          );
-          _resetForm();
-        } else if (state is CreateRecepError || state is SendTelegramError) {
-          toastification.show(
-            style: ToastificationStyle.flat,
-            context: context,
-            alignment: Alignment.topCenter,
-            title: Text(
-              state is CreateRecepError
-                  ? state.failure.errorMsg
-                  : 'Failed to send Telegram message',
-            ),
-            autoCloseDuration: const Duration(seconds: 4),
-            showProgressBar: false,
-            primaryColor: Colors.white,
-            backgroundColor: Colors.redAccent,
-            foregroundColor: Colors.white,
-          );
-        }
-      },
-      builder: (context, state) {
-        if (state is CreateRecepLoading) {
-          return const Scaffold(body: Center(child: CircularProgressIndicator()));
-        }
+  void _updateTemplateData(TemplateModel value) {
+    final newData = value.preparations?.isNotEmpty == true
+        ? List<PrepContainerData>.generate(
+      value.preparations!.length,
+          (index) {
+        final prep = value.preparations![index];
+        final mnnFromTemplate =
+        (prep.medicine?.inn ?? [])
+            .whereType<Map<String, dynamic>>()
+            .map((item) => MnnModel.fromJson(item))
+            .toList();
 
-        return BlocListener<CreateTemplateCubit, CreateTemplateState>(
-          listener: (context, cstate) {
-            if (cstate is CreateTemplateGetMedicineSuccess) {
-              setState(() {
-                medicineList = cstate.list;
-                if (lastAddIndex >= 0 && lastAddIndex < preparationContainersData.length) {
-                  preparationContainersData[lastAddIndex] =
-                      preparationContainersData[lastAddIndex].copyWith(medicineList: cstate.list);
-                  preparationContainers[lastAddIndex] = buildPreparationContainer(lastAddIndex);
-                }
-              });
-            } else if (cstate is CreateTemplateGetMedicineError) {
-              toastification.show(
-                style: ToastificationStyle.flat,
-                context: context,
-                alignment: Alignment.topCenter,
-                title: Text(cstate.failure.errorMsg),
-                autoCloseDuration: const Duration(seconds: 2),
-                showProgressBar: false,
-                primaryColor: Colors.white,
-                backgroundColor: Colors.redAccent,
-                foregroundColor: Colors.white,
-              );
-            } else if (cstate is CreateTemplateUploadSuccess) {
-              toastification.show(
-                style: ToastificationStyle.flat,
-                context: context,
-                alignment: Alignment.topCenter,
-                title: Text(LocaleKeys.create_template_template_created.tr()),
-                autoCloseDuration: const Duration(seconds: 2),
-                showProgressBar: false,
-                primaryColor: Colors.white,
-                backgroundColor: Colors.green,
-                foregroundColor: Colors.white,
-              );
-            } else if (cstate is CreateTemplateUploadError) {
-              toastification.show(
-                style: ToastificationStyle.flat,
-                context: context,
-                alignment: Alignment.topCenter,
-                title: Text(cstate.failure.errorMsg),
-                autoCloseDuration: const Duration(seconds: 2),
-                showProgressBar: false,
-                primaryColor: Colors.white,
-                backgroundColor: Colors.redAccent,
-                foregroundColor: Colors.white,
-              );
-            }
-          },
-          child: buildScaffold(context),
+        return PrepContainerData(
+          selectedMNNs: List.from(mnnFromTemplate),
+          medicineList: List.from(medicineList),
+          preparation: PreparationModel(
+            name: prep.name ?? "",
+            amount: prep.amount.toString(),
+            medicineId: prep.medicineId ?? 0,
+            days: prep.days ?? 0,
+            timesInDay: prep.timesInDay ?? 0,
+            quantity: prep.quantity ?? 0,
+            type: prep.type ?? "",
+            inn: List.from(mnnFromTemplate),
+          ),
+          selectedPreparations: [
+            PreparationModel(
+              name: prep.name ?? "",
+              amount: prep.amount.toString(),
+              medicineId: prep.medicineId ?? 0,
+              days: prep.days ?? 0,
+              timesInDay: prep.timesInDay ?? 0,
+              quantity: prep.quantity ?? 0,
+              type: prep.type ?? "",
+              inn: List.from(mnnFromTemplate),
+            ),
+          ],
         );
       },
+    )
+        : [
+      PrepContainerData(
+        selectedMNNs: List.from(widget.selectedMNNs),
+        medicineList: List.from(medicineList),
+      )
+    ];
+
+    setState(() {
+      templateName = value.name ?? "";
+      diagnosisController.text = value.diagnosis ?? "";
+      commentController.text = value.note ?? "";
+      preparationContainersData = newData;
+      nameControllers.clear();
+      debounceTimers.clear();
+      nameControllers = List.generate(
+        newData.length,
+            (i) => TextEditingController(text: newData[i].preparation.name),
+      );
+      debounceTimers = List.generate(newData.length, (i) => null);
+      preparationContainers = List.generate(
+        newData.length,
+            (i) => _buildPreparationContainer(i),
+      );
+      lastAddIndex = newData.isEmpty ? -1 : newData.length - 1;
+    });
+
+    if (newData.isNotEmpty && newData.last.selectedMNNs.isNotEmpty) {
+      context
+          .read<CreateTemplateCubit>()
+          .getMedicine(inn: newData.last.selectedMNNs);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.of(context).pop();
+        return false;
+      },
+      child: BlocConsumer<CreateRecepCubit, CreateRecepState>(
+        listener: (context, state) {
+          if (state is SendTelegramSuccess) {
+            // Navigator.pushReplacement(
+            //   context,
+            //   MaterialPageRoute(builder: (context) => ReceiptSuccessPage()),
+            // );
+            _showToast(
+              context,'Квитанция успешно отправлена',
+              Colors.greenAccent,
+            );
+            _resetForm();
+          } else if (state is CreateRecepError || state is SendTelegramError) {
+            _showToast(
+              context,
+              state is CreateRecepError
+                  ? state.failure.errorMsg
+                  : 'Telegram xabarini yuborishda xatolik',
+              Colors.redAccent,
+            );
+          }
+        },
+        builder: (context, state) {
+          if (state is CreateRecepLoading) {
+            return  Scaffold(
+                body: Center(child: CircularProgressIndicator()));
+          }
+
+          return BlocListener<CreateTemplateCubit, CreateTemplateState>(
+            listener: (context, cstate) {
+              if (cstate is CreateTemplateGetMedicineSuccess) {
+                setState(() {
+                  medicineList = List.from(cstate.list);
+                  if (lastAddIndex >= 0 &&
+                      lastAddIndex < preparationContainersData.length) {
+                    preparationContainersData[lastAddIndex] =
+                        preparationContainersData[lastAddIndex].copyWith(
+                          medicineList: List.from(cstate.list),
+                        );
+                    preparationContainers[lastAddIndex] =
+                        _buildPreparationContainer(lastAddIndex);
+                  }
+                });
+              } else if (cstate is CreateTemplateGetMedicineError) {
+                _showToast(context, cstate.failure.errorMsg, Colors.redAccent);
+              } else if (cstate is CreateTemplateUploadSuccess) {
+                _showToast(
+                    context,
+                    LocaleKeys.create_template_template_created.tr(),
+                    Colors.green);
+              } else if (cstate is CreateTemplateUploadError) {
+                _showToast(context, cstate.failure.errorMsg, Colors.redAccent);
+              }
+            },
+            child: _buildScaffold(context),
+          );
+        },
+      ),
     );
   }
 
-  Widget buildScaffold(BuildContext context) {
+  Widget _buildScaffold(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
         forceMaterialTransparency: true,
         title: Text(
           LocaleKeys.create_recep_title.tr(),
-          style: TextStyle(
+          style:  TextStyle(
             fontFamily: 'VelaSans',
             fontSize: Dimens.space30,
             fontWeight: FontWeight.w800,
             color: Colors.black,
           ),
         ),
+        // leading: IconButton(
+        //   icon:  Icon(Icons.arrow_back),
+        //   onPressed: () => Navigator.of(context).pop(),
+        // ),
       ),
       body: SingleChildScrollView(
         child: Form(
@@ -238,10 +294,10 @@ class _CreateRecepState extends State<CreateRecep> {
           child: Column(
             spacing: Dimens.space10,
             children: [
-              buildTemplateSelection(),
-              buildNameField(),
-              buildBirthDateAndNumberField(),
-              buildDiagnosisField(),
+              _buildTemplateSelection(),
+              _buildNameField(),
+              _buildBirthDateAndNumberField(),
+              _buildDiagnosisField(),
               Column(children: preparationContainers),
               UniversalButton.filled(
                 onPressed: _addNewContainer,
@@ -250,10 +306,10 @@ class _CreateRecepState extends State<CreateRecep> {
                 textColor: AppColors.blueColor,
                 text: LocaleKeys.create_recep_add_preparations.tr(),
               ),
-              buildCommentField(),
+              _buildCommentField(),
               UniversalButton.filled(
                 text: LocaleKeys.create_recep_save_template.tr(),
-                onPressed: create_template,
+                onPressed: _createTemplate,
                 fontSize: Dimens.space14,
                 backgroundColor: AppColors.blueAccent20,
                 textColor: AppColors.blueColor,
@@ -261,7 +317,7 @@ class _CreateRecepState extends State<CreateRecep> {
               ),
               UniversalButton.filled(
                 text: LocaleKeys.create_recep_send_recep.tr(),
-                onPressed: createRecep,
+                onPressed: _createRecep,
                 fontSize: Dimens.space14,
                 backgroundColor: AppColors.blueColor,
                 cornerRadius: Dimens.space20,
@@ -274,78 +330,41 @@ class _CreateRecepState extends State<CreateRecep> {
     );
   }
 
-  Widget buildTemplateSelection() {
+  Widget _buildTemplateSelection() {
     return Container(
-      padding: EdgeInsets.all(Dimens.space20),
+      padding:  EdgeInsets.all(Dimens.space20),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(Dimens.space20),
         color: AppColors.white,
       ),
       child: GestureDetector(
-        onTap: () {
-          showModalBottomSheet(
-            showDragHandle: true,
-            enableDrag: true,
-            useSafeArea: true,
-            isScrollControlled: true,
-            backgroundColor: AppColors.backgroundColor,
-            context: context,
-            builder: (context) {
-              return TemplatePage(
-                isBottom: true,
-                onChange: (TemplateModel value) {
-                  setState(() {
-                    templateName = value.name ?? "";
-                    preparationContainersData = List.generate(
-                      value.preparations?.length ?? 0,
-                          (index) => PrepContainerData(
-                        selectedMNNs: widget.selectedMNNs,
-                        medicineList: medicineList,
-                        preparation: PreparationModel(
-                          name: value.preparations![index].name ?? "",
-                          amount: value.preparations![index].amount.toString(),
-                          medicineId: value.preparations![index].medicineId ?? 0,
-                          days: value.preparations![index].days ?? 0,
-                          timesInDay: value.preparations![index].timesInDay ?? 0,
-                          quantity: value.preparations![index].quantity ?? 0,
-                          type: value.preparations![index].type ?? "",
-                        ),
-                        selectedPreparations: [
-                          PreparationModel(
-                            name: value.preparations![index].name ?? "",
-                            amount: value.preparations![index].amount.toString(),
-                            medicineId: value.preparations![index].medicineId ?? 0,
-                            days: value.preparations![index].days ?? 0,
-                            timesInDay: value.preparations![index].timesInDay ?? 0,
-                            quantity: value.preparations![index].quantity ?? 0,
-                            type: value.preparations![index].type ?? "",
-                          ),
-                        ],
-                      ),
-                    );
-                    nameControllers = List.generate(
-                      value.preparations?.length ?? 0,
-                          (index) => TextEditingController(text: value.preparations![index].name ?? ""),
-                    );
-                    debounceTimers = List.generate(value.preparations?.length ?? 0, (index) => null);
-                    preparationContainers = List.generate(
-                      value.preparations?.length ?? 0,
-                          (index) => buildPreparationContainer(index),
-                    );
-                    diagnosisController.text = value.diagnosis ?? "";
-                    commentController.text = value.note ?? "";
-                    lastAddIndex = preparationContainersData.isEmpty ? -1 : preparationContainersData.length - 1;
-                    if (kDebugMode) {
-                      print("Template imported: ${value.name}");
-                    }
-                  });
-                },
-              );
-            },
-          );
-        },
+        // onTap: () async {
+        //   await showModalBottomSheet(
+        //     showDragHandle: true,
+        //     enableDrag: true,
+        //     useSafeArea: true,
+        //     isScrollControlled: true,
+        //     backgroundColor: AppColors.backgroundColor,
+        //     context: context,
+        //     builder: (dialogContext) => WillPopScope(
+        //       onWillPop: () async {
+        //         Navigator.of(dialogContext).pop();
+        //         return false;
+        //       },
+        //       child: TemplatePage(
+        //         isBottom: true,
+        //         onChange: (TemplateModel value) {
+        //           _updateTemplateData(value);
+        //           Navigator.of(dialogContext).pop();
+        //         },
+        //       ),
+        //     ),
+        //   );
+        // },
+
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: Dimens.space14, vertical: Dimens.space16),
+          padding:  EdgeInsets.symmetric(
+              horizontal: Dimens.space14, vertical: Dimens.space16),
           decoration: BoxDecoration(
             color: AppColors.backgroundColor,
             borderRadius: BorderRadius.circular(Dimens.space10),
@@ -355,8 +374,10 @@ class _CreateRecepState extends State<CreateRecep> {
             children: [
               Expanded(
                 child: Text(
-                  templateName.isEmpty ? LocaleKeys.create_recep_select_template.tr() : templateName,
-                  style: TextStyle(
+                  templateName.isEmpty
+                      ? LocaleKeys.create_recep_select_template.tr()
+                      : templateName,
+                  style:  TextStyle(
                     fontFamily: 'VelaSans',
                     fontSize: Dimens.space14,
                     fontWeight: FontWeight.w400,
@@ -374,9 +395,9 @@ class _CreateRecepState extends State<CreateRecep> {
     );
   }
 
-  Widget buildNameField() {
+  Widget _buildNameField() {
     return Container(
-      padding: EdgeInsets.all(Dimens.space20),
+      padding:  EdgeInsets.all(Dimens.space20),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(Dimens.space20),
         color: AppColors.white,
@@ -387,7 +408,7 @@ class _CreateRecepState extends State<CreateRecep> {
         children: [
           Text(
             LocaleKeys.create_recep_name.tr(),
-            style: TextStyle(
+            style:  TextStyle(
               fontFamily: 'VelaSans',
               fontSize: Dimens.space18,
               fontWeight: FontWeight.w700,
@@ -409,9 +430,9 @@ class _CreateRecepState extends State<CreateRecep> {
     );
   }
 
-  Widget buildBirthDateAndNumberField() {
+  Widget _buildBirthDateAndNumberField() {
     return Container(
-      padding: EdgeInsets.all(Dimens.space20),
+      padding:  EdgeInsets.all(Dimens.space20),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(Dimens.space20),
         color: AppColors.white,
@@ -422,7 +443,7 @@ class _CreateRecepState extends State<CreateRecep> {
         children: [
           Text(
             LocaleKeys.create_recep_birthdate_and_number.tr(),
-            style: TextStyle(
+            style:  TextStyle(
               fontFamily: 'VelaSans',
               fontSize: Dimens.space18,
               fontWeight: FontWeight.w700,
@@ -430,7 +451,7 @@ class _CreateRecepState extends State<CreateRecep> {
             ),
           ),
           GestureDetector(
-            onTap: () => showDatePickerBottomSheet(context),
+            onTap: () => _showDatePickerBottomSheet(context),
             child: AppTextField(
               textColor: Colors.black,
               isEnabled: false,
@@ -457,7 +478,7 @@ class _CreateRecepState extends State<CreateRecep> {
             ),
           ),
           AppTextField(
-            prefixIcon: Text(
+            prefixIcon:  Text(
               textAlign: TextAlign.center,
               "+998  ",
               style: TextStyle(fontFamily: 'VelaSans', color: Colors.black),
@@ -482,9 +503,9 @@ class _CreateRecepState extends State<CreateRecep> {
     );
   }
 
-  Widget buildDiagnosisField() {
+  Widget _buildDiagnosisField() {
     return Container(
-      padding: EdgeInsets.all(Dimens.space20),
+      padding:  EdgeInsets.all(Dimens.space20),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(Dimens.space20),
         color: AppColors.white,
@@ -495,7 +516,7 @@ class _CreateRecepState extends State<CreateRecep> {
         children: [
           Text(
             LocaleKeys.create_recep_diagnose.tr(),
-            style: TextStyle(
+            style:  TextStyle(
               fontFamily: 'VelaSans',
               fontSize: Dimens.space18,
               fontWeight: FontWeight.w700,
@@ -517,9 +538,9 @@ class _CreateRecepState extends State<CreateRecep> {
     );
   }
 
-  Widget buildCommentField() {
+  Widget _buildCommentField() {
     return Container(
-      padding: EdgeInsets.all(Dimens.space20),
+      padding:  EdgeInsets.all(Dimens.space20),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(Dimens.space20),
         color: AppColors.white,
@@ -530,7 +551,7 @@ class _CreateRecepState extends State<CreateRecep> {
         children: [
           Text(
             LocaleKeys.create_recep_add_comment.tr(),
-            style: TextStyle(
+            style:  TextStyle(
               fontFamily: 'VelaSans',
               fontSize: Dimens.space18,
               fontWeight: FontWeight.w700,
@@ -548,11 +569,11 @@ class _CreateRecepState extends State<CreateRecep> {
     );
   }
 
-  Widget buildPreparationContainer(int index) {
+  Widget _buildPreparationContainer(int index) {
     if (index >= preparationContainersData.length ||
         index >= nameControllers.length ||
         index >= debounceTimers.length) {
-      return const Text("Index error", style: TextStyle(color: Colors.red));
+      return  Text("Index xatosi", style: TextStyle(color: Colors.red));
     }
 
     final containerData = preparationContainersData[index];
@@ -561,24 +582,48 @@ class _CreateRecepState extends State<CreateRecep> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (containerData.selectedPreparations.isNotEmpty &&
-          nameController.text != containerData.selectedPreparations.first.name) {
+          nameController.text !=
+              containerData.selectedPreparations.first.name) {
         nameController.text = containerData.selectedPreparations.first.name;
       }
     });
 
     const availableTypes = [
-      'Tablet', 'Capsule', 'Syrup', 'Injection', 'Ointment', 'Cream', 'Gel',
-      'Spray', 'Inhaler', 'Drops', 'Suppository', 'Powder', 'Lozenge', 'Patch',
-      'Solution', 'Suspension', 'Emulsion', 'Lotion', 'Foam', 'Granules',
-      'Ampoule', 'Vial', 'Shampoo', 'Mouthwash', 'Nasal Spray', 'Eye Drops',
-      'Ear Drops', 'Nebulizer Solution',
+      'Tablet',
+      'Capsule',
+      'Syrup',
+      'Injection',
+      'Ointment',
+      'Cream',
+      'Gel',
+      'Spray',
+      'Inhaler',
+      'Drops',
+      'Suppository',
+      'Powder',
+      'Lozenge',
+      'Patch',
+      'Solution',
+      'Suspension',
+      'Emulsion',
+      'Lotion',
+      'Foam',
+      'Granules',
+      'Ampoule',
+      'Vial',
+      'Shampoo',
+      'Mouthwash',
+      'Nasal Spray',
+      'Eye Drops',
+      'Ear Drops',
+      'Nebulizer Solution',
     ];
 
     return Container(
       key: ValueKey('prep_container_$index'),
       width: double.infinity,
-      margin: const EdgeInsets.only(top: 10),
-      padding: EdgeInsets.all(Dimens.space20),
+      margin:  EdgeInsets.only(top: 10),
+      padding:  EdgeInsets.all(Dimens.space20),
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(20),
@@ -591,7 +636,7 @@ class _CreateRecepState extends State<CreateRecep> {
             children: [
               Text(
                 LocaleKeys.create_recep_select.tr(),
-                style: TextStyle(
+                style:  TextStyle(
                   fontFamily: 'VelaSans',
                   fontWeight: FontWeight.w700,
                   fontSize: Dimens.space18,
@@ -609,7 +654,7 @@ class _CreateRecepState extends State<CreateRecep> {
                       debounceTimers.removeAt(index);
                       preparationContainers = List.generate(
                         preparationContainersData.length,
-                            (i) => buildPreparationContainer(i),
+                            (i) => _buildPreparationContainer(i),
                       );
                       lastAddIndex = lastAddIndex == index
                           ? preparationContainersData.isEmpty
@@ -619,17 +664,8 @@ class _CreateRecepState extends State<CreateRecep> {
                           ? lastAddIndex - 1
                           : lastAddIndex;
                     } else {
-                      toastification.show(
-                        style: ToastificationStyle.flat,
-                        context: context,
-                        alignment: Alignment.topCenter,
-                        title: const Text("At least one preparation is required"),
-                        autoCloseDuration: const Duration(seconds: 2),
-                        showProgressBar: false,
-                        primaryColor: Colors.white,
-                        backgroundColor: Colors.redAccent,
-                        foregroundColor: Colors.white,
-                      );
+                      _showToast(
+                          context, "Kamida bitta dori kerak", Colors.redAccent);
                     }
                   });
                 },
@@ -641,7 +677,7 @@ class _CreateRecepState extends State<CreateRecep> {
               ),
             ],
           ),
-          const SizedBox(height: 5),
+          SizedBox(height: 5),
           UniversalButton.filled(
             text: LocaleKeys.create_recep_select_mnn.tr(),
             onPressed: () => showMNN(
@@ -653,21 +689,24 @@ class _CreateRecepState extends State<CreateRecep> {
                 setState(() {
                   lastAddIndex = index;
                   preparationContainersData[index] = containerData.copyWith(
-                    selectedMNNs: updatedList,
+                    selectedMNNs: List.from(updatedList),
                     medicineList: [],
                     selectedPreparations: [],
                     preparation: PreparationModel(
                       name: nameController.text.isNotEmpty ? nameController.text : '',
                       amount: '',
-                      quantity: 1,
-                      timesInDay: 1,
-                      days: 1,
-                      type: '',
-                      medicineId: 0,
+                      quantity: med.quantity > 0 ? med.quantity : 1,       // oldingi qiymatni saqlash
+                      timesInDay: med.timesInDay > 0 ? med.timesInDay : 1, // oldingi qiymatni saqlash
+                      days: med.days > 0 ? med.days : 1,                   // oldingi qiymatni saqlash
+                      type: med.type.isNotEmpty ? med.type : '',
+                      medicineId: med.medicineId > 0 ? med.medicineId : 0,
                     ),
                   );
+
                   if (updatedList.isNotEmpty) {
-                    context.read<CreateTemplateCubit>().getMedicine(inn: updatedList);
+                    context
+                        .read<CreateTemplateCubit>()
+                        .getMedicine(inn: updatedList);
                   }
                 });
               },
@@ -682,39 +721,58 @@ class _CreateRecepState extends State<CreateRecep> {
               spacing: 8.0,
               runSpacing: 8.0,
               children: containerData.selectedMNNs
-                  .map((mnn) => Chip(
-                label: Text(mnn.name ?? "null", style: const TextStyle(color: Colors.black)),
-                deleteIcon: const Icon(Icons.remove_circle),
-                deleteIconColor: AppColors.redAccent,
-                backgroundColor: AppColors.backgroundColor,
-                side: BorderSide.none,
-                onDeleted: () {
-                  setState(() {
-                    preparationContainersData[index] = containerData.copyWith(
-                      selectedMNNs: containerData.selectedMNNs.where((item) => item != mnn).toList(),
-                      medicineList: [],
-                      selectedPreparations: [],
-                      preparation: PreparationModel(
-                        name: nameController.text.isNotEmpty ? nameController.text : '',
-                        amount: '',
-                        quantity: 1,
-                        timesInDay: 1,
-                        days: 1,
-                        type: '',
-                        medicineId: 0,
-                      ),
-                    );
-                  });
-                },
-              ))
+                  .asMap()
+                  .entries
+                  .map(
+                    (entry) => Chip(
+                  key: ValueKey('mnn_${entry.key}_${entry.value.id}'),
+                  label: Text(
+                    entry.value.name ?? "null",
+                    style:  TextStyle(color: Colors.black),
+                  ),
+                  deleteIcon:  Icon(Icons.remove_circle),
+                  deleteIconColor: AppColors.redAccent,
+                  backgroundColor: AppColors.backgroundColor,
+                  side: BorderSide.none,
+                  onDeleted: () {
+                    setState(() {
+                      final updatedMNNs = List<MnnModel>.from(
+                          containerData.selectedMNNs)
+                        ..removeWhere((item) => item.id == entry.value.id);
+                      preparationContainersData[index] =
+                          containerData.copyWith(
+                            selectedMNNs: updatedMNNs,
+                            medicineList: [],
+                            selectedPreparations: [],
+                            preparation: PreparationModel(
+                              name: nameController.text.isNotEmpty ? nameController.text : '',
+                              amount: '',
+                              quantity: med.quantity > 0 ? med.quantity : 1,
+                              timesInDay: med.timesInDay > 0 ? med.timesInDay : 1,
+                              days: med.days > 0 ? med.days : 1,
+                              type: med.type.isNotEmpty ? med.type : '',
+                              medicineId: med.medicineId > 0 ? med.medicineId : 0,
+                            ),
+
+                          );
+                      if (updatedMNNs.isNotEmpty) {
+                        context
+                            .read<CreateTemplateCubit>()
+                            .getMedicine(inn: updatedMNNs);
+                      }
+                    });
+                  },
+                ),
+              )
                   .toList(),
             ),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           TextField(
             controller: nameController,
             decoration: InputDecoration(
               labelText: LocaleKeys.create_recep_select_medicine.tr(),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+              border:
+              OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
               filled: true,
               fillColor: AppColors.backgroundColor,
               suffixIcon: containerData.medicineList.isNotEmpty
@@ -726,63 +784,64 @@ class _CreateRecepState extends State<CreateRecep> {
                 ),
                 onPressed: () {
                   if (containerData.selectedMNNs.isEmpty) {
-                    toastification.show(
-                      style: ToastificationStyle.flat,
-                      context: context,
-                      alignment: Alignment.topCenter,
-                      title: const Text("Please select MNNs first"),
-                      autoCloseDuration: const Duration(seconds: 2),
-                      showProgressBar: false,
-                      primaryColor: Colors.white,
-                      backgroundColor: Colors.redAccent,
-                      foregroundColor: Colors.white,
-                    );
+                    _showToast(context, "Avval MNNlarni tanlang",
+                        Colors.redAccent);
                     return;
                   }
+                  context
+                      .read<CreateTemplateCubit>()
+                      .getMedicine(inn: containerData.selectedMNNs);
                   try {
                     showMedicine(
                       ctx: context,
                       model: (value) {
                         setState(() {
                           final newPreparation = PreparationModel(
-                            name: value.name ?? "Unknown",
+                            name: value.name ?? "Noma'lum",
                             amount: "${value.prescription ?? ''} ${value.volume ?? ''}".trim(),
-                            quantity: 1,
-                            timesInDay: 1,
-                            days: 1,
-                            inn: value.inn,
-                            type: value.type ?? "Unknown",
+                            quantity: med.quantity > 0 ? med.quantity : 1,
+                            timesInDay: med.timesInDay > 0 ? med.timesInDay : 1,
+                            days: med.days > 0 ? med.days : 1,
+                            inn: value.inn != null
+                                ? (value.inn as List<dynamic>)
+                                .map((item) => MnnModel.fromJson(item as Map<String, dynamic>))
+                                .toList()
+                                : [],
+                            type: value.type ?? "Noma'lum",
                             medicineId: value.id ?? 0,
                           );
-                          preparationContainersData[index] = containerData.copyWith(
-                            preparation: newPreparation,
-                            selectedPreparations: [newPreparation],
-                          );
-                          nameController.text = value.name ?? "Unknown";
-                          preparationContainers[index] = buildPreparationContainer(index);
-                          if (kDebugMode) {
-                            print("Selected medicine: name=${value.name}, medicineId=${value.id}");
-                          }
+
+                          preparationContainersData[index] =
+                              containerData.copyWith(
+                                selectedMNNs: value.inn != null
+                                    ? (value.inn as List<dynamic>)
+                                    .map((item) => MnnModel.fromJson(
+                                    item as Map<String, dynamic>))
+                                    .toList()
+                                    : [],
+                                preparation: newPreparation,
+                                selectedPreparations: [newPreparation],
+                                medicineList: containerData
+                                    .medicineList.isNotEmpty
+                                    ? List.from(containerData.medicineList)
+                                    : List.from(medicineList),
+                              );
+                          nameControllers[index].text =
+                              value.name ?? "Noma'lum";
+                          preparationContainers[index] =
+                              _buildPreparationContainer(index);
                         });
-                        Navigator.pop(context);
+                        Navigator.of(context).pop();
                       },
-                      medicine: containerData.medicineList,
+                      medicine: containerData.medicineList.isNotEmpty
+                          ? containerData.medicineList
+                          : medicineList,
                     );
                   } catch (e) {
-                    toastification.show(
-                      style: ToastificationStyle.flat,
-                      context: context,
-                      alignment: Alignment.topCenter,
-                      title: const Text("Error displaying medicines"),
-                      autoCloseDuration: const Duration(seconds: 2),
-                      showProgressBar: false,
-                      primaryColor: Colors.white,
-                      backgroundColor: Colors.redAccent,
-                      foregroundColor: Colors.white,
-                    );
-                    if (kDebugMode) {
-                      print("Error in showMedicine: $e");
-                    }
+                    _showToast(
+                        context,
+                        "Dorilar ro'yxatini ko'rsatishda xatolik",
+                        Colors.redAccent);
                   }
                 },
               )
@@ -792,77 +851,105 @@ class _CreateRecepState extends State<CreateRecep> {
             textInputAction: TextInputAction.done,
             onChanged: (value) {
               debounceTimers[index]?.cancel();
-              debounceTimers[index] = Timer(const Duration(milliseconds: 300), () {
-                setState(() {
-                  final matchingMedicine = containerData.medicineList.firstWhere(
-                        (medicine) => medicine.name?.toLowerCase() == value.toLowerCase(),
-                    orElse: () => MedicineModel(name: value, id: 0, type: med.type, inn: containerData.selectedMNNs.isNotEmpty ? containerData.selectedMNNs : null),
-                  );
-                  final updatedMed = PreparationModel(
-                    name: value,
-                    amount: med.amount.isNotEmpty ? med.amount : matchingMedicine.prescription != null && matchingMedicine.volume != null
-                        ? "${matchingMedicine.prescription} ${matchingMedicine.volume}".trim()
-                        : '',
-                    quantity: med.quantity > 0 ? med.quantity : 1,
-                    timesInDay: med.timesInDay > 0 ? med.timesInDay : 1,
-                    days: med.days > 0 ? med.days : 1,
-                    type: med.type.isNotEmpty ? med.type : matchingMedicine.type ?? '',
-                    medicineId: matchingMedicine.id ?? 0,
-                    inn: containerData.selectedMNNs.isNotEmpty ? containerData.selectedMNNs : null,
-                  );
-                  preparationContainersData[index] = containerData.copyWith(
-                    preparation: updatedMed,
-                    selectedPreparations: [updatedMed],
-                  );
-                  if (kDebugMode) {
-                    print("Manual input: name=$value, medicineId=${updatedMed.medicineId}, inn=${updatedMed.inn}");
-                  }
-                });
-              });
+              debounceTimers[index] =
+                  Timer( Duration(milliseconds: 300), () {
+                    setState(() {
+                      final matchingMedicine =
+                      containerData.medicineList.firstWhere(
+                            (medicine) =>
+                        medicine.name?.toLowerCase() == value.toLowerCase(),
+                        orElse: () => MedicineModel(
+                          name: value,
+                          id: 0,
+                          type: med.type,
+                          inn: containerData.selectedMNNs.isNotEmpty
+                              ? List.from(containerData.selectedMNNs)
+                              : null,
+                        ),
+                      );
+                      final updatedMed = PreparationModel(
+                        name: value,
+                        amount: med.amount.isNotEmpty
+                            ? med.amount
+                            : matchingMedicine.prescription != null &&
+                            matchingMedicine.volume != null
+                            ? "${matchingMedicine.prescription} ${matchingMedicine.volume}"
+                            .trim()
+                            : '',
+                        quantity: med.quantity > 0 ? med.quantity : 1,
+                        timesInDay: med.timesInDay > 0 ? med.timesInDay : 1,
+                        days: med.days > 0 ? med.days : 1,
+                        type: med.type.isNotEmpty
+                            ? med.type
+                            : matchingMedicine.type ?? '',
+                        medicineId: matchingMedicine.id ?? 0,
+                        inn: containerData.selectedMNNs.isNotEmpty
+                            ? List.from(containerData.selectedMNNs)
+                            : null,
+                      );
+                      preparationContainersData[index] = containerData.copyWith(
+                        preparation: updatedMed,
+                        selectedPreparations: [updatedMed],
+                      );
+                    });
+                  });
             },
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           Row(
             children: [
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+                  padding:
+                  EdgeInsets.symmetric(horizontal: 20, vertical: 0),
                   decoration: BoxDecoration(
                     color: AppColors.backgroundColor,
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: DropdownButtonFormField<String>(
                     isExpanded: true,
-                    value: med.type.isNotEmpty && availableTypes.contains(med.type) ? med.type : null,
-                    decoration: const InputDecoration(
+                    value:
+                    med.type.isNotEmpty && availableTypes.contains(med.type)
+                        ? med.type
+                        : null,
+                    decoration:  InputDecoration(
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.symmetric(vertical: 16),
                     ),
-                    hint: const Text(
-                      "Select Type",
-                      style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: Colors.grey),
+                    hint:  Text(
+                      "Turni tanlang",
+                      style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12,
+                          color: Colors.grey),
                     ),
-                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: Colors.black),
+                    style:  TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                        color: Colors.black),
                     items: availableTypes
-                        .map((type) => DropdownMenuItem<String>(value: type, child: Text(type)))
+                        .map((type) => DropdownMenuItem<String>(
+                        value: type, child: Text(type)))
                         .toList(),
                     onChanged: (value) {
                       if (value != null) {
                         setState(() {
-                          preparationContainersData[index] = containerData.copyWith(
-                            preparation: med.copyWith(type: value),
-                            selectedPreparations: [med.copyWith(type: value)],
-                          );
+                          preparationContainersData[index] =
+                              containerData.copyWith(
+                                preparation: med.copyWith(type: value),
+                                selectedPreparations: [med.copyWith(type: value)],
+                              );
                         });
                       }
                     },
                   ),
                 ),
               ),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 0),
+                  padding:
+                  EdgeInsets.symmetric(horizontal: 20, vertical: 0),
                   decoration: BoxDecoration(
                     color: AppColors.backgroundColor,
                     borderRadius: BorderRadius.circular(10),
@@ -871,25 +958,29 @@ class _CreateRecepState extends State<CreateRecep> {
                     initialValue: med.amount,
                     onChanged: (value) {
                       setState(() {
-                        preparationContainersData[index] = containerData.copyWith(
-                          preparation: med.copyWith(amount: value),
-                          selectedPreparations: [med.copyWith(amount: value)],
-                        );
+                        preparationContainersData[index] =
+                            containerData.copyWith(
+                              preparation: med.copyWith(amount: value),
+                              selectedPreparations: [med.copyWith(amount: value)],
+                            );
                       });
                     },
                     keyboardType: TextInputType.text,
-                    decoration: const InputDecoration(
-                      hintText: "Amount",
+                    decoration:  InputDecoration(
+                      hintText: "Miqdori",
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.symmetric(vertical: 16),
                     ),
-                    style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: Colors.black),
+                    style:  TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                        color: Colors.black),
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           Row(
             children: [
               Expanded(
@@ -899,14 +990,16 @@ class _CreateRecepState extends State<CreateRecep> {
                   onChanged: (value) {
                     if (value < 1) return;
                     debounceTimers[index]?.cancel();
-                    debounceTimers[index] = Timer(const Duration(milliseconds: 300), () {
-                      setState(() {
-                        preparationContainersData[index] = containerData.copyWith(
-                          preparation: med.copyWith(quantity: value),
-                          selectedPreparations: [med.copyWith(quantity: value)],
-                        );
-                      });
-                    });
+                    debounceTimers[index] =
+                        Timer( Duration(milliseconds: 300), () {
+                          setState(() {
+                            preparationContainersData[index] =
+                                containerData.copyWith(
+                                  preparation: med.copyWith(quantity: value),
+                                  selectedPreparations: [med.copyWith(quantity: value)],
+                                );
+                          });
+                        });
                   },
                 ),
               ),
@@ -917,14 +1010,18 @@ class _CreateRecepState extends State<CreateRecep> {
                   onChanged: (value) {
                     if (value < 1) return;
                     debounceTimers[index]?.cancel();
-                    debounceTimers[index] = Timer(const Duration(milliseconds: 300), () {
-                      setState(() {
-                        preparationContainersData[index] = containerData.copyWith(
-                          preparation: med.copyWith(timesInDay: value),
-                          selectedPreparations: [med.copyWith(timesInDay: value)],
-                        );
-                      });
-                    });
+                    debounceTimers[index] =
+                        Timer( Duration(milliseconds: 300), () {
+                          setState(() {
+                            preparationContainersData[index] =
+                                containerData.copyWith(
+                                  preparation: med.copyWith(timesInDay: value),
+                                  selectedPreparations: [
+                                    med.copyWith(timesInDay: value)
+                                  ],
+                                );
+                          });
+                        });
                   },
                 ),
               ),
@@ -935,14 +1032,16 @@ class _CreateRecepState extends State<CreateRecep> {
                   onChanged: (value) {
                     if (value < 1) return;
                     debounceTimers[index]?.cancel();
-                    debounceTimers[index] = Timer(const Duration(milliseconds: 300), () {
-                      setState(() {
-                        preparationContainersData[index] = containerData.copyWith(
-                          preparation: med.copyWith(days: value),
-                          selectedPreparations: [med.copyWith(days: value)],
-                        );
-                      });
-                    });
+                    debounceTimers[index] =
+                        Timer( Duration(milliseconds: 300), () {
+                          setState(() {
+                            preparationContainersData[index] =
+                                containerData.copyWith(
+                                  preparation: med.copyWith(days: value),
+                                  selectedPreparations: [med.copyWith(days: value)],
+                                );
+                          });
+                        });
                   },
                 ),
               ),
@@ -955,7 +1054,8 @@ class _CreateRecepState extends State<CreateRecep> {
                 child: Center(
                   child: Text(
                     LocaleKeys.create_recep_quantity.tr(),
-                    style: GoogleFonts.ubuntu(fontWeight: FontWeight.w500, fontSize: Dimens.space12),
+                    style: GoogleFonts.ubuntu(
+                        fontWeight: FontWeight.w500, fontSize: Dimens.space12),
                   ),
                 ),
               ),
@@ -963,7 +1063,8 @@ class _CreateRecepState extends State<CreateRecep> {
                 child: Center(
                   child: Text(
                     LocaleKeys.create_recep_times.tr(),
-                    style: GoogleFonts.ubuntu(fontWeight: FontWeight.w500, fontSize: Dimens.space12),
+                    style: GoogleFonts.ubuntu(
+                        fontWeight: FontWeight.w500, fontSize: Dimens.space12),
                   ),
                 ),
               ),
@@ -971,7 +1072,8 @@ class _CreateRecepState extends State<CreateRecep> {
                 child: Center(
                   child: Text(
                     LocaleKeys.create_recep_days.tr(),
-                    style: GoogleFonts.ubuntu(fontWeight: FontWeight.w500, fontSize: Dimens.space12),
+                    style: GoogleFonts.ubuntu(
+                        fontWeight: FontWeight.w500, fontSize: Dimens.space12),
                   ),
                 ),
               ),
@@ -982,25 +1084,13 @@ class _CreateRecepState extends State<CreateRecep> {
     );
   }
 
-  void createRecep() async {
-    if (!formKey.currentState!.validate() || preparationContainersData.isEmpty) {
-      showValidationError();
-      return;
-    }
+  void _createRecep() async {
+    if (!_validateForm()) return;
 
     final token = await SecureStorage().read(key: "accessToken") ?? "";
     if (token.isEmpty) {
-      toastification.show(
-        style: ToastificationStyle.flat,
-        context: context,
-        alignment: Alignment.topCenter,
-        title: const Text("Authentication token not found"),
-        autoCloseDuration: const Duration(seconds: 2),
-        showProgressBar: false,
-        primaryColor: Colors.white,
-        backgroundColor: Colors.redAccent,
-        foregroundColor: Colors.white,
-      );
+      _showToast(
+          context, "Autentifikatsiya tokeni topilmadi", Colors.redAccent);
       return;
     }
 
@@ -1008,7 +1098,8 @@ class _CreateRecepState extends State<CreateRecep> {
     final docID = decodedToken["sub"];
 
     final validPreparations = preparationContainersData
-        .where((e) => e.preparation.name.isNotEmpty)
+        .where((e) =>
+    e.preparation.name.isNotEmpty && e.preparation.type.isNotEmpty)
         .map((e) => Preparation(
       name: e.preparation.name,
       amount: e.preparation.amount,
@@ -1020,11 +1111,19 @@ class _CreateRecepState extends State<CreateRecep> {
       medicine: MedicineModel(
         id: e.preparation.medicineId,
         name: e.preparation.name,
-        inn: e.selectedMNNs.isNotEmpty ? e.selectedMNNs : null,
+        inn: e.selectedMNNs.isNotEmpty
+            ? List.from(e.selectedMNNs)
+            : null,
         type: e.preparation.type,
       ),
     ))
         .toList();
+
+    if (validPreparations.isEmpty) {
+      _showToast(
+          context, LocaleKeys.create_recep_add_medicine.tr(), Colors.redAccent);
+      return;
+    }
 
     context.read<CreateRecepCubit>().saveRecep(
       model: RecepModel(
@@ -1043,62 +1142,26 @@ class _CreateRecepState extends State<CreateRecep> {
       ),
     );
 
-    final message = buildTelegramMessage();
+    final message = _buildTelegramMessage();
     context.read<CreateRecepCubit>().sendTelegramData(
       number: "998${numberController.text.trim().replaceAll(" ", "")}",
       message: message,
     );
   }
 
-  void create_template() async {
-    if (!formKey.currentState!.validate()) {
-      showValidationError();
-      return;
-    }
+  void _createTemplate() async {
+    if (!_validateForm()) return;
 
     if (preparationContainersData.isEmpty) {
-      toastification.show(
-        style: ToastificationStyle.flat,
-        context: context,
-        alignment: Alignment.topCenter,
-        title: Text(LocaleKeys.create_recep_add_medicine.tr()),
-        autoCloseDuration: const Duration(seconds: 2),
-        showProgressBar: false,
-        primaryColor: Colors.white,
-        backgroundColor: Colors.redAccent,
-        foregroundColor: Colors.white,
-      );
-      return;
-    }
-
-    if (preparationContainersData.every((e) => e.preparation.name.isEmpty)) {
-      toastification.show(
-        style: ToastificationStyle.flat,
-        context: context,
-        alignment: Alignment.topCenter,
-        title: Text(LocaleKeys.create_recep_select_medicine.tr()),
-        autoCloseDuration: const Duration(seconds: 2),
-        showProgressBar: false,
-        primaryColor: Colors.white,
-        backgroundColor: Colors.redAccent,
-        foregroundColor: Colors.white,
-      );
+      _showToast(
+          context, LocaleKeys.create_recep_add_medicine.tr(), Colors.redAccent);
       return;
     }
 
     final token = await SecureStorage().read(key: "accessToken") ?? "";
     if (token.isEmpty) {
-      toastification.show(
-        style: ToastificationStyle.flat,
-        context: context,
-        alignment: Alignment.topCenter,
-        title: const Text("Authentication token not  found"),
-        autoCloseDuration: const Duration(seconds: 2),
-        showProgressBar: false,
-        primaryColor: Colors.white,
-        backgroundColor: Colors.redAccent,
-        foregroundColor: Colors.white,
-      );
+      _showToast(
+          context, "Autentifikatsiya tokeni topilmadi", Colors.redAccent);
       return;
     }
 
@@ -1106,7 +1169,8 @@ class _CreateRecepState extends State<CreateRecep> {
     final uuid = decodedToken["sub"] ?? "";
 
     final validPreparations = preparationContainersData
-        .where((e) => e.preparation.name.isNotEmpty)
+        .where((e) =>
+    e.preparation.name.isNotEmpty && e.preparation.type.isNotEmpty)
         .map((e) => Preparation(
       name: e.preparation.name,
       amount: e.preparation.amount,
@@ -1118,21 +1182,25 @@ class _CreateRecepState extends State<CreateRecep> {
       medicine: MedicineModel(
         id: e.preparation.medicineId,
         name: e.preparation.name,
-        inn: e.selectedMNNs.isNotEmpty ? e.selectedMNNs : null,
+        inn: e.selectedMNNs.isNotEmpty
+            ? List.from(e.selectedMNNs)
+            : null,
         type: e.preparation.type,
       ),
     ))
         .toList();
 
+    if (validPreparations.isEmpty) {
+      _showToast(context, LocaleKeys.create_recep_select_medicine.tr(),
+          Colors.redAccent);
+      return;
+    }
+
     final effectiveTemplateName = templateName.isEmpty
         ? diagnosisController.text.trim().isNotEmpty
         ? diagnosisController.text.trim()
-        : "Unnamed Template ${DateTime.now().millisecondsSinceEpoch}"
+        : "Nomsiz shablon ${DateTime.now().millisecondsSinceEpoch}"
         : templateName;
-
-    if (kDebugMode) {
-      print("Saving template: $effectiveTemplateName, Preparations: ${validPreparations.map((e) => {'name': e.name, 'medicineId': e.medicineId, 'inn': e.medicine?.inn}).toList()}");
-    }
 
     context.read<CreateTemplateCubit>().uploadTemplate(
       model: UploadTemplateModel(
@@ -1140,7 +1208,7 @@ class _CreateRecepState extends State<CreateRecep> {
         diagnosis: diagnosisController.text.trim(),
         preparations: validPreparations,
         note: commentController.text.trim(),
-        saved: false,
+        saved: true,
         doctorId: uuid,
       ),
     );
@@ -1164,38 +1232,45 @@ class _CreateRecepState extends State<CreateRecep> {
     });
   }
 
-  String buildTelegramMessage() {
-    var message = '💊 Пациент: ${nameController.text.trim()}\n\n';
-    message += 'Дата рождения: ${birthDateController.text}\n\n';
-    message += '🩺 Диагноз: ${diagnosisController.text.trim()}\n\n';
-    message += '📝 Рецепт:\n\n';
+  String _buildTelegramMessage() {
+    var message = '💊 Bemor: ${nameController.text.trim()}\n\n';
+    message += 'Tug\'ilgan sana: ${birthDateController.text}\n\n';
+    message += '🩺 Diagnoz: ${diagnosisController.text.trim()}\n\n';
+    message += '📝 Retsept:\n\n';
 
     var receiptDetails = '';
     for (var container in preparationContainersData) {
-      if (container.preparation.name.isNotEmpty) {
+      if (container.preparation.name.isNotEmpty &&
+          container.preparation.type.isNotEmpty) {
         final prep = container.preparation;
-        final mnnName = container.selectedMNNs.isNotEmpty ? '[${container.selectedMNNs.first.name ?? ''}]' : '';
+        final mnnName = container.selectedMNNs.isNotEmpty
+            ? '[${container.selectedMNNs.first.name ?? ''}]'
+            : '';
         receiptDetails +=
-        '✅ ${prep.name} $mnnName ${prep.amount} ${prep.quantity} ${prep.type} * ${prep.timesInDay} раз в день (${prep.days} дней)\n';
+        '✅ ${prep.name} $mnnName ${prep.amount} ${prep.quantity} ${prep.type} * ${prep.timesInDay} marta kuniga (${prep.days} kun)\n';
       }
     }
 
     message += receiptDetails.isNotEmpty
         ? receiptDetails
-        : '✅ Нет назначенных препаратов\n';
+        : '✅ Tayinlangan dorilar yo\'q\n';
 
     if (commentController.text.trim().isNotEmpty) {
-      message += '\nПримечание: ${commentController.text.trim()}\n';
-    }
-
-    if (kDebugMode) {
-      print("Telegram message: $message");
+      message += '\nIzoh: ${commentController.text.trim()}\n';
     }
 
     return message;
   }
 
-  void showValidationError() {
+  bool _validateForm() {
+    if (!formKey.currentState!.validate()) {
+      _showValidationError();
+      return false;
+    }
+    return true;
+  }
+
+  void _showValidationError() {
     String? errorMessage;
     if (nameController.text.isEmpty) {
       errorMessage = LocaleKeys.create_recep_enter_name.tr();
@@ -1208,21 +1283,25 @@ class _CreateRecepState extends State<CreateRecep> {
     }
 
     if (errorMessage != null) {
-      toastification.show(
-        style: ToastificationStyle.flat,
-        context: context,
-        alignment: Alignment.topCenter,
-        title: Text(errorMessage),
-        autoCloseDuration: const Duration(seconds: 4),
-        showProgressBar: false,
-        primaryColor: Colors.white,
-        backgroundColor: Colors.redAccent,
-        foregroundColor: Colors.white,
-      );
+      _showToast(context, errorMessage, Colors.redAccent);
     }
   }
 
-  Future<void> showDatePickerBottomSheet(BuildContext ctx) async {
+  void _showToast(BuildContext context, String message, Color backgroundColor) {
+    toastification.show(
+      style: ToastificationStyle.flat,
+      context: context,
+      alignment: Alignment.topCenter,
+      title: Text(message),
+      autoCloseDuration:  Duration(seconds: 2),
+      showProgressBar: false,
+      primaryColor: Colors.white,
+      backgroundColor: backgroundColor,
+      foregroundColor: Colors.white,
+    );
+  }
+
+  Future<void> _showDatePickerBottomSheet(BuildContext ctx) async {
     DateTime dateTime = selectedDate ?? DateTime.now();
     if (birthDateController.text.length == 10) {
       final format = DateFormat("dd/MM/yyyy");
@@ -1238,10 +1317,10 @@ class _CreateRecepState extends State<CreateRecep> {
           height: 350,
           child: Column(
             children: [
-              const SizedBox(height: 30),
+              SizedBox(height: 30),
               Text(
                 LocaleKeys.sign_up_select_date.tr(),
-                style: const TextStyle(
+                style:  TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
@@ -1262,7 +1341,7 @@ class _CreateRecepState extends State<CreateRecep> {
               CupertinoButton(
                 child: Text(
                   LocaleKeys.sign_up_save.tr(),
-                  style: const TextStyle(
+                  style:  TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.w600,
                   ),
@@ -1270,78 +1349,14 @@ class _CreateRecepState extends State<CreateRecep> {
                 onPressed: () {
                   setState(() {
                     selectedDate = dateTime;
-                    birthDateController.text = DateFormat('dd/MM/yyyy').format(dateTime);
+                    birthDateController.text =
+                        DateFormat('dd/MM/yyyy').format(dateTime);
                   });
-                  Navigator.pop(context);
+                  Navigator.of(context).pop();
                 },
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20),
             ],
-          ),
-        );
-      },
-    );
-  }
-
-  void showInputAmount({
-    required String name,
-    required double amount,
-    required ValueChanged<double> onChange,
-  }) {
-    final textController = TextEditingController(text: amount.toString());
-    final quantForm = GlobalKey<FormState>();
-
-    showModalBottomSheet(
-      isScrollControlled: true,
-      enableDrag: true,
-      showDragHandle: true,
-      context: context,
-      builder: (context) {
-        return Form(
-          key: quantForm,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            spacing: Dimens.space20,
-            children: [
-              Text(
-                name,
-                style:  TextStyle(
-                  fontSize: Dimens.space18,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              TextFormField(
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                validator: (value) {
-                  if (value?.isEmpty ?? true) {
-                    return "kamida 1 ta bo'lishi kerak";
-                  }
-                  final number = double.tryParse(value!);
-                  if (number == null || number < 1) {
-                    return "0 bo'lmasligi kerak";
-                  }
-                  return null;
-                },
-                maxLength: 5,
-                controller: textController,
-                decoration: const InputDecoration(hintText: "1"),
-              ),
-              UniversalButton.filled(
-                text: "Сохранить",
-                onPressed: () {
-                  if (quantForm.currentState!.validate()) {
-                    final number = double.parse(textController.text.trim());
-                    onChange(number);
-                    Navigator.pop(context);
-                  }
-                },
-              ), SizedBox(height: Dimens.space50),
-            ],
-          ).paddingOnly(
-            left: Dimens.space30,
-            right: Dimens.space30,
-            top: Dimens.space20,
-            bottom: MediaQuery.of(context).viewInsets.bottom,
           ),
         );
       },

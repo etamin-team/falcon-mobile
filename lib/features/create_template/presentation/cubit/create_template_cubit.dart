@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wm_doctor/features/create_template/data/model/mnn_model.dart';
 
 import '../../../../core/error/failure.dart';
+import '../../../../core/network/api_client.dart';
+import '../../../../core/utils/dependencies_injection.dart';
 import '../../../home/data/model/template_model.dart';
 import '../../data/model/medicine_model.dart';
 import '../../data/model/upload_template_model.dart';
@@ -20,7 +22,6 @@ class CreateTemplateCubit extends Cubit<CreateTemplateState> {
     List<String>? newInn = inn.map((e) => e.id.toString()).toList();
     print("----------------------------------------------------");
     print(newInn);
-    
     emit(CreateTemplateGetMedicineLoading());
     final request = await createTemplateRepositoryImpl.getMedicine(inn: newInn);
     request.fold(

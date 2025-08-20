@@ -39,7 +39,6 @@ class _SignPageState extends State<SignPage> {
           if(!isDataDownload){
 
             context.read<RegionsCubit>().getRegions();
-            context.read<WorkplaceCubit>().getWorkplace();
           }
           internet = true;
         } else {
@@ -52,7 +51,6 @@ class _SignPageState extends State<SignPage> {
       },
     );
     context.read<RegionsCubit>().getRegions();
-    context.read<WorkplaceCubit>().getWorkplace();
     super.initState();
   }
 
@@ -107,49 +105,37 @@ class _SignPageState extends State<SignPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  LocaleKeys.texts_welcome.tr(),
-                  style: TextStyle(
-                    fontFamily: 'VelaSans',
-                      fontWeight: FontWeight.w400, fontSize: 32),
+                Center(
+                  child: Text(
+                    textAlign: TextAlign.center,
+                    LocaleKeys.texts_welcome.tr(),
+                    style: TextStyle(
+                      fontFamily: 'VelaSans',
+                        fontWeight: FontWeight.w400, fontSize: 32),
+                  ),
                 ),
                 SizedBox(),
                 SizedBox(),
-                Row(
-                  spacing: Dimens.space10,
-                  children: [
-                    Expanded(
-                      flex: 1,
-                      child: UniversalButton.filled(
-                        fontSize: 12,
-                        height: Dimens.space60,
-                        text: LocaleKeys.texts_sign_up.tr(),
-                        textFontWeight: FontWeight.w400,
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => SignUpPage()));
-                        },
-                      ),
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: UniversalButton.outline(
-
-                        height: Dimens.space60,
-                        textFontWeight: FontWeight.w400,
-                        text: LocaleKeys.texts_sign_in.tr(),
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => SignInPage()));
-                        },
-                      ),
-                    ),
-                  ],
-                )
+                UniversalButton.filled(
+                    text: LocaleKeys.texts_sign_up.tr(),
+                    textFontWeight: FontWeight.w400,
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => SignUpPage()));
+                    },
+                  ),
+                UniversalButton.outline(
+                    textFontWeight: FontWeight.w400,
+                    text: LocaleKeys.texts_sign_in.tr(),
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => SignInPage()));
+                    },
+                  ),
               ],
             ),
           ),

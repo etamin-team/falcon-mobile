@@ -47,6 +47,26 @@ class TemplateModel {
       'saved': saved,
     };
   }
+
+  TemplateModel copyWith({
+    int? id,
+    String? name,
+    String? diagnosis,
+    List<TemplatePreparation>? preparations,
+    String? note,
+    String? doctorId,
+    bool? saved,
+  }) {
+    return TemplateModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      diagnosis: diagnosis ?? this.diagnosis,
+      preparations: preparations ?? this.preparations,
+      note: note ?? this.note,
+      doctorId: doctorId ?? this.doctorId,
+      saved: saved ?? this.saved,
+    );
+  }
 }
 
 class TemplatePreparation {

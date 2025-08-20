@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:toastification/toastification.dart';
 import 'package:wm_doctor/core/extensions/widget_extensions.dart';
 import 'package:wm_doctor/core/model/language_model.dart';
@@ -50,14 +49,10 @@ class _SignUpDataState extends State<SignUpData> {
   final birthDateController = TextEditingController();
   bool isMen = true;
   bool isObscureText = true;
-  // LanguageModel city = LanguageModel(uz: "", ru: "");
   LanguageModel city = LanguageModel(uz: "", ru: "", en: "");
-  // LanguageModel doctorTypeName = LanguageModel(uz: "", ru: "");
   LanguageModel doctorTypeName = LanguageModel(uz: "", ru: "", en: "");
-  // LanguageModel doctorPosition = LanguageModel(uz: "", ru: "");
   LanguageModel doctorPosition = LanguageModel(uz: "", ru: "", en: "");
   String workplace = "";
-
   int districtId = 0;
   int workplaceId = 0;
 
@@ -108,19 +103,15 @@ class _SignUpDataState extends State<SignUpData> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Color(0xFFEBF2FA), // Yuqori qism uchun rang
-                Color(0xFFD7E9F6), // Yuqori qism uchun rang
-                Color(0xFF98B0F9), // Pastki qism uchun rang
+                Color(0xFFEBF2FA),
+                Color(0xFFD7E9F6),
+                Color(0xFF98B0F9),
               ],
             ),
           ),
           child: Scaffold(
             backgroundColor: CupertinoColors.transparent,
             appBar: AppBar(
-              // title: Image.asset(
-              //   Assets.images.logo.path,
-              //   height: 40,
-              // ),
               toolbarHeight: Dimens.space100,
               automaticallyImplyLeading: false,
               forceMaterialTransparency: true,
@@ -156,7 +147,7 @@ class _SignUpDataState extends State<SignUpData> {
               child: Scrollbar(
                 trackVisibility: true,
                 thickness: 5,
-                radius: Radius.circular(5), // T
+                radius: Radius.circular(5),
                 child: SingleChildScrollView(
                   child: Form(
                     key: formKey,
@@ -225,13 +216,9 @@ class _SignUpDataState extends State<SignUpData> {
                               keyboardType: TextInputType.datetime,
                               formatter: [
                                 TextMask(pallet: '##/##/####'),
-                                // DateFormatter(),
                                 LengthLimitingTextInputFormatter(10),
                               ],
                               suffixIcon: InkWell(
-                                // onTap: () {
-                                //   showDatePickerBottomSheet(context);
-                                // },
                                 child: SvgPicture.asset(
                                   Assets.icons.calendar,
                                   height: Dimens.space14,
@@ -301,13 +288,13 @@ class _SignUpDataState extends State<SignUpData> {
                           ],
                         ),
                         CustomDropDownCard(
-                          title: LocaleKeys.sign_up_region.tr(),
                           validator: (value) {
                             if (value.toString().isEmpty) {
-                              return LocaleKeys.sign_up_select_address.tr();
+                              return LocaleKeys.sign_up_region.tr();
                             }
                             return null;
                           },
+                          title: LocaleKeys.sign_up_region.tr(),
                           onClick: () {
                             showRegions(
                               ctx: context,
@@ -328,7 +315,7 @@ class _SignUpDataState extends State<SignUpData> {
                             );
                           },
                           textController: addressController,
-                          hint: LocaleKeys.sign_up_select_address.tr(),
+                          hint: LocaleKeys.sign_up_region.tr(),
                         ),
                         CustomDropDownCard(
                           validator: (value) {
@@ -346,14 +333,14 @@ class _SignUpDataState extends State<SignUpData> {
                                   workplace = value;
                                   workplaceController.text = value;
                                 });
-                                if (formKey.currentState!.validate()) {}
                               },
                               id: (value) {
                                 setState(() {
                                   workplaceId = value;
                                 });
-                                if (formKey.currentState!.validate()) {}
                               },
+                              selectedRegionID: districtId,
+                              selectedDistrictID: districtId,
                             );
                           },
                           textController: workplaceController,
@@ -362,7 +349,7 @@ class _SignUpDataState extends State<SignUpData> {
                         CustomDropDownCard(
                           validator: (value) {
                             if (value.toString().isEmpty) {
-                              return LocaleKeys.sign_up_select_type.tr();
+                              return LocaleKeys.sign_up_doctor_type.tr();
                             }
                             return null;
                           },
@@ -384,7 +371,7 @@ class _SignUpDataState extends State<SignUpData> {
                             );
                           },
                           textController: doctorTypeController,
-                          hint: LocaleKeys.sign_up_select_type.tr(),
+                          hint: LocaleKeys.sign_up_doctor_type.tr(),
                         ),
                         CustomDropDownCard(
                           validator: (value) {
@@ -444,9 +431,6 @@ class _SignUpDataState extends State<SignUpData> {
                             obscureText: isObscureText,
                             keyboardType: TextInputType.visiblePassword,
                             formatter: [
-                              // TextMask(pallet: '+998 ## ### ## ##'),
-                              // FilteringTextInputFormatter.allow(RegExp(r'^\+?[0-9\s]*$'),
-                              //     replacementString: ""),
                               LengthLimitingTextInputFormatter(20),
                             ],
                             title: LocaleKeys.sign_up_password.tr(),
@@ -457,7 +441,6 @@ class _SignUpDataState extends State<SignUpData> {
                               if (value.toString() != passwordController.text) {
                                 return LocaleKeys.sign_up_enter_rePassword.tr();
                               }
-
                               return null;
                             },
                             suffixIcon: IconButton(
@@ -473,9 +456,6 @@ class _SignUpDataState extends State<SignUpData> {
                             obscureText: isObscureText,
                             keyboardType: TextInputType.visiblePassword,
                             formatter: [
-                              // TextMask(pallet: '+998 ## ### ## ##'),
-                              // FilteringTextInputFormatter.allow(RegExp(r'^\+?[0-9\s]*$'),
-                              //     replacementString: ""),
                               LengthLimitingTextInputFormatter(20),
                             ],
                             title: LocaleKeys.sign_up_rePassword.tr(),
@@ -505,11 +485,6 @@ class _SignUpDataState extends State<SignUpData> {
                               child: UniversalButton.filled(
                                 height: Dimens.space60,
                                 fontSize: Dimens.space14,
-                                // icon: Icon(
-                                //   CupertinoIcons.arrow_right,
-                                //   color: Colors.white,
-                                //   size: 25,
-                                // ),
                                 text: LocaleKeys.sign_up_continue.tr(),
                                 textFontWeight: FontWeight.w400,
                                 onPressed: () {
@@ -517,11 +492,11 @@ class _SignUpDataState extends State<SignUpData> {
                                     context.read<SignUpCubit>().signUp(
                                         data: {
                                           "firstName":
-                                              nameController.text.trim(),
+                                          nameController.text.trim(),
                                           "lastName":
-                                              lastNameController.text.trim(),
+                                          lastNameController.text.trim(),
                                           "middleName":
-                                              middleNameController.text.trim(),
+                                          middleNameController.text.trim(),
                                           "phoneNumber": numberController.text
                                               .trim()
                                               .substring(4),
@@ -532,14 +507,13 @@ class _SignUpDataState extends State<SignUpData> {
                                               .trim()
                                               .replaceAll("+", ""),
                                           "password":
-                                              passwordController.text.trim(),
+                                          passwordController.text.trim(),
                                           "birthDate": DateFormat('yyyy-MM-dd')
                                               .format(selectedDate!),
                                           "gender": isMen ? "MALE" : "FEMALE",
                                           "workPlaceId": workplaceId,
                                           "fieldName":
-                                              // doctorTypeName.en.toUpperCase(),
-                                              doctorTypeName.en.toUpperCase(),
+                                          doctorTypeName.en.toUpperCase(),
                                           "position": doctorPosition.uz,
                                           "districtId": districtId
                                         },
@@ -548,7 +522,7 @@ class _SignUpDataState extends State<SignUpData> {
                                             .replaceAll(" ", "")
                                             .replaceAll("+", ""),
                                         password:
-                                            passwordController.text.trim());
+                                        passwordController.text.trim());
                                   } else {
                                     toastification.show(
                                       style: ToastificationStyle.flat,
@@ -559,7 +533,7 @@ class _SignUpDataState extends State<SignUpData> {
                                         maxLines: 5,
                                       ),
                                       autoCloseDuration:
-                                          const Duration(seconds: 3),
+                                      const Duration(seconds: 3),
                                       showProgressBar: false,
                                       primaryColor: Colors.white,
                                       backgroundColor: Colors.redAccent,
@@ -595,11 +569,7 @@ class _SignUpDataState extends State<SignUpData> {
     return showModalBottomSheet(
       context: ctx,
       isScrollControlled: true,
-      // BottomSheet o'lchamini moslashuvchan qiladi
       backgroundColor: Colors.white,
-      // shape: const RoundedRectangleBorder(
-      //   borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      // ),
       builder: (BuildContext context) {
         return SizedBox(
           height: 350,
@@ -618,7 +588,7 @@ class _SignUpDataState extends State<SignUpData> {
                   mode: CupertinoDatePickerMode.date,
                   dateOrder: DatePickerDateOrder.dmy,
                   initialDateTime:
-                      selectedDate == null ? DateTime(2024) : selectedDate!,
+                  selectedDate == null ? DateTime(2024) : selectedDate!,
                   minimumDate: DateTime(1900),
                   maximumDate: DateTime(2024),
                   onDateTimeChanged: (DateTime newDate) {
@@ -657,19 +627,19 @@ class _SignUpDataState extends State<SignUpData> {
       context,
       MaterialPageRoute(
           builder: (context) => SignUpSuccessPage(
-                title: LocaleKeys.sign_up_sign_up_title.tr(),
-                text: LocaleKeys.sign_up_sign_up_text.tr(),
-              )),
-      (route) => false,
+            title: LocaleKeys.sign_up_sign_up_title.tr(),
+            text: LocaleKeys.sign_up_sign_up_text.tr(),
+          )),
+          (route) => false,
     );
   }
 
   Widget CustomDropDownCard(
       {required TextEditingController textController,
-      required String title,
-      required String hint,
-      required VoidCallback onClick,
-      required FormFieldValidator<String?>? validator}) {
+        required String title,
+        required String hint,
+        required VoidCallback onClick,
+        required FormFieldValidator<String?>? validator}) {
     return GestureDetector(
       onTap: onClick,
       child: AppTextField(

@@ -4,5 +4,5 @@ import '../../../../core/error/failure.dart';
 import '../../../auth/sign_up/data/model/workplace_model.dart';
 
 abstract class WorkplaceRepository {
-  Future<Either<Failure, List<WorkplaceModel>>> getWorkplace();
+  Future<Either<Failure, List<WorkplaceModel>>> getWorkplace(int regionId, int districtId);
 }

@@ -1,23 +1,18 @@
-import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
-import 'package:wm_doctor/core/error/failure.dart';
-import 'package:wm_doctor/features/workplace/data/repository/workplace_repository_impl.dart';
-
-import '../../../auth/sign_up/data/model/workplace_model.dart';
-
-part 'workplace_state.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:wm_doctor/features/workplace/domain/repository/workplace_repositort.dart';
+import 'package:wm_doctor/features/workplace/presentation/cubit/workplace_state.dart';
 
 class WorkplaceCubit extends Cubit<WorkplaceState> {
-  final WorkplaceRepositoryImpl workplaceRepositoryImpl;
+  final WorkplaceRepository repository;
 
-  WorkplaceCubit(this.workplaceRepositoryImpl) : super(WorkplaceInitial());
+  WorkplaceCubit(this.repository) : super(WorkplaceInitial());
 
-  void getWorkplace() async {
+  Future<void> getWorkplace(int regionId, int districtId) async {
     emit(WorkplaceLoading());
-    final request = await workplaceRepositoryImpl.getWorkplace();
-    request.fold(
-      (l) => emit(WorkplaceError(failure: l)),
-      (r) => emit(WorkplaceSuccess(workplace: r)),
+    final result = await repository.getWorkplace(regionId, districtId);
+    result.fold(
+          (failure) => emit(WorkplaceError(failure: failure)),
+          (workplaces) => emit(WorkplaceSuccess(workplace: workplaces)),
     );
   }
 }

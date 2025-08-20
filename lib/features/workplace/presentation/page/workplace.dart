@@ -10,17 +10,25 @@ import 'package:wm_doctor/features/workplace/presentation/cubit/workplace_cubit.
 
 import '../../../../gen/locale_keys.g.dart';
 import '../../../auth/sign_up/data/model/workplace_model.dart';
+import '../cubit/workplace_state.dart';
 
 class WorkplacePage extends StatefulWidget {
   final ValueChanged<String> name;
   final ValueChanged<int> id;
+  final int regionId;
+  final int districtId;
 
-  const WorkplacePage({super.key, required this.name, required this.id});
+  const WorkplacePage({
+    super.key,
+    required this.name,
+    required this.id,
+    required this.regionId,
+    required this.districtId,
+  });
 
   @override
   State<WorkplacePage> createState() => _WorkplacePageState();
 }
-
 
 class _WorkplacePageState extends State<WorkplacePage> {
   final searchController = TextEditingController();
@@ -28,7 +36,7 @@ class _WorkplacePageState extends State<WorkplacePage> {
 
   @override
   void initState() {
-    context.read<WorkplaceCubit>().getWorkplace(); // Doktorlarni yuklash
+    context.read<WorkplaceCubit>().getWorkplace(widget.regionId, widget.districtId);
     super.initState();
   }
 
@@ -73,8 +81,8 @@ class _WorkplacePageState extends State<WorkplacePage> {
             if (searchController.text.isNotEmpty) {
               list = state.workplace
                   .where((element) => (element.name)
-                      .toLowerCase()
-                      .startsWith(searchController.text.trim().toLowerCase()))
+                  .toLowerCase()
+                  .startsWith(searchController.text.trim().toLowerCase()))
                   .toList();
             }
             return Column(
@@ -97,7 +105,7 @@ class _WorkplacePageState extends State<WorkplacePage> {
                       spacing: Dimens.space10,
                       children: List.generate(
                         list.length,
-                        (index) {
+                            (index) {
                           return GestureDetector(
                             onTap: () {
                               widget.name(list[index].name);
@@ -108,7 +116,7 @@ class _WorkplacePageState extends State<WorkplacePage> {
                               decoration: BoxDecoration(
                                   color: AppColors.white,
                                   borderRadius:
-                                      BorderRadius.circular(Dimens.space10)),
+                                  BorderRadius.circular(Dimens.space10)),
                               padding: EdgeInsets.symmetric(
                                   horizontal: Dimens.space20,
                                   vertical: Dimens.space12),

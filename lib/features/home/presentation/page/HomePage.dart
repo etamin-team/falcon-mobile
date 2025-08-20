@@ -9,6 +9,7 @@ import 'package:wm_doctor/features/profile/presentation/cubit/profile_cubit.dart
 import 'package:wm_doctor/features/template/presentation/page/templates.dart';
 import 'package:wm_doctor/gen/locale_keys.g.dart';
 import '../../../preparad/presentation/page/preparad.dart';
+import '../../../template/presentation/page/template_page.dart';
 import '../cubit/home_cubit.dart';
 
 class HomePage extends StatefulWidget {
@@ -196,13 +197,10 @@ class _HomePageState extends State<HomePage> {
                                                       .preparations!.isNotEmpty;
                                           return GestureDetector(
                                             onTap: () {
-                                              // Uncomment and implement navigation to template details if needed
                                               // Navigator.push(
                                               //   context,
                                               //   MaterialPageRoute(
-                                              //     builder: (context) => TemplatePage2(
-                                              //       model: template,
-                                              //     ),
+                                              //     builder: (context) => TemplatePage2(model: template),
                                               //   ),
                                               // );
                                             },
@@ -226,7 +224,7 @@ class _HomePageState extends State<HomePage> {
                                                           .start,
                                                       children: [
                                                         Text(
-                                                          template.name ?? "",
+                                                          template.name?.toUpperCase() ?? "",
                                                           style: TextStyle(
                                                             fontFamily:
                                                             'VelaSans',

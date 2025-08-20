@@ -51,7 +51,6 @@ class _MainPageState extends State<MainPage> {
               context.read<MainPageCubit>().checkToken();
             }
             context.read<RegionsCubit>().getRegions();
-            context.read<WorkplaceCubit>().getWorkplace();
           }
           internet = true;
         } else {
